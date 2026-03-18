@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Điều Khoản Sử Dụng – PetShop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --off-white: #f7f4ef;
+      --warm-white: #fdfbf8;
+      --ink: #1a1714;
+      --ink-light: #4a4540;
+      --ink-muted: #8a8178;
+      --rule: #d9d3c8;
+      --accent: #c8601a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--warm-white);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HERO ── */
+    .tos-hero {
+      background: var(--ink);
+      padding: 72px 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 48px;
+      border-bottom: 1px solid #2e2a27;
+      position: relative;
+      overflow: hidden;
+    }
+    .tos-hero::after {
+      content: '';
+      position: absolute;
+      left: -60px; bottom: -60px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,96,26,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .tos-hero-eyebrow {
+      font-size: 0.72rem; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 20px;
+    }
+    .tos-hero h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 600; line-height: 1.2; color: #fff;
+      margin-bottom: 16px;
+    }
+    .tos-hero-desc {
+      font-size: 0.92rem; line-height: 1.85;
+      color: rgba(255,255,255,.5); max-width: 520px;
+    }
+    .tos-meta {
+      text-align: right; flex-shrink: 0;
+    }
+    .tos-meta-date {
+      font-family: 'Lora', serif;
+      font-size: 0.78rem; color: rgba(255,255,255,.3);
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .tos-meta-val {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem; font-weight: 600;
+      color: rgba(255,255,255,.6);
+    }
+
+    /* ── LAYOUT ── */
+    .tos-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 70vh;
+    }
+
+    /* ── SIDEBAR / TOC ── */
+    .tos-sidebar {
+      border-right: 1px solid var(--rule);
+      padding: 48px 0;
+      position: sticky;
+      top: 0;
+      height: fit-content;
+    }
+    .toc-label {
+      font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink-muted); padding: 0 32px;
+      margin-bottom: 20px; display: block;
+    }
+    .toc-list { list-style: none; }
+    .toc-list li a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 32px;
+      font-size: 0.84rem; color: var(--ink-muted);
+      text-decoration: none;
+      transition: color .2s, background .2s;
+      border-left: 2px solid transparent;
+    }
+    .toc-list li a:hover { color: var(--ink); background: var(--off-white); }
+    .toc-list li a.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: #fff8f4;
+    }
+    .toc-list li a .toc-num {
+      font-family: 'Lora', serif;
+      font-size: 0.72rem; font-weight: 600;
+      color: var(--rule); flex-shrink: 0; width: 20px;
+    }
+    .toc-list li a.active .toc-num { color: var(--accent); }
+    .toc-divider { height: 1px; background: var(--rule); margin: 16px 32px; }
+
+    /* ── CONTENT ── */
+    .tos-content { padding: 56px 64px 80px; }
+
+    .tos-section {
+      margin-bottom: 64px;
+      padding-bottom: 64px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .tos-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .tos-section-head {
+      display: flex; align-items: flex-start; gap: 20px;
+      margin-bottom: 28px;
+    }
+    .tos-section-num {
+      font-family: 'Lora', serif;
+      font-size: 2rem; font-weight: 600;
+      color: var(--rule); line-height: 1;
+      flex-shrink: 0; padding-top: 4px;
+    }
+    .tos-section h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.35rem; font-weight: 600;
+      color: var(--ink); line-height: 1.3;
+    }
+    .tos-section h2 em { font-style: italic; color: var(--accent); }
+
+    .tos-section p {
+      font-size: 0.92rem; line-height: 1.95;
+      color: var(--ink-light); margin-bottom: 16px;
+    }
+    .tos-section p:last-child { margin-bottom: 0; }
+
+    .tos-section ul, .tos-section ol {
+      padding-left: 0; list-style: none;
+      display: flex; flex-direction: column; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .tos-section ul li, .tos-section ol li {
+      font-size: 0.9rem; line-height: 1.85;
+      color: var(--ink-light);
+      display: flex; align-items: flex-start; gap: 12px;
+      padding-left: 0;
+    }
+    .tos-section ul li::before {
+      content: '—'; color: var(--accent);
+      font-weight: 600; flex-shrink: 0; margin-top: 2px;
+    }
+    .tos-section ol { counter-reset: tos-counter; }
+    .tos-section ol li { counter-increment: tos-counter; }
+    .tos-section ol li::before {
+      content: counter(tos-counter, decimal-leading-zero);
+      font-family: 'Lora', serif;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--accent); flex-shrink: 0; margin-top: 3px;
+      min-width: 24px;
+    }
+
+    /* Highlight box */
+    .tos-highlight {
+      background: var(--off-white);
+      border-left: 3px solid var(--accent);
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+    .tos-highlight p {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 0.92rem; line-height: 1.7;
+      color: var(--ink); margin: 0;
+    }
+
+    /* Warning box */
+    .tos-warning {
+      background: #fff8f4;
+      border: 1px solid #f5c4b0;
+      border-radius: 2px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .tos-warning-icon { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+    .tos-warning p {
+      font-size: 0.88rem; line-height: 1.75;
+      color: var(--ink-light); margin: 0;
+    }
+    .tos-warning strong { color: var(--accent); }
+
+    /* Info box */
+    .tos-info {
+      background: #eef4ff;
+      border: 1px solid #c0d4f7;
+      border-radius: 2px;
+      padding: 18px 22px;
+      margin: 20px 0;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .tos-info-icon { font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+    .tos-info p { font-size: 0.88rem; line-height: 1.75; color: #3a5a9a; margin: 0; }
+
+    /* Tag */
+    .tos-tag {
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 3px 10px;
+      background: var(--off-white); color: var(--ink-muted);
+      border: 1px solid var(--rule); margin-bottom: 12px;
+    }
+
+    /* Contact CTA at bottom */
+    .tos-cta {
+      background: var(--ink);
+      padding: 56px 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 48px;
+      border-top: 1px solid var(--rule);
+    }
+    .tos-cta h3 {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem; font-weight: 600;
+      color: #fff; margin-bottom: 10px;
+    }
+    .tos-cta p {
+      font-size: 0.88rem; line-height: 1.8;
+      color: rgba(255,255,255,.5); max-width: 480px;
+    }
+    .btn-accent {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--accent); color: #fff;
+      text-decoration: none; font-size: 0.82rem;
+      font-weight: 500; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 14px 28px;
+      border: none; cursor: pointer; white-space: nowrap;
+      transition: background .2s, transform .2s;
+    }
+    .btn-accent:hover { background: #a84f14; transform: translateY(-1px); color: #fff; }
+
+    /* ── FADE ── */
+    .fade-in {
+      opacity: 0; transform: translateY(16px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .tos-hero { grid-template-columns: 1fr; padding: 48px 24px; gap: 28px; }
+      .tos-meta { text-align: left; }
+      .tos-layout { grid-template-columns: 1fr; }
+      .tos-sidebar { display: none; }
+      .tos-content { padding: 40px 24px 64px; }
+      .tos-cta { grid-template-columns: 1fr; padding: 40px 24px; gap: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<!-- HERO -->
+<section class="tos-hero">
+  <div class="fade-in">
+    <p class="tos-hero-eyebrow">Pháp lý — PetShop</p>
+    <h1>Điều Khoản Sử Dụng</h1>
+    <p class="tos-hero-desc">
+      Vui lòng đọc kỹ các điều khoản sau trước khi sử dụng dịch vụ của PetShop.
+      Việc truy cập và mua hàng tại PetShop đồng nghĩa với việc bạn đồng ý với toàn bộ nội dung dưới đây.
+    </p>
+  </div>
+  <div class="tos-meta fade-in" style="transition-delay:.1s">
+    <div class="tos-meta-date">Có hiệu lực từ</div>
+    <div class="tos-meta-val">01 / 01 / 2026</div>
+    <div class="tos-meta-date" style="margin-top:16px;">Cập nhật lần cuối</div>
+    <div class="tos-meta-val">01 / 01 / 2026</div>
+  </div>
+</section>
+
+<!-- LAYOUT -->
+<div class="tos-layout">
+
+  <!-- SIDEBAR TOC -->
+  <aside class="tos-sidebar">
+    <span class="toc-label">Mục lục</span>
+    <ul class="toc-list">
+      <li><a href="#s1" class="active"><span class="toc-num">01</span> Giới thiệu & Phạm vi</a></li>
+      <li><a href="#s2"><span class="toc-num">02</span> Tài khoản người dùng</a></li>
+      <li><a href="#s3"><span class="toc-num">03</span> Quy định mua hàng</a></li>
+      <li><a href="#s4"><span class="toc-num">04</span> Thanh toán & Hóa đơn</a></li>
+      <li><a href="#s5"><span class="toc-num">05</span> Giao hàng & Vận chuyển</a></li>
+      <li><a href="#s6"><span class="toc-num">06</span> Đổi trả & Hoàn tiền</a></li>
+      <li><a href="#s7"><span class="toc-num">07</span> Nội dung người dùng</a></li>
+      <li><a href="#s8"><span class="toc-num">08</span> Quyền sở hữu trí tuệ</a></li>
+      <li><a href="#s9"><span class="toc-num">09</span> Giới hạn trách nhiệm</a></li>
+      <li><a href="#s10"><span class="toc-num">10</span> Chính sách bảo mật</a></li>
+      <div class="toc-divider"></div>
+      <li><a href="#s11"><span class="toc-num">11</span> Thay đổi điều khoản</a></li>
+      <li><a href="#s12"><span class="toc-num">12</span> Liên hệ & Khiếu nại</a></li>
+    </ul>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="tos-content">
+
+    <!-- 01 -->
+    <div class="tos-section fade-in" id="s1">
+      <div class="tos-section-head">
+        <span class="tos-section-num">01</span>
+        <h2>Giới thiệu & <em>Phạm vi áp dụng</em></h2>
+      </div>
+      <p>
+        Chào mừng bạn đến với PetShop — nền tảng thương mại điện tử chuyên cung cấp thực phẩm, phụ kiện và
+        dịch vụ chăm sóc thú cưng tại Việt Nam. Điều khoản sử dụng này ("Điều Khoản") là thỏa thuận pháp lý
+        ràng buộc giữa bạn ("Người Dùng") và PetShop ("Chúng Tôi"), áp dụng cho toàn bộ việc sử dụng
+        website, ứng dụng và các dịch vụ liên quan.
+      </p>
+      <p>
+        Bằng cách truy cập website, tạo tài khoản hoặc thực hiện bất kỳ giao dịch nào trên PetShop,
+        bạn xác nhận rằng mình đã đọc, hiểu và đồng ý bị ràng buộc bởi các Điều Khoản này.
+        Nếu bạn không đồng ý, vui lòng ngừng sử dụng dịch vụ.
+      </p>
+      <div class="tos-highlight">
+        <p>"Điều Khoản này áp dụng cho tất cả người dùng — bao gồm khách vãng lai, thành viên đã đăng ký và đối tác kinh doanh của PetShop."</p>
+      </div>
+      <p>
+        PetShop có quyền cập nhật Điều Khoản này bất kỳ lúc nào. Phiên bản mới nhất luôn được đăng tải
+        công khai tại trang này kèm theo ngày cập nhật. Tiếp tục sử dụng dịch vụ sau khi có thay đổi
+        đồng nghĩa với việc bạn chấp nhận phiên bản mới.
+      </p>
+    </div>
+
+    <!-- 02 -->
+    <div class="tos-section fade-in" id="s2">
+      <div class="tos-section-head">
+        <span class="tos-section-num">02</span>
+        <h2>Tài khoản <em>người dùng</em></h2>
+      </div>
+      <span class="tos-tag">Bắt buộc đối với thành viên</span>
+      <p>Để mua hàng và tích điểm thành viên, bạn cần tạo tài khoản trên PetShop. Khi đăng ký, bạn cam kết:</p>
+      <ul>
+        <li>Cung cấp thông tin chính xác, đầy đủ và cập nhật (họ tên, email, số điện thoại, địa chỉ).</li>
+        <li>Bảo mật mật khẩu và không chia sẻ thông tin đăng nhập với bất kỳ ai.</li>
+        <li>Thông báo ngay cho PetShop nếu phát hiện tài khoản bị truy cập trái phép.</li>
+        <li>Mỗi người dùng chỉ được tạo một tài khoản duy nhất.</li>
+        <li>Không sử dụng tài khoản của người khác dưới bất kỳ hình thức nào.</li>
+      </ul>
+      <div class="tos-warning">
+        <span class="tos-warning-icon">⚠️</span>
+        <p>PetShop có quyền <strong>tạm khóa hoặc xóa vĩnh viễn</strong> tài khoản nếu phát hiện hành vi gian lận,
+          cung cấp thông tin sai lệch hoặc vi phạm Điều Khoản này mà không cần thông báo trước.</p>
+      </div>
+      <p>
+        Bạn chịu hoàn toàn trách nhiệm về mọi hoạt động được thực hiện dưới tài khoản của mình.
+        PetShop không chịu trách nhiệm về bất kỳ thiệt hại nào phát sinh do bạn không bảo mật thông tin đăng nhập.
+      </p>
+    </div>
+
+    <!-- 03 -->
+    <div class="tos-section fade-in" id="s3">
+      <div class="tos-section-head">
+        <span class="tos-section-num">03</span>
+        <h2>Quy định <em>mua hàng</em></h2>
+      </div>
+      <p>
+        Tất cả sản phẩm được hiển thị trên PetShop đều có sẵn theo điều kiện tồn kho thực tế.
+        Việc sản phẩm xuất hiện trên trang web không đảm bảo chắc chắn rằng sản phẩm đó còn hàng tại thời điểm bạn đặt.
+      </p>
+      <ol>
+        <li>Chọn sản phẩm, số lượng và nhấn "Thêm vào giỏ hàng" hoặc "Mua ngay".</li>
+        <li>Kiểm tra lại thông tin đơn hàng trong trang giỏ hàng.</li>
+        <li>Nhập địa chỉ giao hàng và chọn phương thức thanh toán.</li>
+        <li>Xác nhận đơn hàng — bạn sẽ nhận email xác nhận ngay sau đó.</li>
+        <li>PetShop xử lý và đóng gói đơn hàng trong vòng 24 giờ làm việc.</li>
+      </ol>
+      <div class="tos-info">
+        <span class="tos-info-icon">ℹ️</span>
+        <p>PetShop có quyền hủy đơn hàng nếu sản phẩm hết hàng sau khi đặt, thông tin giao hàng không hợp lệ,
+          hoặc phát hiện dấu hiệu gian lận. Bạn sẽ được hoàn tiền đầy đủ trong các trường hợp này.</p>
+      </div>
+      <p>
+        Giá sản phẩm được niêm yết bằng Đồng Việt Nam (₫) và đã bao gồm thuế VAT (nếu có).
+        PetShop có quyền thay đổi giá sản phẩm bất kỳ lúc nào, nhưng giá tại thời điểm bạn xác nhận đơn hàng
+        sẽ được giữ nguyên cho đơn đó.
+      </p>
+    </div>
+
+    <!-- 04 -->
+    <div class="tos-section fade-in" id="s4">
+      <div class="tos-section-head">
+        <span class="tos-section-num">04</span>
+        <h2>Thanh toán <em>& Hóa đơn</em></h2>
+      </div>
+      <p>PetShop chấp nhận các phương thức thanh toán sau:</p>
+      <ul>
+        <li>Thanh toán khi nhận hàng (COD) — áp dụng trong nội thành TP.HCM.</li>
+        <li>Chuyển khoản ngân hàng — thông tin tài khoản hiển thị khi thanh toán.</li>
+        <li>Ví điện tử: MoMo, ZaloPay, VNPay.</li>
+        <li>Thẻ tín dụng / ghi nợ quốc tế: Visa, Mastercard.</li>
+      </ul>
+      <p>
+        Tất cả giao dịch thanh toán trực tuyến được mã hóa SSL và xử lý qua cổng thanh toán bảo mật.
+        PetShop không lưu trữ thông tin thẻ ngân hàng của bạn trên hệ thống.
+      </p>
+      <div class="tos-highlight">
+        <p>"Hóa đơn điện tử sẽ được gửi về email của bạn trong vòng 24 giờ sau khi đơn hàng hoàn tất.
+          Nếu cần hóa đơn VAT doanh nghiệp, vui lòng cung cấp thông tin trước khi xác nhận đơn."</p>
+      </div>
+    </div>
+
+    <!-- 05 -->
+    <div class="tos-section fade-in" id="s5">
+      <div class="tos-section-head">
+        <span class="tos-section-num">05</span>
+        <h2>Giao hàng <em>& Vận chuyển</em></h2>
+      </div>
+      <p>PetShop giao hàng toàn quốc thông qua các đối tác vận chuyển uy tín. Thời gian giao hàng dự kiến:</p>
+      <ul>
+        <li><strong>Nội thành TP.HCM:</strong> 1 – 2 ngày làm việc.</li>
+        <li><strong>Các tỉnh thành lân cận:</strong> 2 – 3 ngày làm việc.</li>
+        <li><strong>Toàn quốc:</strong> 3 – 5 ngày làm việc.</li>
+        <li><strong>Vùng sâu, vùng xa:</strong> 5 – 7 ngày làm việc.</li>
+      </ul>
+      <p>
+        Thời gian trên chỉ mang tính ước tính và có thể thay đổi tùy tình trạng thực tế.
+        PetShop không chịu trách nhiệm về sự chậm trễ do thiên tai, dịch bệnh hay lỗi của đơn vị vận chuyển.
+      </p>
+      <div class="tos-warning">
+        <span class="tos-warning-icon">📦</span>
+        <p>Khi nhận hàng, vui lòng <strong>kiểm tra kỹ kiện hàng trước khi ký nhận</strong>.
+          Nếu phát hiện hàng bị hư hỏng do vận chuyển, hãy từ chối nhận và liên hệ PetShop ngay trong ngày.</p>
+      </div>
+    </div>
+
+    <!-- 06 -->
+    <div class="tos-section fade-in" id="s6">
+      <div class="tos-section-head">
+        <span class="tos-section-num">06</span>
+        <h2>Đổi trả <em>& Hoàn tiền</em></h2>
+      </div>
+      <span class="tos-tag">Trong vòng 7 ngày</span>
+      <p>
+        PetShop áp dụng chính sách đổi trả trong vòng <strong>7 ngày</strong> kể từ ngày nhận hàng,
+        với điều kiện sản phẩm còn nguyên vẹn, chưa qua sử dụng và còn đầy đủ bao bì, tem nhãn.
+      </p>
+      <p>Các trường hợp được đổi trả / hoàn tiền:</p>
+      <ul>
+        <li>Sản phẩm bị lỗi do nhà sản xuất (vỡ bao bì, hư hỏng từ trong).</li>
+        <li>Giao sai sản phẩm so với đơn hàng đã đặt.</li>
+        <li>Sản phẩm bị hư hỏng trong quá trình vận chuyển.</li>
+        <li>Sản phẩm hết hạn sử dụng trước khi đến tay khách hàng.</li>
+      </ul>
+      <p>Các trường hợp <strong>không</strong> được đổi trả:</p>
+      <ul>
+        <li>Sản phẩm đã được mở seal, sử dụng một phần.</li>
+        <li>Sản phẩm hỏng do người dùng (rơi, vỡ, để sai cách).</li>
+        <li>Thực phẩm, thức ăn thú cưng đã được mở bao bì.</li>
+        <li>Sản phẩm khuyến mãi, flash sale được ghi rõ không áp dụng đổi trả.</li>
+      </ul>
+      <div class="tos-info">
+        <span class="tos-info-icon">💳</span>
+        <p>Thời gian hoàn tiền: 3 – 5 ngày làm việc với ví điện tử và chuyển khoản; 7 – 15 ngày với thẻ tín dụng
+          tùy ngân hàng phát hành.</p>
+      </div>
+    </div>
+
+    <!-- 07 -->
+    <div class="tos-section fade-in" id="s7">
+      <div class="tos-section-head">
+        <span class="tos-section-num">07</span>
+        <h2>Nội dung <em>người dùng</em></h2>
+      </div>
+      <p>
+        PetShop cho phép người dùng đăng tải đánh giá, bình luận, hình ảnh liên quan đến sản phẩm.
+        Khi đăng nội dung, bạn đồng ý rằng nội dung đó không vi phạm quyền của bên thứ ba và tuân thủ các quy tắc sau:
+      </p>
+      <ul>
+        <li>Nội dung phải trung thực, dựa trên trải nghiệm thực tế của bạn.</li>
+        <li>Không chứa ngôn từ thô tục, xúc phạm, kỳ thị hay thù địch.</li>
+        <li>Không chứa thông tin cá nhân của người khác (số điện thoại, địa chỉ, hình ảnh).</li>
+        <li>Không phải nội dung quảng cáo, spam hay có mục đích thương mại.</li>
+      </ul>
+      <p>
+        PetShop có quyền xóa bất kỳ nội dung nào vi phạm quy định trên mà không cần thông báo.
+        Bạn trao cho PetShop quyền sử dụng nội dung bạn đăng tải cho mục đích quảng bá sản phẩm
+        và dịch vụ (không phát sinh thêm chi phí).
+      </p>
+    </div>
+
+    <!-- 08 -->
+    <div class="tos-section fade-in" id="s8">
+      <div class="tos-section-head">
+        <span class="tos-section-num">08</span>
+        <h2>Quyền sở hữu <em>trí tuệ</em></h2>
+      </div>
+      <p>
+        Toàn bộ nội dung trên website PetShop — bao gồm logo, hình ảnh, văn bản, giao diện, mã nguồn,
+        thiết kế và nhãn hiệu — là tài sản sở hữu trí tuệ của PetShop hoặc được cấp phép hợp lệ từ bên thứ ba.
+      </p>
+      <ul>
+        <li>Không sao chép, tái sản xuất hay phân phối nội dung mà không có sự đồng ý bằng văn bản.</li>
+        <li>Không sử dụng logo hay nhãn hiệu PetShop cho bất kỳ mục đích thương mại nào.</li>
+        <li>Không thu thập dữ liệu sản phẩm, giá cả hay thông tin khách hàng bằng phương tiện tự động.</li>
+      </ul>
+      <div class="tos-warning">
+        <span class="tos-warning-icon">⚠️</span>
+        <p>Vi phạm quyền sở hữu trí tuệ có thể dẫn đến <strong>hành động pháp lý</strong> theo quy định
+          của pháp luật Việt Nam về sở hữu trí tuệ.</p>
+      </div>
+    </div>
+
+    <!-- 09 -->
+    <div class="tos-section fade-in" id="s9">
+      <div class="tos-section-head">
+        <span class="tos-section-num">09</span>
+        <h2>Giới hạn <em>trách nhiệm</em></h2>
+      </div>
+      <p>
+        PetShop cung cấp dịch vụ và sản phẩm theo nguyên tắc "nguyên trạng" và "sẵn có".
+        Chúng tôi nỗ lực đảm bảo chất lượng nhưng không đảm bảo rằng dịch vụ sẽ không có lỗi,
+        không bị gián đoạn hay đáp ứng đúng 100% mọi yêu cầu.
+      </p>
+      <p>Trong phạm vi tối đa được pháp luật cho phép, PetShop không chịu trách nhiệm về:</p>
+      <ul>
+        <li>Thiệt hại gián tiếp, đặc biệt hay hậu quả phát sinh từ việc sử dụng dịch vụ.</li>
+        <li>Mất mát dữ liệu, lợi nhuận hay cơ hội kinh doanh.</li>
+        <li>Hành động của bên thứ ba (đơn vị vận chuyển, cổng thanh toán).</li>
+        <li>Sự cố kỹ thuật nằm ngoài tầm kiểm soát của PetShop.</li>
+      </ul>
+      <p>
+        Trách nhiệm tối đa của PetShop trong mọi trường hợp không vượt quá tổng giá trị
+        đơn hàng liên quan đến khiếu nại đó.
+      </p>
+    </div>
+
+    <!-- 10 -->
+    <div class="tos-section fade-in" id="s10">
+      <div class="tos-section-head">
+        <span class="tos-section-num">10</span>
+        <h2>Chính sách <em>bảo mật</em></h2>
+      </div>
+      <p>
+        PetShop thu thập và xử lý dữ liệu cá nhân của bạn theo Chính Sách Bảo Mật riêng,
+        được đăng tải tại <a th:href="@{/privacy}" href="/privacy" style="color:var(--accent);text-decoration:none;font-weight:500;">petshop.vn/privacy</a>.
+        Bằng cách sử dụng dịch vụ, bạn đồng ý với việc thu thập và xử lý dữ liệu theo
+        chính sách đó.
+      </p>
+      <p>Tóm tắt các cam kết bảo mật chính:</p>
+      <ul>
+        <li>Dữ liệu cá nhân chỉ được dùng để xử lý đơn hàng, cải thiện dịch vụ và liên lạc với bạn.</li>
+        <li>Không bán hay trao đổi dữ liệu cá nhân của bạn cho bên thứ ba vì mục đích thương mại.</li>
+        <li>Bạn có quyền yêu cầu xem, sửa hoặc xóa dữ liệu cá nhân bất kỳ lúc nào.</li>
+        <li>PetShop áp dụng các biện pháp bảo mật kỹ thuật phù hợp để bảo vệ dữ liệu của bạn.</li>
+      </ul>
+    </div>
+
+    <!-- 11 -->
+    <div class="tos-section fade-in" id="s11">
+      <div class="tos-section-head">
+        <span class="tos-section-num">11</span>
+        <h2>Thay đổi <em>điều khoản</em></h2>
+      </div>
+      <p>
+        PetShop có thể cập nhật Điều Khoản này định kỳ để phản ánh thay đổi trong dịch vụ,
+        quy định pháp luật hoặc chính sách kinh doanh. Khi có thay đổi đáng kể, chúng tôi sẽ:
+      </p>
+      <ul>
+        <li>Cập nhật ngày "Cập nhật lần cuối" ở đầu trang này.</li>
+        <li>Gửi thông báo qua email đến địa chỉ đã đăng ký (đối với thành viên).</li>
+        <li>Hiển thị thông báo nổi bật trên website trong ít nhất 7 ngày.</li>
+      </ul>
+      <p>
+        Nếu bạn tiếp tục sử dụng dịch vụ sau thời điểm thay đổi có hiệu lực, điều đó đồng nghĩa
+        với việc bạn chấp nhận phiên bản Điều Khoản mới nhất.
+      </p>
+    </div>
+
+    <!-- 12 -->
+    <div class="tos-section fade-in" id="s12">
+      <div class="tos-section-head">
+        <span class="tos-section-num">12</span>
+        <h2>Liên hệ <em>& Khiếu nại</em></h2>
+      </div>
+      <p>
+        Nếu bạn có thắc mắc về Điều Khoản này, muốn khiếu nại về đơn hàng hay sản phẩm,
+        hoặc cần yêu cầu hỗ trợ pháp lý, vui lòng liên hệ PetShop qua:
+      </p>
+      <ul>
+        <li><strong>Email:</strong> support@petshop.vn — phản hồi trong vòng 24 giờ làm việc.</li>
+        <li><strong>Hotline:</strong> 0900 000 000 — 8:00 đến 20:00, Thứ 2 đến Chủ nhật.</li>
+        <li><strong>Địa chỉ:</strong> 123 Đường Thú Cưng, Quận 1, TP. Hồ Chí Minh.</li>
+      </ul>
+      <p>
+        Mọi tranh chấp phát sinh từ Điều Khoản này sẽ được giải quyết thông qua thương lượng
+        trước. Nếu không đạt được thỏa thuận, tranh chấp sẽ được đưa ra giải quyết tại
+        Tòa án nhân dân có thẩm quyền tại TP. Hồ Chí Minh theo pháp luật Việt Nam.
+      </p>
+      <div class="tos-highlight">
+        <p>"Chúng tôi luôn ưu tiên giải quyết mọi vấn đề một cách thiện chí và nhanh chóng.
+          Hãy liên hệ với chúng tôi — thường thì một cuộc trò chuyện là đủ."</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+<!-- CTA -->
+<div class="tos-cta fade-in">
+  <div>
+    <h3>Còn thắc mắc về điều khoản?</h3>
+    <p>Đội ngũ PetShop luôn sẵn sàng giải đáp. Liên hệ với chúng tôi qua email hoặc hotline — chúng tôi phản hồi trong vòng 24 giờ làm việc.</p>
+  </div>
+  <a th:href="@{/contact}" href="/contact" class="btn-accent">
+    Liên hệ ngay
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  </a>
+</div>
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Fade-in
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+  // TOC active highlight on scroll
+  const sections = document.querySelectorAll('.tos-section[id]');
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const onScroll = () => {
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) current = s.id; });
+    tocLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>
+</body>
+</html>

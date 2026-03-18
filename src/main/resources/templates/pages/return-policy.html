@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chính Sách Đổi Trả – PetShop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --off-white: #f7f4ef; --warm-white: #fdfbf8;
+      --ink: #1a1714; --ink-light: #4a4540; --ink-muted: #8a8178;
+      --rule: #d9d3c8; --accent: #c8601a;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--warm-white); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; }
+
+    /* HERO */
+    .hero {
+      background: var(--ink); padding: 72px 48px;
+      display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 48px;
+      border-bottom: 1px solid #2e2a27; position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ''; position: absolute; right: -60px; top: -60px;
+      width: 320px; height: 320px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,96,26,.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .eyebrow { font-size: .72rem; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+    .hero h1 { font-family: 'Lora', serif; font-size: clamp(1.8rem,4vw,3rem); font-weight: 600; line-height: 1.2; color: #fff; margin-bottom: 14px; }
+    .hero h1 em { font-style: italic; color: var(--accent); }
+    .hero-desc { font-size: .92rem; line-height: 1.85; color: rgba(255,255,255,.5); max-width: 500px; }
+    .hero-meta { text-align: right; flex-shrink: 0; }
+    .meta-label { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 4px; }
+    .meta-val { font-family: 'Lora', serif; font-size: 1rem; font-weight: 600; color: rgba(255,255,255,.55); }
+
+    /* LAYOUT */
+    .layout { display: grid; grid-template-columns: 260px 1fr; }
+
+    /* SIDEBAR */
+    .sidebar { border-right: 1px solid var(--rule); padding: 48px 0; position: sticky; top: 0; height: fit-content; }
+    .toc-label { font-size: .68rem; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-muted); padding: 0 32px; margin-bottom: 18px; display: block; }
+    .toc-list { list-style: none; }
+    .toc-list a { display: flex; align-items: center; gap: 12px; padding: 10px 32px; font-size: .84rem; color: var(--ink-muted); text-decoration: none; border-left: 2px solid transparent; transition: color .2s, background .2s; }
+    .toc-list a:hover { color: var(--ink); background: var(--off-white); }
+    .toc-list a.active { color: var(--accent); border-left-color: var(--accent); background: #fff8f4; }
+    .toc-num { font-family: 'Lora', serif; font-size: .72rem; font-weight: 600; color: var(--rule); flex-shrink: 0; width: 20px; }
+    .toc-list a.active .toc-num { color: var(--accent); }
+    .toc-div { height: 1px; background: var(--rule); margin: 14px 32px; }
+
+    /* CONTENT */
+    .content { padding: 56px 64px 80px; }
+    .sec { margin-bottom: 60px; padding-bottom: 60px; border-bottom: 1px solid var(--rule); }
+    .sec:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .sec-head { display: flex; align-items: flex-start; gap: 20px; margin-bottom: 26px; }
+    .sec-num { font-family: 'Lora', serif; font-size: 2rem; font-weight: 600; color: var(--rule); line-height: 1; flex-shrink: 0; padding-top: 4px; }
+    .sec h2 { font-family: 'Lora', serif; font-size: 1.3rem; font-weight: 600; color: var(--ink); line-height: 1.3; }
+    .sec h2 em { font-style: italic; color: var(--accent); }
+    .sec p { font-size: .92rem; line-height: 1.95; color: var(--ink-light); margin-bottom: 14px; }
+    .sec p:last-child { margin-bottom: 0; }
+    .sec ul, .sec ol { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .sec ul li, .sec ol li { font-size: .9rem; line-height: 1.8; color: var(--ink-light); display: flex; align-items: flex-start; gap: 12px; }
+    .sec ul li::before { content: '—'; color: var(--accent); font-weight: 600; flex-shrink: 0; margin-top: 2px; }
+    .sec ol { counter-reset: c; }
+    .sec ol li { counter-increment: c; }
+    .sec ol li::before { content: counter(c,decimal-leading-zero); font-family: 'Lora', serif; font-size: .75rem; font-weight: 600; color: var(--accent); flex-shrink: 0; margin-top: 3px; min-width: 24px; }
+
+    /* Boxes */
+    .box-quote { background: var(--off-white); border-left: 3px solid var(--accent); padding: 20px 24px; margin: 18px 0; }
+    .box-quote p { font-family: 'Lora', serif; font-style: italic; font-size: .92rem; line-height: 1.7; color: var(--ink); margin: 0; }
+    .box-warn { background: #fff8f4; border: 1px solid #f5c4b0; padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+    .box-warn p { font-size: .88rem; line-height: 1.75; color: var(--ink-light); margin: 0; }
+    .box-warn strong { color: var(--accent); }
+    .box-info { background: #eef4ff; border: 1px solid #c0d4f7; padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+    .box-info p { font-size: .88rem; line-height: 1.75; color: #3a5a9a; margin: 0; }
+    .box-ok { background: #f0faf4; border: 1px solid #a8d8b8; padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+    .box-ok p { font-size: .88rem; line-height: 1.75; color: #2d6a4f; margin: 0; }
+
+    /* Steps timeline */
+    .steps { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+    .step { display: flex; gap: 24px; align-items: flex-start; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+    .step:last-child { border-bottom: none; }
+    .step-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--off-white); border: 1.5px solid var(--rule); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'Lora', serif; font-size: .9rem; font-weight: 600; color: var(--accent); }
+    .step-body {}
+    .step-title { font-family: 'Lora', serif; font-size: .98rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+    .step-desc { font-size: .86rem; line-height: 1.75; color: var(--ink-muted); }
+
+    /* Tag */
+    .tag { display: inline-block; font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; padding: 3px 10px; background: var(--off-white); color: var(--ink-muted); border: 1px solid var(--rule); margin-bottom: 14px; }
+    .tag.ok { background: #f0faf4; color: #2d6a4f; border-color: #a8d8b8; }
+    .tag.no { background: #fff4f0; color: var(--accent); border-color: #f5c4b0; }
+
+    /* CTA */
+    .cta-bar { background: var(--ink); padding: 56px 48px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 48px; border-top: 1px solid var(--rule); }
+    .cta-bar h3 { font-family: 'Lora', serif; font-size: 1.4rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
+    .cta-bar p { font-size: .88rem; line-height: 1.8; color: rgba(255,255,255,.5); max-width: 480px; }
+    .btn-accent { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff; text-decoration: none; font-size: .82rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; padding: 14px 28px; border: none; cursor: pointer; white-space: nowrap; transition: background .2s, transform .2s; }
+    .btn-accent:hover { background: #a84f14; transform: translateY(-1px); color: #fff; }
+
+    /* Fade */
+    .fade-in { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 48px 24px; gap: 24px; }
+      .hero-meta { text-align: left; }
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .content { padding: 40px 24px 64px; }
+      .cta-bar { grid-template-columns: 1fr; padding: 40px 24px; gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="fade-in">
+    <p class="eyebrow">Chính sách — PetShop</p>
+    <h1>Chính Sách <em>Đổi Trả</em></h1>
+    <p class="hero-desc">Chúng tôi muốn bạn hoàn toàn hài lòng với mỗi đơn hàng. Nếu có bất kỳ vấn đề gì, chính sách đổi trả của PetShop được thiết kế để giải quyết nhanh chóng và công bằng.</p>
+  </div>
+  <div class="hero-meta fade-in" style="transition-delay:.1s">
+    <div class="meta-label">Áp dụng từ</div>
+    <div class="meta-val">01 / 01 / 2024</div>
+    <div class="meta-label" style="margin-top:14px;">Thời hạn đổi trả</div>
+    <div class="meta-val" style="color:var(--accent);">7 ngày</div>
+  </div>
+</section>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <span class="toc-label">Mục lục</span>
+    <ul class="toc-list">
+      <li><a href="#r1" class="active"><span class="toc-num">01</span>Điều kiện đổi trả</a></li>
+      <li><a href="#r2"><span class="toc-num">02</span>Trường hợp được đổi trả</a></li>
+      <li><a href="#r3"><span class="toc-num">03</span>Không được đổi trả</a></li>
+      <li><a href="#r4"><span class="toc-num">04</span>Quy trình đổi trả</a></li>
+      <li><a href="#r5"><span class="toc-num">05</span>Chính sách hoàn tiền</a></li>
+      <li><a href="#r6"><span class="toc-num">06</span>Phí vận chuyển đổi trả</a></li>
+      <div class="toc-div"></div>
+      <li><a href="#r7"><span class="toc-num">07</span>Liên hệ hỗ trợ</a></li>
+    </ul>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content">
+
+    <div class="sec fade-in" id="r1">
+      <div class="sec-head"><span class="sec-num">01</span><h2>Điều kiện <em>đổi trả</em></h2></div>
+      <p>PetShop chấp nhận đổi trả trong vòng <strong>7 ngày</strong> kể từ ngày bạn nhận được hàng (theo xác nhận giao hàng của đơn vị vận chuyển). Sản phẩm cần đáp ứng đầy đủ các điều kiện sau:</p>
+      <ul>
+        <li>Còn nguyên vẹn, chưa qua sử dụng, không bị trầy xước hay biến dạng.</li>
+        <li>Còn đầy đủ bao bì gốc, tem nhãn, phụ kiện đi kèm (nếu có).</li>
+        <li>Có hóa đơn mua hàng hoặc mã đơn hàng để đối chiếu.</li>
+        <li>Yêu cầu được gửi trong vòng 7 ngày kể từ ngày nhận hàng.</li>
+      </ul>
+      <div class="box-quote">
+        <p>"Chúng tôi hiểu rằng đôi khi sản phẩm không như mong đợi — và đó hoàn toàn không phải lỗi của bạn. Quy trình đổi trả được thiết kế để đơn giản và không gây khó chịu."</p>
+      </div>
+    </div>
+
+    <div class="sec fade-in" id="r2">
+      <div class="sec-head"><span class="sec-num">02</span><h2>Trường hợp <em>được đổi trả</em></h2></div>
+      <span class="tag ok">✓ Được chấp nhận</span>
+      <p>PetShop chịu toàn bộ chi phí xử lý (bao gồm phí vận chuyển chiều về) trong các trường hợp sau:</p>
+      <ul>
+        <li><strong>Sản phẩm bị lỗi nhà sản xuất:</strong> Bao bì bị vỡ từ bên trong, sản phẩm không hoạt động đúng chức năng, lỗi kỹ thuật không do tác động bên ngoài.</li>
+        <li><strong>Giao sai sản phẩm:</strong> Sản phẩm nhận được khác với sản phẩm đã đặt về tên, loại, kích thước hoặc số lượng.</li>
+        <li><strong>Hư hỏng do vận chuyển:</strong> Sản phẩm bị móp, vỡ, biến dạng do quá trình vận chuyển — cần có ảnh chụp tại thời điểm mở hộp.</li>
+        <li><strong>Hết hạn sử dụng:</strong> Thực phẩm, thức ăn thú cưng có hạn sử dụng đã hết trước khi giao đến tay bạn.</li>
+        <li><strong>Sản phẩm không đúng mô tả:</strong> Có sự khác biệt đáng kể so với thông tin được đăng trên website.</li>
+      </ul>
+      <div class="box-ok">
+        <span>✅</span>
+        <p>Trong các trường hợp trên, bạn có thể chọn: <strong>đổi sản phẩm mới</strong> hoặc <strong>hoàn tiền 100%</strong> giá trị sản phẩm.</p>
+      </div>
+    </div>
+
+    <div class="sec fade-in" id="r3">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Trường hợp <em>không được đổi trả</em></h2></div>
+      <span class="tag no">✗ Không áp dụng</span>
+      <p>Để đảm bảo quyền lợi và vệ sinh cho tất cả khách hàng, PetShop không chấp nhận đổi trả trong các trường hợp sau:</p>
+      <ul>
+        <li>Sản phẩm đã được mở seal, sử dụng một phần hoặc toàn bộ.</li>
+        <li>Thực phẩm, thức ăn, bánh thưởng cho thú cưng đã mở bao bì.</li>
+        <li>Cát vệ sinh, đệm nằm, đồ chơi mềm đã qua sử dụng (vệ sinh hoặc tiếp xúc).</li>
+        <li>Hư hỏng do người dùng: rơi, va đập, bảo quản sai cách, tự tháo lắp.</li>
+        <li>Yêu cầu đổi trả gửi sau 7 ngày kể từ ngày nhận hàng.</li>
+        <li>Sản phẩm thuộc danh mục khuyến mãi, flash sale có ghi rõ "Không đổi trả".</li>
+        <li>Sản phẩm đặt hàng theo yêu cầu riêng (hàng đặt trước, hàng nhập theo đơn).</li>
+      </ul>
+      <div class="box-warn">
+        <span>⚠️</span>
+        <p>Nếu bạn không chắc sản phẩm của mình có thuộc diện đổi trả hay không, hãy <strong>liên hệ PetShop trước khi gửi hàng về</strong>. Chúng tôi sẽ xác nhận trong vòng 2 giờ làm việc.</p>
+      </div>
+    </div>
+
+    <div class="sec fade-in" id="r4">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Quy trình <em>đổi trả</em></h2></div>
+      <p>Quy trình đổi trả của PetShop gồm 5 bước đơn giản, thường hoàn tất trong 3 – 5 ngày làm việc:</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-circle">01</div>
+          <div class="step-body">
+            <div class="step-title">Liên hệ PetShop</div>
+            <div class="step-desc">Gửi yêu cầu qua email support@petshop.vn hoặc hotline 0900 000 000. Cung cấp mã đơn hàng, mô tả vấn đề và ảnh chụp sản phẩm (nếu bị hỏng).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-circle">02</div>
+          <div class="step-body">
+            <div class="step-title">Xác nhận yêu cầu</div>
+            <div class="step-desc">PetShop xem xét và xác nhận yêu cầu trong vòng 24 giờ làm việc. Bạn sẽ nhận được email xác nhận kèm hướng dẫn gửi hàng về.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-circle">03</div>
+          <div class="step-body">
+            <div class="step-title">Gửi hàng về</div>
+            <div class="step-desc">Đóng gói sản phẩm cẩn thận, dán nhãn theo hướng dẫn PetShop cung cấp. Gửi qua đơn vị vận chuyển được chỉ định (PetShop trả phí nếu lỗi thuộc trách nhiệm của chúng tôi).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-circle">04</div>
+          <div class="step-body">
+            <div class="step-title">Kiểm tra hàng nhận về</div>
+            <div class="step-desc">PetShop kiểm tra sản phẩm trong vòng 1 – 2 ngày làm việc sau khi nhận được hàng. Kết quả kiểm tra sẽ được thông báo qua email.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-circle">05</div>
+          <div class="step-body">
+            <div class="step-title">Đổi hàng mới / Hoàn tiền</div>
+            <div class="step-desc">Tùy lựa chọn của bạn: hàng đổi mới được giao trong 1 – 2 ngày, hoặc tiền hoàn về tài khoản trong 3 – 7 ngày làm việc.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec fade-in" id="r5">
+      <div class="sec-head"><span class="sec-num">05</span><h2>Chính sách <em>hoàn tiền</em></h2></div>
+      <p>PetShop hoàn tiền 100% giá trị sản phẩm (không bao gồm phí vận chuyển gốc trừ trường hợp lỗi thuộc về PetShop). Thời gian hoàn tiền tùy theo phương thức thanh toán ban đầu:</p>
+      <ul>
+        <li><strong>Ví điện tử (MoMo, ZaloPay, VNPay):</strong> 1 – 3 ngày làm việc.</li>
+        <li><strong>Chuyển khoản ngân hàng:</strong> 2 – 5 ngày làm việc.</li>
+        <li><strong>Thẻ tín dụng / ghi nợ quốc tế:</strong> 7 – 15 ngày làm việc (tùy ngân hàng phát hành).</li>
+        <li><strong>Thanh toán COD:</strong> Chuyển khoản về tài khoản ngân hàng bạn cung cấp, 2 – 3 ngày làm việc.</li>
+      </ul>
+      <div class="box-info">
+        <span>ℹ️</span>
+        <p>Hoàn tiền chỉ được xử lý sau khi PetShop kiểm tra và xác nhận sản phẩm đổi trả đạt điều kiện. Bạn sẽ nhận thông báo qua email khi tiền được hoàn.</p>
+      </div>
+    </div>
+
+    <div class="sec fade-in" id="r6">
+      <div class="sec-head"><span class="sec-num">06</span><h2>Phí vận chuyển <em>đổi trả</em></h2></div>
+      <ul>
+        <li><strong>PetShop chịu phí:</strong> Trường hợp lỗi thuộc trách nhiệm của PetShop (sản phẩm lỗi, giao sai, hư hỏng vận chuyển).</li>
+        <li><strong>Khách hàng chịu phí:</strong> Trường hợp đổi vì lý do cá nhân (đổi ý, chọn sai size, không ưng màu) — phí cả hai chiều.</li>
+        <li><strong>Chia sẻ phí:</strong> Một số trường hợp đặc biệt có thể được xem xét từng trường hợp — liên hệ bộ phận hỗ trợ để được tư vấn.</li>
+      </ul>
+    </div>
+
+    <div class="sec fade-in" id="r7">
+      <div class="sec-head"><span class="sec-num">07</span><h2>Liên hệ <em>hỗ trợ</em></h2></div>
+      <p>Đội ngũ PetShop sẵn sàng hỗ trợ bạn xuyên suốt quá trình đổi trả:</p>
+      <ul>
+        <li><strong>Email:</strong> support@petshop.vn — phản hồi trong 2 giờ làm việc.</li>
+        <li><strong>Hotline:</strong> 0900 000 000 — 8:00 đến 20:00, mỗi ngày trong tuần.</li>
+        <li><strong>Địa chỉ nhận hàng đổi trả:</strong> 123 Đường Thú Cưng, Quận 1, TP. Hồ Chí Minh.</li>
+      </ul>
+      <div class="box-quote">
+        <p>"Mỗi vấn đề đều có giải pháp. Hãy liên hệ với chúng tôi — chúng tôi ở đây để giúp bạn, không phải để từ chối."</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!--<div class="cta-bar fade-in">-->
+<!--  <div>-->
+<!--    <h3>Cần hỗ trợ đổi trả ngay?</h3>-->
+<!--    <p>Đội ngũ PetShop phản hồi trong vòng 2 giờ làm việc. Liên hệ ngay để được hướng dẫn từng bước.</p>-->
+<!--  </div>-->
+<!--  <a th:href="@{/contact}" href="/contact" class="btn-accent">-->
+<!--    Liên hệ hỗ trợ-->
+<!--    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>-->
+<!--  </a>-->
+<!--</div>-->
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+  }, { threshold: 0.06 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+  const sections = document.querySelectorAll('.sec[id]');
+  const links = document.querySelectorAll('.toc-list a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) cur = s.id; });
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+  }, { passive: true });
+
+  fetch('/cart/count').then(r => r.json())
+    .then(d => { const el = document.getElementById('cartCount'); if (el && d.count > 0) el.textContent = d.count; })
+    .catch(() => {});
+</script>
+</body>
+</html>

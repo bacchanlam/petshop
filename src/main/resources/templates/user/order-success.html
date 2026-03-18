@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặt Hàng Thành Công - PetShop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    .success-icon { animation: bounceIn .6s ease; display:flex; justify-content:center; }
+    .success-icon svg { width:80px; height:80px; color:#198754; }
+    @keyframes bounceIn {
+        0%   { transform:scale(0); opacity:0; }
+        60%  { transform:scale(1.2); }
+        100% { transform:scale(1);  opacity:1; }
+    }
+    .success-card { border-radius:20px; border:none; box-shadow:0 10px 40px rgba(0,0,0,.12); }
+  </style>
+</head>
+<body class="bg-light">
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="card success-card text-center p-5">
+        <div class="success-icon mb-3">
+          <i data-lucide="circle-check-big"></i>
+        </div>
+        <h3 class="fw-bold text-success mb-2">Đặt hàng thành công!</h3>
+        <p class="text-muted mb-4">
+          Cảm ơn bạn đã mua hàng tại PetShop!<br>
+          Đơn hàng của bạn đang được xử lý.
+        </p>
+
+        <!-- Mã đơn hàng nếu có -->
+        <div th:if="${orderId}" class="alert alert-info rounded-3 mb-4">
+          <span class="fw-semibold">Mã đơn hàng: #<span th:text="${orderId}"></span></span>
+        </div>
+
+        <!-- Thông tin theo dõi -->
+        <div class="text-start mb-4 p-3 bg-light rounded-3">
+          <p class="mb-2 small d-flex align-items-center gap-2">
+            <i data-lucide="package" style="width:15px;height:15px;flex-shrink:0;color:#6c757d"></i>
+            <strong>Trạng thái:</strong>
+            <span class="badge bg-warning text-dark ms-1">Chờ xác nhận</span>
+          </p>
+          <p class="mb-2 small d-flex align-items-center gap-2">
+            <i data-lucide="truck" style="width:15px;height:15px;flex-shrink:0;color:#6c757d"></i>
+            <strong>Dự kiến giao:</strong> 2-4 ngày làm việc
+          </p>
+          <p class="mb-0 small d-flex align-items-center gap-2">
+            <i data-lucide="phone" style="width:15px;height:15px;flex-shrink:0;color:#6c757d"></i>
+            <strong>Hỗ trợ:</strong> 0900 000 000
+          </p>
+        </div>
+
+        <div class="d-grid gap-2">
+          <a th:href="@{/orders/history}" class="btn btn-primary btn-lg fw-semibold d-flex align-items-center justify-content-center gap-2">
+            <i data-lucide="clock" style="width:18px;height:18px"></i>
+            Xem lịch sử đơn hàng
+          </a>
+          <a th:href="@{/products}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
+            <i data-lucide="shopping-bag" style="width:16px;height:16px"></i>
+            Tiếp tục mua sắm
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

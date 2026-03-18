@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <style>
+        .search-input::placeholder { color: rgba(255,255,255,0.7); }
+        .search-input:focus {
+            background: rgba(255,255,255,0.25) !important;
+            border-color: #F5A623 !important;
+            box-shadow: none;
+            color: #fff !important;
+        }
+        .search-btn:hover {
+            background: #d4891a !important;
+            border-color: #d4891a !important;
+        }
+
+        /* ===== NAVBAR SCROLL BEHAVIOR ===== */
+        .navbar {
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+            will-change: transform;
+        }
+        .navbar.navbar-hidden {
+            transform: translateY(-100%);
+            box-shadow: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ======= NAVBAR ======= -->
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow">
+    <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand fw-bold fs-4" th:href="@{/}">
+            🐾 PetShop
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarMain">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarMain">
+            <!-- Menu trái -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}">Trang Chủ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/products}">Sản Phẩm</a>
+                </li>
+            </ul>
+
+            <!-- Tìm kiếm -->
+            <form class="d-flex me-3" th:action="@{/products}" method="get">
+                <div class="input-group" style="width: 260px;">
+                    <input class="form-control search-input" type="search" name="keyword"
+                           placeholder="Tìm sản phẩm..."
+                           style="border-radius: 6px 0 0 6px;
+                                  border: 2px solid rgba(255,255,255,0.35);
+                                  background: rgba(255,255,255,0.15);
+                                  color: #fff;
+                                  font-size: 0.9rem;
+                                  padding: 6px 12px;">
+                    <button class="btn search-btn" type="submit"
+                            style="background: #F5A623;
+                                   border: 2px solid #F5A623;
+                                   border-radius: 0 6px 6px 0;
+                                   padding: 6px 14px;
+                                   color: #fff;
+                                   transition: background 0.2s, border-color 0.2s;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.156a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Menu phải -->
+            <ul class="navbar-nav">
+                <!-- Chưa đăng nhập -->
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/auth/login}">Đăng nhập</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" th:href="@{/auth/register}">Đăng ký</a>
+                </li>
+
+                <!-- Đã đăng nhập: Giỏ hàng -->
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link position-relative" th:href="@{/cart}">
+                        🛒 Giỏ hàng
+                        <span class="badge bg-danger rounded-pill cart-count"
+                              id="cartCount">0</span>
+                    </a>
+                </li>
+
+                <!-- Đã đăng nhập: Dropdown tài khoản -->
+                <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                        👤 <span sec:authentication="name"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" th:href="@{/account/profile}">
+                                Thông tin cá nhân
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" th:href="@{/orders/history}">
+                                Lịch sử đơn hàng
+                            </a>
+                        </li>
+                        <!-- Chỉ hiện với Admin -->
+                        <li sec:authorize="hasRole('ADMIN')">
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li sec:authorize="hasRole('ADMIN')">
+                            <a class="dropdown-item text-danger fw-bold"
+                               th:href="@{/admin/dashboard}">
+                                ⚙️ Quản trị Admin
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger"
+                               th:href="@{/auth/logout}">Đăng xuất</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            navbar.style.transition = 'transform 0.35s ease';
+            var lastScrollY = window.scrollY;
+            window.addEventListener('scroll', function () {
+                var currentScrollY = window.scrollY;
+                if (currentScrollY > lastScrollY && currentScrollY > 60) {
+                    navbar.style.transform = 'translateY(-100%)';
+                } else {
+                    navbar.style.transform = 'translateY(0)';
+                }
+                lastScrollY = currentScrollY;
+            }, { passive: true });
+        });
+    </script>
+</nav>
+</body>
+</html>

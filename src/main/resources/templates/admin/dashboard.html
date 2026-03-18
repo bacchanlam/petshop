@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - PetShop Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Lucide Icons (dùng bởi Linear, Vercel, Shadcn...) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    .stat-card {
+        border-radius: 16px; border: none;
+        background: linear-gradient(135deg, var(--c1), var(--c2));
+        color: white; transition: transform .2s, box-shadow .2s;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,.2); }
+    .stat-icon  { opacity: .85; display: flex; align-items: center; margin-bottom: 8px; }
+    .stat-icon svg { width: 30px; height: 30px; stroke: white; }
+    .stat-value { font-size: 2rem; font-weight: 800; line-height: 1; }
+    .stat-label { opacity: .85; font-size: .9rem; }
+
+    .card-blue   { --c1:#0d6efd; --c2:#0a58ca; }
+    .card-green  { --c1:#198754; --c2:#146c43; }
+    .card-orange { --c1:#fd7e14; --c2:#e8590c; }
+    .card-purple { --c1:#6f42c1; --c2:#59359a; }
+    .card-red    { --c1:#dc3545; --c2:#b02a37; }
+    .card-teal   { --c1:#0dcaf0; --c2:#0aa2c0; }
+
+    .section-card { border-radius: 14px; border: none; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+    .status-PENDING   { background:#fff3cd; color:#856404; }
+    .status-CONFIRMED { background:#cfe2ff; color:#084298; }
+    .status-SHIPPING  { background:#d1ecf1; color:#0c5460; }
+    .status-COMPLETED { background:#d4edda; color:#155724; }
+    .status-CANCELLED { background:#f8d7da; color:#721c24; }
+    .status-badge { font-size:.75rem; padding:3px 10px; border-radius:20px; font-weight:600; }
+    .low-stock  { color: #dc3545; font-weight: 700; }
+    .product-thumb-sm { width:40px; height:40px; object-fit:cover; border-radius:6px; }
+
+    .section-title { display: flex; align-items: center; gap: 8px; }
+    .section-title svg { width: 17px; height: 17px; color: #6c757d; flex-shrink: 0; }
+  </style>
+</head>
+<body class="bg-light">
+<div class="d-flex">
+
+  <div th:replace="~{fragments/admin-sidebar :: sidebar}" th:with="activePage='dashboard'"></div>
+
+  <div class="flex-grow-1 p-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-0 d-flex align-items-center gap-2">
+          <i data-lucide="layout-dashboard" style="width:22px;height:22px;color:#0d6efd"></i>
+          Dashboard
+        </h4>
+        <small class="text-muted">Tổng quan hệ thống PetShop</small>
+      </div>
+      <div class="text-muted small d-flex align-items-center gap-1">
+        <i data-lucide="clock-3" style="width:14px;height:14px"></i>
+        <span id="currentTime"></span>
+      </div>
+    </div>
+
+    <!-- ===== STATS CARDS ===== -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="card stat-card card-blue p-3 h-100">
+          <div class="stat-icon"><i data-lucide="shopping-cart"></i></div>
+          <div class="stat-value" th:text="${totalOrders}">0</div>
+          <div class="stat-label">Tổng đơn hàng</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="card stat-card card-orange p-3 h-100">
+          <div class="stat-icon"><i data-lucide="hourglass"></i></div>
+          <div class="stat-value" th:text="${pendingOrders}">0</div>
+          <div class="stat-label">Chờ xác nhận</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="card stat-card card-green p-3 h-100">
+          <div class="stat-icon"><i data-lucide="banknote"></i></div>
+          <div class="stat-value"
+               th:text="${#numbers.formatDecimal(revenueMonth / 1000000, 1, 'POINT', 1, 'COMMA') + 'M'}">0</div>
+          <div class="stat-label">Doanh thu tháng (₫)</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="card stat-card card-teal p-3 h-100">
+          <div class="stat-icon"><i data-lucide="calendar-check"></i></div>
+          <div class="stat-value" th:text="${ordersToday}">0</div>
+          <div class="stat-label">Đơn hôm nay</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="card stat-card card-purple p-3 h-100">
+          <div class="stat-icon"><i data-lucide="package"></i></div>
+          <div class="stat-value" th:text="${totalProducts}">0</div>
+          <div class="stat-label">Sản phẩm đang bán</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="card stat-card card-red p-3 h-100">
+          <div class="stat-icon"><i data-lucide="users"></i></div>
+          <div class="stat-value" th:text="${totalUsers}">0</div>
+          <div class="stat-label">Người dùng</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ROW 2 ===== -->
+    <div class="row g-4 mb-4">
+
+      <!-- Biểu đồ Doughnut -->
+      <div class="col-lg-5">
+        <div class="card section-card p-4 h-100">
+          <h6 class="fw-bold mb-3 section-title">
+            <i data-lucide="pie-chart"></i>
+            Phân bổ đơn hàng theo trạng thái
+          </h6>
+          <div class="d-flex justify-content-center">
+            <canvas id="orderDonut" width="260" height="260"></canvas>
+          </div>
+          <div class="row g-2 mt-3">
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width:12px;height:12px;border-radius:3px;background:#ffc107"></div>
+                <small>Chờ XN (<span th:text="${cntPending}"></span>)</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width:12px;height:12px;border-radius:3px;background:#0d6efd"></div>
+                <small>Đã XN (<span th:text="${cntConfirmed}"></span>)</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width:12px;height:12px;border-radius:3px;background:#0dcaf0"></div>
+                <small>Đang giao (<span th:text="${cntShipping}"></span>)</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width:12px;height:12px;border-radius:3px;background:#198754"></div>
+                <small>Hoàn thành (<span th:text="${cntCompleted}"></span>)</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center gap-2">
+                <div style="width:12px;height:12px;border-radius:3px;background:#dc3545"></div>
+                <small>Đã hủy (<span th:text="${cntCancelled}"></span>)</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sản phẩm sắp hết hàng -->
+      <div class="col-lg-7">
+        <div class="card section-card p-4 h-100">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0 section-title">
+              <i data-lucide="triangle-alert" style="color:#fd7e14"></i>
+              Sản phẩm sắp hết hàng
+            </h6>
+            <a th:href="@{/admin/products}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+              <i data-lucide="list" style="width:14px;height:14px"></i>
+              Xem tất cả
+            </a>
+          </div>
+
+          <div th:if="${lowStockProducts.empty}" class="text-muted text-center py-4 d-flex flex-column align-items-center gap-2">
+            <i data-lucide="check-circle" style="width:32px;height:32px;color:#198754"></i>
+            Không có sản phẩm nào sắp hết hàng
+          </div>
+
+          <div class="table-responsive" th:unless="${lowStockProducts.empty}">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead class="table-light">
+              <tr>
+                <th>Ảnh</th>
+                <th>Sản phẩm</th>
+                <th>Danh mục</th>
+                <th class="text-center">Tồn kho</th>
+                <th></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="p : ${lowStockProducts}">
+                <td>
+                  <img th:if="${p.thumbnail != null}"
+                       th:src="@{'/uploads/products/' + ${p.thumbnail}}"
+                       class="product-thumb-sm" alt="">
+                  <img th:unless="${p.thumbnail != null}"
+                       src="/images/no-image.png"
+                       class="product-thumb-sm" alt="">
+                </td>
+                <td>
+                  <span class="fw-semibold small" th:text="${#strings.abbreviate(p.name, 35)}"></span>
+                </td>
+                <td>
+                  <small class="text-muted" th:text="${p.category?.name ?: 'N/A'}"></small>
+                </td>
+                <td class="text-center">
+                  <span class="low-stock" th:text="${p.stock}"></span>
+                </td>
+                <td>
+                  <a th:href="@{/admin/products/edit/{id}(id=${p.id})}"
+                     class="btn btn-xs btn-outline-warning d-inline-flex align-items-center gap-1"
+                     style="font-size:.7rem; padding:2px 8px;">
+                    <i data-lucide="pencil" style="width:11px;height:11px"></i>
+                    Cập nhật
+                  </a>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ROW 3: ĐƠN HÀNG GẦN ĐÂY ===== -->
+    <div class="card section-card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold mb-0 section-title">
+          <i data-lucide="scroll-text"></i>
+          Đơn hàng gần đây
+        </h6>
+        <a th:href="@{/admin/orders}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+          Xem tất cả
+          <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
+        </a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th>#Đơn</th>
+            <th>Khách hàng</th>
+            <th>Số SP</th>
+            <th>Tổng tiền</th>
+            <th>Thanh toán</th>
+            <th>Trạng thái</th>
+            <th>Thời gian</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="o : ${recentOrders}">
+            <td class="fw-semibold">#<span th:text="${o.id}"></span></td>
+            <td>
+              <div th:text="${o.fullName}"></div>
+              <small class="text-muted" th:text="${o.phone}"></small>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark border" th:text="${o.orderItems.size()}"></span>
+            </td>
+            <td class="fw-bold text-danger"
+                th:text="${#numbers.formatDecimal(o.totalAmount,0,'COMMA',0,'POINT') + ' ₫'}"></td>
+            <td>
+              <small th:text="${o.paymentMethod.displayName}"></small>
+            </td>
+            <td>
+              <span class="status-badge"
+                    th:classappend="'status-' + ${o.status}"
+                    th:text="${o.status.displayName}"></span>
+            </td>
+            <td>
+              <small class="text-muted"
+                     th:text="${#temporals.format(o.createdAt,'dd/MM HH:mm')}"></small>
+            </td>
+            <td>
+              <a th:href="@{/admin/orders/{id}(id=${o.id})}"
+                 class="btn btn-sm btn-outline-primary d-flex align-items-center justify-content-center"
+                 style="width:32px;height:32px;padding:0;">
+                <i data-lucide="chevron-right" style="width:16px;height:16px"></i>
+              </a>
+            </td>
+          </tr>
+          <tr th:if="${recentOrders.empty}">
+            <td colspan="8" class="text-center text-muted py-5">
+              <div class="d-flex flex-column align-items-center gap-2">
+                <i data-lucide="inbox" style="width:32px;height:32px;opacity:.35"></i>
+                Chưa có đơn hàng nào
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+  // Bắt buộc gọi sau khi DOM load xong
+  lucide.createIcons();
+
+  // Đồng hồ thời gian thực
+  function updateTime() {
+      const now = new Date();
+      document.getElementById('currentTime').textContent =
+          now.toLocaleDateString('vi-VN', {weekday:'long',year:'numeric',month:'long',day:'numeric'})
+          + ' ' + now.toLocaleTimeString('vi-VN');
+  }
+  updateTime();
+  setInterval(updateTime, 1000);
+
+  // Dữ liệu biểu đồ từ Thymeleaf
+  const pending   = /*[[${cntPending}]]*/ 0;
+  const confirmed = /*[[${cntConfirmed}]]*/ 0;
+  const shipping  = /*[[${cntShipping}]]*/ 0;
+  const completed = /*[[${cntCompleted}]]*/ 0;
+  const cancelled = /*[[${cntCancelled}]]*/ 0;
+
+  new Chart(document.getElementById('orderDonut'), {
+      type: 'doughnut',
+      data: {
+          labels: ['Chờ XN', 'Đã XN', 'Đang giao', 'Hoàn thành', 'Đã hủy'],
+          datasets: [{
+              data: [pending, confirmed, shipping, completed, cancelled],
+              backgroundColor: ['#ffc107', '#0d6efd', '#0dcaf0', '#198754', '#dc3545'],
+              borderWidth: 2,
+              borderColor: '#fff'
+          }]
+      },
+      options: {
+          cutout: '65%',
+          plugins: {
+              legend: { display: false },
+              tooltip: {
+                  callbacks: {
+                      label: ctx => ` ${ctx.label}: ${ctx.raw} đơn`
+                  }
+              }
+          }
+      }
+  });
+</script>
+</body>
+</html>

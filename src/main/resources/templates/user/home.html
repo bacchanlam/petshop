@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetShop - Thiên Đường Thú Cưng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --cream:    #fdf6ee;
+            --warm-50:  #fef9f2;
+            --amber:    #d97706;
+            --amber-lt: #fbbf24;
+            --brown:    #78350f;
+            --brown-md: #92400e;
+            --sage:     #6b7c5c;
+            --sage-lt:  #e8edd5;
+            --terracota:#c2622d;
+            --gray-50:  #f9fafb;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --text:     #1c1309;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--cream);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: var(--brown);
+            background-image:
+                radial-gradient(ellipse 70% 60% at 80% 50%, #c2622d55 0%, transparent 70%),
+                radial-gradient(ellipse 40% 50% at 10% 80%, #fbbf2420 0%, transparent 60%);
+            color: #fff;
+            padding: 96px 0 80px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -.5px;
+        }
+        .hero-sub {
+            color: rgba(255,255,255,.72);
+            font-size: 1.05rem;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 999px;
+            padding: 8px 20px;
+            font-size: .88rem;
+            font-weight: 500;
+            color: #fff;
+            text-decoration: none;
+            transition: background .2s, transform .2s;
+            backdrop-filter: blur(4px);
+        }
+        .hero-pill:hover {
+            background: rgba(255,255,255,.22);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        .hero-cta {
+            background: var(--amber-lt);
+            color: var(--brown);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 36px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background .2s, transform .2s, box-shadow .2s;
+            box-shadow: 0 4px 16px rgba(251,191,36,.35);
+        }
+        .hero-cta:hover {
+            background: #fcd34d;
+            color: var(--brown);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(251,191,36,.45);
+        }
+
+        /* ── TRUST BAR ── */
+        .trust-bar {
+            background: #fff;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: .88rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            padding: 14px 0;
+        }
+        .trust-item i { font-size: 1.25rem; color: var(--amber); }
+
+        /* ── SECTION TITLES ── */
+        .section-label {
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        /* ── CATEGORY CARDS ── */
+        .cat-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 16px 20px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text);
+            border: 1.5px solid var(--gray-200);
+            transition: border-color .2s, transform .2s, box-shadow .2s;
+            display: block;
+            height: 100%;
+        }
+        .cat-card:hover {
+            border-color: var(--amber);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(217,119,6,.12);
+            color: var(--text);
+        }
+        .cat-icon {
+            width: 52px; height: 52px;
+            background: var(--warm-50);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 1.4rem;
+            color: var(--amber);
+            border: 1px solid #f3e8d5;
+        }
+        .cat-card:hover .cat-icon { background: #fef3c7; }
+        .cat-name { font-size: .85rem; font-weight: 600; }
+
+        /* ── PRODUCT CARDS ── */
+        .prod-card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1.5px solid var(--gray-200);
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .prod-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(0,0,0,.1);
+            border-color: #e5c99a;
+        }
+        .prod-img-wrap {
+            position: relative;
+            overflow: hidden;
+            background: var(--warm-50);
+        }
+        .prod-img {
+            width: 100%;
+            height: 195px;
+            object-fit: cover;
+            display: block;
+            transition: transform .35s ease;
+        }
+        .prod-card:hover .prod-img { transform: scale(1.04); }
+        .prod-badge {
+            position: absolute;
+            top: 10px; left: 10px;
+            background: var(--brown);
+            color: #fff;
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .5px;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+        .prod-body {
+            padding: 14px 14px 16px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .prod-brand {
+            font-size: .72rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--sage);
+            margin-bottom: 4px;
+        }
+        .prod-name {
+            font-weight: 600;
+            font-size: .9rem;
+            line-height: 1.35;
+            color: var(--text);
+            text-decoration: none;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .prod-name:hover { color: var(--amber); }
+        .stars { color: var(--amber-lt); font-size: .8rem; line-height: 1; }
+        .stars-count { color: var(--gray-600); font-size: .75rem; }
+        .prod-price {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--terracota);
+        }
+        .btn-cart {
+            background: var(--brown);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 0;
+            font-size: .85rem;
+            font-weight: 600;
+            width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: background .2s, transform .15s;
+            cursor: pointer;
+        }
+        .btn-cart:hover { background: var(--brown-md); transform: scale(1.02); }
+        .btn-soldout {
+            background: var(--gray-200);
+            color: var(--gray-600);
+            border: none;
+            border-radius: 10px;
+            padding: 9px 0;
+            font-size: .85rem;
+            font-weight: 600;
+            width: 100%;
+            cursor: not-allowed;
+        }
+
+        /* ── BESTSELLER ── */
+        .bestseller-section {
+            background: linear-gradient(180deg, #fff8ee 0%, #fff 100%);
+        }
+        .bestseller-header-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fef3c7;
+            border: 1.5px solid #fbbf24;
+            border-radius: 999px;
+            padding: 5px 14px;
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--brown);
+            margin-bottom: 6px;
+        }
+        .rank-badge {
+            position: absolute;
+            top: 10px; left: 10px;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: .75rem;
+            font-weight: 800;
+            color: #fff;
+            z-index: 2;
+            line-height: 1;
+        }
+        .rank-1 { background: linear-gradient(135deg,#f59e0b,#d97706); box-shadow:0 2px 8px rgba(245,158,11,.5); }
+        .rank-2 { background: linear-gradient(135deg,#9ca3af,#6b7280); box-shadow:0 2px 8px rgba(107,114,128,.4); }
+        .rank-3 { background: linear-gradient(135deg,#cd7c3b,#b45309); box-shadow:0 2px 8px rgba(180,83,9,.4); }
+        .rank-other { background: var(--brown); }
+        .badge-hot {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: linear-gradient(135deg,#ef4444,#dc2626);
+            color: #fff;
+            font-size: .62rem;
+            font-weight: 800;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 999px;
+            display: flex; align-items: center; gap: 3px;
+            box-shadow: 0 2px 8px rgba(239,68,68,.4);
+        }
+        .sold-count {
+            font-size: .74rem;
+            color: var(--gray-600);
+            display: flex; align-items: center; gap: 4px;
+            margin-bottom: 2px;
+        }
+        .sold-count i { color: #ef4444; font-size: .68rem; }
+
+        /* ── PROMO BANNER ── */
+        .promo-banner {
+            background: var(--sage);
+            background-image: radial-gradient(ellipse 60% 80% at 90% 50%, #4a5e3a55, transparent);
+            color: #fff;
+            border-radius: 20px;
+            padding: 48px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .promo-banner::after {
+            content: '';
+            position: absolute;
+            right: -20px; top: -20px;
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.06);
+        }
+        .promo-banner::before {
+            content: '';
+            position: absolute;
+            right: 60px; bottom: -40px;
+            width: 280px; height: 280px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.04);
+        }
+        .promo-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 700;
+        }
+        .btn-promo {
+            background: #fff;
+            color: var(--sage);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 32px;
+            font-weight: 700;
+            font-size: .95rem;
+            text-decoration: none;
+            display: inline-flex; align-items: center; gap: 8px;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .btn-promo:hover {
+            color: var(--sage);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,.15);
+        }
+
+        /* ── DIVIDER ── */
+        .section-divider {
+            border: none;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gray-200) 20%, var(--gray-200) 80%, transparent);
+            margin: 0;
+        }
+
+        /* ── BRANDS ── */
+        .brands-section {
+            background: #fff;
+            border-top: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .brand-track { display: flex; gap: 12px; overflow: hidden; }
+        .brand-card {
+            flex: 0 0 calc(100% / 7 - 12px);
+            min-width: 120px;
+            background: var(--warm-50);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 14px;
+            padding: 18px 12px;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            text-decoration: none; color: var(--text);
+            transition: border-color .2s, transform .2s, box-shadow .2s;
+            cursor: pointer;
+        }
+        .brand-card:hover {
+            border-color: var(--amber);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(217,119,6,.12);
+            color: var(--text);
+        }
+        .brand-logo-box {
+            width: 150px; height: 100px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: .95rem; letter-spacing: -.5px;
+            color: var(--brown); background: #fff;
+            border-radius: 8px; border: 1px solid #f0e4d0;
+        }
+        .brand-name { font-size: .75rem; font-weight: 600; color: var(--gray-600); text-align: center; }
+
+        /* ── BLOG ── */
+        .blog-card {
+            background: #fff;
+            border-radius: 16px;
+            border: 1.5px solid var(--gray-200);
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s, border-color .2s;
+            height: 100%; display: flex; flex-direction: column;
+            text-decoration: none; color: var(--text);
+        }
+        .blog-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0,0,0,.09); border-color: #e5c99a; color: var(--text); }
+        .blog-img-wrap { position: relative; overflow: hidden; background: var(--sage-lt); }
+        .blog-img { width: 100%; height: 185px; object-fit: cover; display: block; transition: transform .35s ease; }
+        .blog-card:hover .blog-img { transform: scale(1.04); }
+        .blog-cat-badge {
+            position: absolute; top: 12px; left: 12px;
+            background: var(--amber); color: #fff;
+            font-size: .68rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+            padding: 3px 10px; border-radius: 999px;
+        }
+        .blog-body { padding: 16px 16px 18px; display: flex; flex-direction: column; flex: 1; }
+        .blog-meta { font-size: .73rem; color: var(--gray-600); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .blog-meta i { color: var(--amber); }
+        .blog-title { font-family: 'Playfair Display', serif; font-size: .98rem; font-weight: 700; line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .blog-excerpt { font-size: .82rem; color: var(--gray-600); line-height: 1.55; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .blog-readmore { margin-top: 14px; font-size: .82rem; font-weight: 600; color: var(--amber); display: inline-flex; align-items: center; gap: 4px; transition: gap .2s; }
+        .blog-card:hover .blog-readmore { gap: 8px; }
+
+        /* ── RANK SVG ICONS ── */
+        .rank-icon { width: 16px; height: 16px; }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+    <div class="container position-relative text-center">
+        <p class="section-label mb-3" style="color:rgba(251,191,36,.85)">Chào mừng đến với</p>
+        <h1 class="hero-title mb-4">Thiên Đường<br>Thú Cưng</h1>
+        <p class="hero-sub mx-auto mb-5">
+            Thức ăn, đồ chơi & phụ kiện chất lượng cao cho những người bạn bốn chân của bạn
+        </p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+            <a th:href="@{/products}" class="hero-cta">
+                <i class="bi bi-bag-fill"></i> Mua Sắm Ngay
+            </a>
+            <a th:href="@{/products(petType=DOG)}" class="hero-pill">
+                <i class="bi bi-stars"></i> Dành cho Chó
+            </a>
+            <a th:href="@{/products(petType=CAT)}" class="hero-pill">
+                <i class="bi bi-heart-fill" style="font-size:.7rem"></i> Dành cho Mèo
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════ TRUST BAR ═══════════════ -->
+<div class="trust-bar">
+    <div class="container">
+        <div class="row g-0 justify-content-center text-center text-md-start">
+            <div class="col-6 col-md-3">
+                <div class="trust-item justify-content-center justify-content-md-start">
+                    <i class="bi bi-truck"></i><span>Miễn phí vận chuyển từ 300k</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="trust-item justify-content-center justify-content-md-start">
+                    <i class="bi bi-patch-check-fill"></i><span>Hàng chính hãng 100%</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="trust-item justify-content-center justify-content-md-start">
+                    <i class="bi bi-arrow-counterclockwise"></i><span>Đổi trả trong 7 ngày</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="trust-item justify-content-center justify-content-md-start">
+                    <i class="bi bi-headset"></i><span>Hỗ trợ 8:00 – 22:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════ DANH MỤC ═══════════════ -->
+<section class="container py-5">
+    <div class="text-center mb-4">
+        <p class="section-label">Khám phá</p>
+        <h2 class="section-title">Danh Mục Sản Phẩm</h2>
+    </div>
+    <div class="row g-3 justify-content-center">
+        <div th:each="cat : ${categories}" class="col-6 col-sm-4 col-md-3 col-lg-2">
+            <a th:href="@{/products(categoryId=${cat.id})}" class="cat-card">
+                <div class="cat-icon"><i class="bi bi-box2-heart"></i></div>
+                <div class="cat-name" th:text="${cat.name}"></div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════ SẢN PHẨM MỚI ═══════════════ -->
+<section class="container py-5">
+    <div class="d-flex align-items-end justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <p class="section-label mb-1">Vừa cập nhật</p>
+            <h2 class="section-title mb-0">Sản Phẩm Mới Nhất</h2>
+        </div>
+        <a th:href="@{/products}" class="d-inline-flex align-items-center gap-2 text-decoration-none fw-semibold"
+           style="color:var(--amber);font-size:.9rem">
+            Xem tất cả <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+    <div class="row g-3">
+        <div th:each="p : ${newProducts}" class="col-6 col-md-4 col-lg-3">
+            <div class="prod-card">
+                <div class="prod-img-wrap">
+                    <a th:href="@{/products/{id}(id=${p.id})}">
+                        <img th:if="${p.thumbnail != null}" th:src="@{'/uploads/products/' + ${p.thumbnail}}" class="prod-img" alt="ảnh sản phẩm">
+                        <img th:unless="${p.thumbnail != null}" src="/images/no-image.png" class="prod-img" alt="no image">
+                    </a>
+                    <span class="prod-badge" th:text="${p.petType.displayName}"></span>
+                </div>
+                <div class="prod-body">
+                    <div class="prod-brand" th:text="${p.brand ?: '&nbsp;'}"></div>
+                    <a th:href="@{/products/{id}(id=${p.id})}" class="prod-name" th:text="${#strings.abbreviate(p.name, 55)}"></a>
+                    <div class="d-flex align-items-center gap-1 mb-2" th:if="${p.averageRating > 0}">
+                        <span class="stars">
+                            <span th:each="i : ${#numbers.sequence(1,5)}" th:text="${i <= p.averageRating} ? '★' : '☆'"></span>
+                        </span>
+                        <span class="stars-count" th:text="'(' + ${p.reviews.size()} + ')'"></span>
+                    </div>
+                    <div class="mt-auto">
+                        <div class="prod-price mb-3" th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT') + ' ₫'}"></div>
+                        <div th:if="${p.stock > 0}">
+                            <form th:action="@{/cart/add}" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <input type="hidden" name="productId" th:value="${p.id}"/>
+                                <input type="hidden" name="quantity" value="1"/>
+                                <button type="submit" class="btn-cart"><i class="bi bi-cart-plus"></i> Thêm vào giỏ</button>
+                            </form>
+                        </div>
+                        <div th:unless="${p.stock > 0}">
+                            <button class="btn-soldout" disabled><i class="bi bi-x-circle"></i> Hết hàng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:if="${newProducts.empty}" class="col-12 text-center py-5" style="color:var(--gray-600)">
+            <i class="bi bi-inbox fs-1 d-block mb-2 opacity-30"></i>Chưa có sản phẩm nào
+        </div>
+    </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════ SẢN PHẨM BÁN CHẠY NHẤT ═══════════════ -->
+<section class="bestseller-section py-5">
+    <div class="container">
+        <div class="d-flex align-items-end justify-content-between mb-4 flex-wrap gap-2">
+            <div>
+                <div class="bestseller-header-pill">
+                    <i class="bi bi-fire" style="color:#ef4444"></i> Top bán chạy
+                </div>
+                <!-- Đổi 🏆 → Bootstrap Icon -->
+                <h2 class="section-title mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-trophy-fill" style="color:var(--amber)"></i>
+                    Sản Phẩm Bán Chạy Nhất
+                </h2>
+            </div>
+            <a th:href="@{/products}" class="d-inline-flex align-items-center gap-2 text-decoration-none fw-semibold"
+               style="color:var(--amber);font-size:.9rem">
+                Xem tất cả <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-3">
+            <div th:each="p, iterStat : ${bestSellerProducts}" class="col-6 col-md-4 col-lg-3">
+                <div class="prod-card">
+                    <div class="prod-img-wrap">
+                        <a th:href="@{/products/{id}(id=${p.id})}">
+                            <img th:if="${p.thumbnail != null}"
+                                 th:src="@{'/uploads/products/' + ${p.thumbnail}}"
+                                 class="prod-img" alt="ảnh sản phẩm">
+                            <img th:unless="${p.thumbnail != null}"
+                                 src="/images/no-image.png"
+                                 class="prod-img" alt="no image">
+                        </a>
+
+                        <!-- Rank badge trái — dùng Bootstrap Icon thay emoji -->
+                        <span th:class="${'rank-badge ' +
+                            (iterStat.index == 0 ? 'rank-1' :
+                            (iterStat.index == 1 ? 'rank-2' :
+                            (iterStat.index == 2 ? 'rank-3' : 'rank-other')))}">
+                            <th:block th:if="${iterStat.index == 0}">
+                                <i class="bi bi-trophy-fill" style="font-size:.8rem"></i>
+                            </th:block>
+                            <th:block th:if="${iterStat.index == 1}">
+                                <i class="bi bi-award-fill" style="font-size:.8rem"></i>
+                            </th:block>
+                            <th:block th:if="${iterStat.index == 2}">
+                                <i class="bi bi-award" style="font-size:.8rem"></i>
+                            </th:block>
+                            <th:block th:if="${iterStat.index >= 3}">
+                                <span th:text="${iterStat.count}"></span>
+                            </th:block>
+                        </span>
+
+                        <!-- HOT badge phải — chỉ top 3 -->
+                        <span class="badge-hot" th:if="${iterStat.index < 3}">
+                            <i class="bi bi-fire"></i> HOT
+                        </span>
+
+                        <!-- Pet type badge (ẩn khi có rank để tránh chồng) -->
+                        <span class="prod-badge" th:if="${iterStat.index >= 3}"
+                              th:text="${p.petType.displayName}"></span>
+                    </div>
+
+                    <div class="prod-body">
+                        <div class="prod-brand" th:text="${p.brand ?: '&nbsp;'}"></div>
+                        <a th:href="@{/products/{id}(id=${p.id})}" class="prod-name"
+                           th:text="${#strings.abbreviate(p.name, 55)}"></a>
+
+                        <!-- Stars -->
+                        <div class="d-flex align-items-center gap-1 mb-1" th:if="${p.averageRating > 0}">
+                            <span class="stars">
+                                <span th:each="i : ${#numbers.sequence(1,5)}"
+                                      th:text="${i <= p.averageRating} ? '★' : '☆'"></span>
+                            </span>
+                            <span class="stars-count" th:text="'(' + ${p.reviews.size()} + ')'"></span>
+                        </div>
+
+                        <!-- Đã bán (chỉ hiện khi > 0) -->
+                        <div class="sold-count" th:if="${p.soldCount != null and p.soldCount > 0}">
+                            <i class="bi bi-bag-check-fill"></i>
+                            Đã bán <strong th:text="${#numbers.formatDecimal(p.soldCount,0,'COMMA',0,'POINT')}"></strong>
+                        </div>
+
+                        <div class="mt-auto">
+                            <div class="prod-price mb-3"
+                                 th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT') + ' ₫'}"></div>
+                            <div th:if="${p.stock > 0}">
+                                <form th:action="@{/cart/add}" method="post">
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                    <input type="hidden" name="productId" th:value="${p.id}"/>
+                                    <input type="hidden" name="quantity" value="1"/>
+                                    <button type="submit" class="btn-cart">
+                                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                                    </button>
+                                </form>
+                            </div>
+                            <div th:unless="${p.stock > 0}">
+                                <button class="btn-soldout" disabled>
+                                    <i class="bi bi-x-circle"></i> Hết hàng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${bestSellerProducts == null or bestSellerProducts.empty}"
+                 class="col-12 text-center py-5" style="color:var(--gray-600)">
+                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-30"></i>
+                Chưa có dữ liệu bán hàng
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════ THƯƠNG HIỆU ═══════════════ -->
+<section class="brands-section py-5">
+    <div class="container">
+        <div class="d-flex align-items-end justify-content-between mb-4 flex-wrap gap-2">
+            <div>
+                <p class="section-label mb-1">Đối tác tin cậy</p>
+                <h2 class="section-title mb-0">Thương Hiệu Nổi Bật</h2>
+            </div>
+            <a th:href="@{/products}" class="d-inline-flex align-items-center gap-2 text-decoration-none fw-semibold"
+               style="color:var(--amber);font-size:.9rem">
+                Xem tất cả <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        <div class="brand-track">
+            <a th:href="@{/products(brand='Royal Canin')}" class="brand-card">
+                <div class="brand-logo-box"><img th:src="@{/images/brands/royal-canin.png}" alt="Royal Canin" style="width:100%;height:100%;object-fit:contain;"></div>
+                <div class="brand-name">Royal Canin</div>
+            </a>
+            <a th:href="@{/products(brand='Zenith')}" class="brand-card">
+                <div class="brand-logo-box"><img th:src="@{/images/brands/zenith.png}" alt="Zenith" style="width:100%;height:100%;object-fit:contain;"></div>
+                <div class="brand-name">Zenith</div>
+            </a>
+            <a th:href="@{/products(brand='Whiskas')}" class="brand-card">
+                <div class="brand-logo-box"><img th:src="@{/images/brands/whiskas.png}" alt="Whiskas" style="width:100%;height:100%;object-fit:contain;"></div>
+                <div class="brand-name">Whiskas</div>
+            </a>
+            <a th:href="@{/products(brand='LaPaw')}" class="brand-card">
+                <div class="brand-logo-box"><img th:src="@{/images/brands/lapaw.png}" alt="LaPaw" style="width:100%;height:100%;object-fit:contain;"></div>
+                <div class="brand-name">LaPaw</div>
+            </a>
+            <a th:href="@{/products(brand='Nutrience')}" class="brand-card">
+                <div class="brand-logo-box"><img th:src="@{/images/brands/nutrience.png}" alt="Nutrience" style="width:100%;height:100%;object-fit:contain;"></div>
+                <div class="brand-name">Nutrience</div>
+            </a>
+            <a th:href="@{/products(brand='Inaba')}" class="brand-card">
+                <div class="brand-logo-box"><img th:src="@{/images/brands/inaba.png}" alt="Inaba" style="width:100%;height:100%;object-fit:contain;"></div>
+                <div class="brand-name">Inaba</div>
+            </a>
+            <a th:href="@{/products(brand='Me-O')}" class="brand-card">
+                <div class="brand-logo-box"><img th:src="@{/images/brands/meo.png}" alt="Me-O'" style="width:100%;height:100%;object-fit:contain;"></div>
+                <div class="brand-name">Me-O'</div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════ BLOG ═══════════════ -->
+<section class="container py-5">
+    <div class="d-flex align-items-end justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <p class="section-label mb-1">Kiến thức thú cưng</p>
+            <h2 class="section-title mb-0">Góc Chăm Sóc Boss</h2>
+        </div>
+        <a href="#" class="d-inline-flex align-items-center gap-2 text-decoration-none fw-semibold"
+           style="color:var(--amber);font-size:.9rem">
+            Xem tất cả <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+    <div class="row g-3">
+        <div class="col-12 col-md-4">
+            <a href="#" class="blog-card">
+                <div class="blog-img-wrap">
+                    <div class="blog-img d-flex align-items-center justify-content-center"
+                         style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
+                        <i class="bi bi-bowl-hot" style="font-size:3.5rem;color:#d97706;opacity:.5"></i>
+                    </div>
+                    <span class="blog-cat-badge">Dinh Dưỡng</span>
+                </div>
+                <div class="blog-body">
+                    <div class="blog-meta">
+                        <span><i class="bi bi-calendar3"></i> 10 tháng 3, 2026</span>
+                        <span><i class="bi bi-clock"></i> 5 phút đọc</span>
+                    </div>
+                    <div class="blog-title">Chó Nên Ăn Gì Mỗi Ngày? Khẩu Phần Chuẩn Theo Độ Tuổi</div>
+                    <p class="blog-excerpt">Chế độ dinh dưỡng đúng cách giúp thú cưng phát triển toàn diện. Tìm hiểu lượng thức ăn phù hợp cho chó con, chó trưởng thành và chó cao tuổi.</p>
+                    <span class="blog-readmore">Đọc thêm <i class="bi bi-arrow-right"></i></span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a href="#" class="blog-card">
+                <div class="blog-img-wrap">
+                    <div class="blog-img d-flex align-items-center justify-content-center"
+                         style="background:linear-gradient(135deg,#e0f2fe,#bae6fd)">
+                        <i class="bi bi-droplet-half" style="font-size:3.5rem;color:#0284c7;opacity:.5"></i>
+                    </div>
+                    <span class="blog-cat-badge" style="background:var(--sage)">Chăm Sóc</span>
+                </div>
+                <div class="blog-body">
+                    <div class="blog-meta">
+                        <span><i class="bi bi-calendar3"></i> 8 tháng 3, 2026</span>
+                        <span><i class="bi bi-clock"></i> 4 phút đọc</span>
+                    </div>
+                    <div class="blog-title">Tắm Cho Mèo Đúng Cách — Bí Quyết Để Boss Không Stress</div>
+                    <p class="blog-excerpt">Mèo vốn không thích nước nhưng việc tắm định kỳ vẫn rất cần thiết. Hướng dẫn từng bước giúp bạn và boss có trải nghiệm tắm dễ chịu nhất.</p>
+                    <span class="blog-readmore">Đọc thêm <i class="bi bi-arrow-right"></i></span>
+                </div>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a href="#" class="blog-card">
+                <div class="blog-img-wrap">
+                    <div class="blog-img d-flex align-items-center justify-content-center"
+                         style="background:linear-gradient(135deg,#dcfce7,#bbf7d0)">
+                        <i class="bi bi-heart-pulse" style="font-size:3.5rem;color:#16a34a;opacity:.5"></i>
+                    </div>
+                    <span class="blog-cat-badge" style="background:var(--terracota)">Sức Khỏe</span>
+                </div>
+                <div class="blog-body">
+                    <div class="blog-meta">
+                        <span><i class="bi bi-calendar3"></i> 5 tháng 3, 2026</span>
+                        <span><i class="bi bi-clock"></i> 6 phút đọc</span>
+                    </div>
+                    <div class="blog-title">Lịch Tiêm Vaccine Cho Chó & Mèo — Những Mũi Không Thể Bỏ</div>
+                    <p class="blog-excerpt">Tiêm phòng đầy đủ là nền tảng bảo vệ sức khỏe cho thú cưng. Xem lịch tiêm chuẩn và các loại vaccine bắt buộc cho chó và mèo ở Việt Nam.</p>
+                    <span class="blog-readmore">Đọc thêm <i class="bi bi-arrow-right"></i></span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═══════════════ PROMO BANNER ═══════════════ -->
+<section class="container pb-5">
+    <div class="promo-banner">
+        <div class="row align-items-center g-4">
+            <div class="col-md-8">
+                <p class="mb-2" style="color:rgba(255,255,255,.65);font-size:.85rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase">
+                    Ưu đãi đặc biệt
+                </p>
+                <h3 class="promo-title mb-2">Miễn Phí Vận Chuyển<br>Toàn Quốc</h3>
+                <p style="color:rgba(255,255,255,.75);font-size:.95rem;margin-bottom:0">
+                    Cho đơn hàng từ <strong style="color:#fff">300.000 ₫</strong> — áp dụng mọi đơn, mọi ngày
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a th:href="@{/products}" class="btn-promo">
+                    <i class="bi bi-bag-check-fill"></i> Mua ngay
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    fetch('/cart/count')
+        .then(r => r.json())
+        .then(data => {
+            const el = document.getElementById('cartCount');
+            if (el && data.count > 0) el.textContent = data.count;
+        }).catch(() => {});
+</script>
+</body>
+</html>

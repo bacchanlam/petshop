@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Giới Thiệu – PetShop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --off-white: #f7f4ef;
+      --warm-white: #fdfbf8;
+      --ink: #1a1714;
+      --ink-light: #4a4540;
+      --ink-muted: #8a8178;
+      --rule: #d9d3c8;
+      --accent: #c8601a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--warm-white);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── HERO ────────────────────────────── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 88vh;
+      border-bottom: 1px solid var(--rule);
+    }
+    .hero-text {
+      padding: 80px 64px 80px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-right: 1px solid var(--rule);
+    }
+    .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 28px;
+    }
+    .hero-title {
+      font-family: 'Lora', serif;
+      font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+      font-weight: 600;
+      line-height: 1.18;
+      color: var(--ink);
+      margin-bottom: 32px;
+    }
+    .hero-title em { font-style: italic; color: var(--accent); }
+    .hero-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: var(--ink-light);
+      max-width: 420px;
+      margin-bottom: 48px;
+    }
+    .hero-rule { width: 40px; height: 2px; background: var(--accent); margin-bottom: 32px; }
+    .hero-stats { display: flex; gap: 40px; }
+    .stat-num {
+      font-family: 'Lora', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1;
+      display: block;
+    }
+    .stat-label { font-size: 0.78rem; color: var(--ink-muted); margin-top: 4px; }
+
+    .hero-image {
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-image-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 40px;
+    }
+    .hero-caption {
+      background: rgba(247, 244, 239, 0.92);
+      backdrop-filter: blur(8px);
+      border-left: 3px solid var(--accent);
+      padding: 16px 20px;
+      max-width: 280px;
+    }
+    .hero-caption p {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    .hero-caption span {
+      display: block;
+      font-style: normal;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      margin-top: 8px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── STORY ───────────────────────────── */
+    .story-section {
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr;
+      border-bottom: 1px solid var(--rule);
+    }
+    .section-aside {
+      padding: 64px 32px;
+      border-right: 1px solid var(--rule);
+    }
+    .section-number {
+      font-family: 'Lora', serif;
+      font-size: 3.5rem;
+      font-weight: 600;
+      color: var(--rule);
+      line-height: 1;
+      display: block;
+    }
+    .section-tag {
+      writing-mode: vertical-rl;
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-top: 20px;
+    }
+    .story-col {
+      padding: 64px 48px;
+      border-right: 1px solid var(--rule);
+    }
+    .story-col:last-child { border-right: none; }
+    .story-col h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--ink);
+      margin-bottom: 24px;
+    }
+    .story-col p {
+      font-size: 0.94rem;
+      line-height: 1.9;
+      color: var(--ink-light);
+      margin-bottom: 16px;
+    }
+
+    /* ── PULL QUOTE ──────────────────────── */
+    .pullquote-section {
+      padding: 80px 48px;
+      border-bottom: 1px solid var(--rule);
+      background: var(--off-white);
+      display: flex;
+      align-items: center;
+      gap: 64px;
+    }
+    .pq-label {
+      flex-shrink: 0;
+      writing-mode: vertical-rl;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+    .pq-line {
+      flex-shrink: 0;
+      width: 1px;
+      height: 80px;
+      background: var(--rule);
+    }
+    .pq-text {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--ink);
+      max-width: 680px;
+    }
+    .pq-text strong { font-style: normal; color: var(--accent); font-weight: 600; }
+
+    /* ── WHY US ──────────────────────────── */
+    .why-section { border-bottom: 1px solid var(--rule); }
+    .why-header {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      border-bottom: 1px solid var(--rule);
+    }
+    .why-header-aside {
+      padding: 32px;
+      border-right: 1px solid var(--rule);
+    }
+    .why-header-main {
+      padding: 32px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .why-header-main h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .why-count { font-size: 0.78rem; color: var(--ink-muted); }
+    .why-grid { display: grid; grid-template-columns: 200px 1fr 1fr; }
+    .why-grid-aside { border-right: 1px solid var(--rule); }
+    .why-items { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; }
+    .why-item {
+      padding: 48px;
+      border-right: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .why-item:nth-child(even) { border-right: none; }
+    .why-item:nth-child(3), .why-item:nth-child(4) { border-bottom: none; }
+    .why-item-num {
+      font-family: 'Lora', serif;
+      font-size: 0.78rem;
+      color: var(--accent);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 16px;
+      letter-spacing: 0.08em;
+    }
+    .why-item h3 {
+      font-family: 'Lora', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+    .why-item p { font-size: 0.88rem; line-height: 1.8; color: var(--ink-muted); }
+
+    /* ── PRODUCTS ────────────────────────── */
+    .products-section { border-bottom: 1px solid var(--rule); }
+    .products-header {
+      padding: 48px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+    }
+    .products-header h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--ink);
+      max-width: 400px;
+      line-height: 1.35;
+    }
+    .products-header p {
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: var(--ink-muted);
+      max-width: 360px;
+    }
+    .product-cats { display: grid; grid-template-columns: repeat(3, 1fr); }
+    .pcat {
+      padding: 40px 48px;
+      border-right: 1px solid var(--rule);
+      text-decoration: none;
+      transition: background 0.2s;
+      display: block;
+    }
+    .pcat:last-child { border-right: none; }
+    .pcat:hover { background: var(--off-white); }
+    .pcat-icon { width: 36px; height: 36px; margin-bottom: 20px; color: var(--ink-muted); }
+    .pcat h3 {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .pcat p {
+      font-size: 0.82rem;
+      color: var(--ink-muted);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .pcat-link {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pcat-link svg { transition: transform 0.2s; }
+    .pcat:hover .pcat-link svg { transform: translateX(4px); }
+
+    /* ── CONTACT ─────────────────────────── */
+    .contact-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--rule);
+    }
+    .contact-left {
+      padding: 64px 48px;
+      border-right: 1px solid var(--rule);
+      background: var(--ink);
+    }
+    .contact-left h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.8rem;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 16px;
+      color: #fff;
+    }
+    .contact-left p {
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.5);
+      max-width: 360px;
+      margin-bottom: 40px;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .cta-btn:hover { background: #a84f14; transform: translateY(-1px); }
+    .contact-right { padding: 64px 48px; }
+    .contact-right h3 {
+      font-family: 'Lora', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 32px;
+    }
+    .contact-list { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+    .contact-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 0.88rem;
+      color: var(--ink-light);
+      line-height: 1.5;
+    }
+    .contact-list li svg { flex-shrink: 0; margin-top: 2px; color: var(--accent); }
+    .contact-list li strong {
+      display: block;
+      font-weight: 500;
+      color: var(--ink);
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+
+    /* ── REVEAL ──────────────────────────── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ──────────────────────── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-image { display: none; }
+      .hero-text { padding: 48px 24px; }
+      .story-section { grid-template-columns: 1fr; }
+      .section-aside { display: none; }
+      .story-col { padding: 40px 24px; border-right: none; }
+      .pullquote-section { padding: 48px 24px; flex-direction: column; gap: 24px; }
+      .pq-label, .pq-line { display: none; }
+      .why-header { grid-template-columns: 1fr; }
+      .why-header-aside { display: none; }
+      .why-header-main { padding: 24px; }
+      .why-grid { grid-template-columns: 1fr; }
+      .why-grid-aside { display: none; }
+      .why-items { grid-column: 1; grid-template-columns: 1fr; }
+      .why-item { padding: 32px 24px; border-right: none; }
+      .why-item:nth-child(3) { border-bottom: 1px solid var(--rule); }
+      .products-header { flex-direction: column; align-items: flex-start; padding: 32px 24px; }
+      .product-cats { grid-template-columns: 1fr; }
+      .pcat { border-right: none; border-bottom: 1px solid var(--rule); padding: 32px 24px; }
+      .pcat:last-child { border-bottom: none; }
+      .contact-section { grid-template-columns: 1fr; }
+      .contact-left { padding: 48px 24px; border-right: none; }
+      .contact-right { padding: 48px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar chung (fragment) -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <p class="eyebrow">Giới thiệu — PetShop</p>
+    <h1 class="hero-title">
+      Chuyên cung cấp<br/>
+      những điều tốt nhất<br/>
+      cho <em>thú cưng của bạn</em>
+    </h1>
+    <p class="hero-body">
+      Chúng tôi không chỉ bán hàng. Chúng tôi là những người nuôi thú cưng,
+      hiểu rõ những gì chúng cần — và cam kết mang đến sản phẩm chất lượng
+      thật sự, không qua loa.
+    </p>
+    <div class="hero-rule"></div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num">500+</span>
+        <span class="stat-label">Sản phẩm chính hãng</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">3.000+</span>
+        <span class="stat-label">Khách hàng tin tưởng</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">5 năm</span>
+        <span class="stat-label">Kinh nghiệm</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-image">
+    <img
+            src="https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=900&auto=format&fit=crop&q=80"
+            alt="Chó và Mèo"
+            style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;"
+    />
+    <div class="hero-image-inner">
+      <div class="hero-caption">
+        <p>"Thú cưng là thành viên gia đình — chúng xứng đáng được chăm sóc tốt nhất."</p>
+        <span>— Triết lý của PetShop</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="story-section">
+  <div class="section-aside fade-in">
+    <span class="section-number">01</span>
+    <span class="section-tag">Câu chuyện</span>
+  </div>
+  <div class="story-col fade-in" style="transition-delay:.1s">
+    <h2>Ra đời từ tình yêu dành cho thú cưng</h2>
+    <p>PetShop được thành lập tại TP. Hồ Chí Minh bởi những người thực sự yêu và nuôi thú cưng. Từ ngày đầu, chúng tôi đặt ra một tiêu chí đơn giản: chỉ bán những gì chúng tôi sẵn sàng dùng cho thú cưng của chính mình.</p>
+    <p>Không phải mọi sản phẩm đắt tiền đều tốt, và không phải sản phẩm rẻ nào cũng kém chất lượng. Chúng tôi nghiên cứu kỹ từng dòng hàng trước khi đưa lên kệ — vì sức khỏe của thú cưng không phải chuyện để thử nghiệm.</p>
+  </div>
+  <div class="story-col fade-in" style="transition-delay:.2s">
+    <h2>Không chỉ là cửa hàng</h2>
+    <p>Chúng tôi hiểu rằng nuôi thú cưng đôi khi gây bối rối — quá nhiều lựa chọn, quá nhiều thông tin mâu thuẫn. Đội ngũ của PetShop luôn sẵn sàng tư vấn thật, không chỉ để bán được hàng.</p>
+    <p>Hỏi chúng tôi về chế độ dinh dưỡng, về loại đồ chơi phù hợp theo giống, theo tuổi — chúng tôi sẽ trả lời thẳng thắn, kể cả khi câu trả lời đó là "không cần mua gì cả."</p>
+  </div>
+</section>
+
+<!-- PULL QUOTE -->
+<div class="pullquote-section fade-in">
+  <span class="pq-label">Cam kết</span>
+  <div class="pq-line"></div>
+  <p class="pq-text">
+    "Mỗi sản phẩm chúng tôi bán ra đều xuất phát từ một câu hỏi duy nhất:
+    <strong>nếu đây là thú cưng của mình, mình có dùng sản phẩm này không?</strong>"
+  </p>
+</div>
+
+<!-- WHY US -->
+<section class="why-section">
+  <div class="why-header fade-in">
+    <div class="why-header-aside">
+      <span class="section-number" style="font-size:2rem;color:var(--rule);font-family:'Lora',serif;font-weight:600;">02</span>
+    </div>
+    <div class="why-header-main">
+      <h2>Tại sao khách hàng chọn PetShop</h2>
+      <span class="why-count">4 lý do</span>
+    </div>
+  </div>
+  <div class="why-grid">
+    <div class="why-grid-aside"></div>
+    <div class="why-items">
+      <div class="why-item fade-in">
+        <span class="why-item-num">— 01</span>
+        <h3>Sản phẩm chính hãng, rõ nguồn gốc</h3>
+        <p>Nhập khẩu từ các thương hiệu có kiểm chứng. Chúng tôi không kinh doanh hàng không rõ nguồn gốc, dù lợi nhuận cao hơn.</p>
+      </div>
+      <div class="why-item fade-in" style="transition-delay:.1s">
+        <span class="why-item-num">— 02</span>
+        <h3>Tư vấn thật, không bán ép</h3>
+        <p>Đội ngũ đều là người nuôi thú cưng. Chúng tôi tư vấn dựa trên nhu cầu thật của thú cưng bạn, không dựa trên hoa hồng.</p>
+      </div>
+      <div class="why-item fade-in" style="transition-delay:.15s">
+        <span class="why-item-num">— 03</span>
+        <h3>Giao hàng nhanh, đóng gói cẩn thận</h3>
+        <p>Thức ăn và đồ dùng được đóng gói đúng cách, không để bẹp hoặc biến dạng trong quá trình vận chuyển.</p>
+      </div>
+      <div class="why-item fade-in" style="transition-delay:.2s">
+        <span class="why-item-num">— 04</span>
+        <h3>Hỗ trợ 8:00 – 20:00 mỗi ngày</h3>
+        <p>Có vấn đề với đơn hàng, thắc mắc về sản phẩm, hay chỉ cần hỏi về chế độ ăn — chúng tôi luôn ở đây.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products-section">
+  <div class="products-header fade-in">
+    <h2>Chúng tôi có gì cho thú cưng của bạn?</h2>
+    <p>Từ thức ăn hằng ngày đến đồ chơi, phụ kiện và sản phẩm chăm sóc — tất cả đều được chọn lọc kỹ trước khi lên kệ.</p>
+  </div>
+  <div class="product-cats">
+    <a th:href="@{/products(petType=DOG)}" href="/products?petType=DOG" class="pcat fade-in">
+      <svg class="pcat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5"/>
+        <path d="M14.267 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.96-1.45-2.344-2.5"/>
+        <path d="M8 14v.5"/><path d="M16 14v.5"/>
+        <path d="M11.25 16.25h1.5L12 17l-.75-.75z"/>
+        <path d="M4.42 11.247A13.152 13.152 0 0 0 4 14.556C4 18.728 7.582 21 12 21s8-2.272 8-6.444c0-1.061-.162-2.2-.493-3.309m-9.243-6.082A8.801 8.801 0 0 1 12 5c.78 0 1.5.108 2.161.306"/>
+      </svg>
+      <h3>Sản phẩm cho chó</h3>
+      <p>Thức ăn hạt, pate, bánh thưởng, đồ chơi, vòng cổ và dụng cụ chăm sóc.</p>
+      <span class="pcat-link">Xem sản phẩm <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </a>
+    <a th:href="@{/products(petType=CAT)}" href="/products?petType=CAT" class="pcat fade-in" style="transition-delay:.1s">
+      <svg class="pcat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5c.67 0 1.35.09 2 .26 1.78-2 5.03-2.84 6.42-2.26 1.4.58-.42 7-.42 7 .57 1.07 1 2.24 1 3.44C21 17.9 16.97 21 12 21s-9-3-9-7.56c0-1.25.5-2.4 1-3.44 0 0-1.89-6.42-.5-7 1.39-.58 4.72.23 6.5 2.23A9.04 9.04 0 0 1 12 5Z"/>
+        <path d="M8 14v.5"/><path d="M16 14v.5"/>
+        <path d="M11.25 16.25h1.5L12 17l-.75-.75z"/>
+      </svg>
+      <h3>Sản phẩm cho mèo</h3>
+      <p>Thức ăn ướt, hạt khô, cát vệ sinh, nhà cho mèo và đồ chơi kích thích.</p>
+      <span class="pcat-link">Xem sản phẩm <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </a>
+    <a th:href="@{/products}" href="/products" class="pcat fade-in" style="transition-delay:.2s">
+      <svg class="pcat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.29 7 12 12 20.71 7"/>
+        <line x1="12" x2="12" y1="22" y2="12"/>
+      </svg>
+      <h3>Tất cả sản phẩm</h3>
+      <p>Duyệt toàn bộ danh mục — lọc theo loại thú cưng, thương hiệu và mức giá.</p>
+      <span class="pcat-link">Xem tất cả <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+    </a>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section">
+  <div class="contact-left fade-in">
+    <h2>Còn thắc mắc?<br/>Hãy liên hệ với chúng tôi.</h2>
+    <p>Đội ngũ PetShop luôn sẵn sàng hỗ trợ — dù là câu hỏi về sản phẩm, đơn hàng, hay chỉ cần tư vấn về chế độ ăn cho thú cưng.</p>
+    <a th:href="@{mailto:support@petshop.vn}" href="mailto:support@petshop.vn" class="cta-btn">
+      Gửi email ngay
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </a>
+  </div>
+  <div class="contact-right fade-in" style="transition-delay:.1s">
+    <h3>Thông tin liên hệ</h3>
+    <ul class="contact-list">
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div><strong>Địa chỉ</strong>123 Đường Thú Cưng, TP. Hồ Chí Minh</div>
+      </li>
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.54 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <div><strong>Điện thoại</strong>0900 000 000</div>
+      </li>
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <div><strong>Email</strong>support@petshop.vn</div>
+      </li>
+      <li>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <div><strong>Giờ làm việc</strong>8:00 – 20:00, Thứ 2 đến Chủ nhật</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- Footer chung (fragment) -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

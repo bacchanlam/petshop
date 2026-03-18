@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="vi">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Thành Viên PetShop</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+          --off-white: #f7f4ef;
+          --warm-white: #fdfbf8;
+          --ink: #1a1714;
+          --ink-light: #4a4540;
+          --ink-muted: #8a8178;
+          --rule: #d9d3c8;
+          --accent: #c8601a;
+
+          /* Tier colors */
+          --bronze: #cd7f32;
+          --bronze-bg: #fdf6ee;
+          --silver: #9e9e9e;
+          --silver-bg: #f5f5f5;
+          --gold: #d4a017;
+          --gold-bg: #fffbec;
+          --diamond: #5b8dee;
+          --diamond-bg: #eef4ff;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+          background: var(--warm-white);
+          color: var(--ink);
+          font-family: 'DM Sans', sans-serif;
+          font-weight: 300;
+          -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── HERO ── */
+        .mem-hero {
+          background: var(--ink);
+          color: #fff;
+          padding: 80px 48px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 64px;
+          align-items: center;
+          border-bottom: 1px solid #333;
+          position: relative;
+          overflow: hidden;
+        }
+        .mem-hero::before {
+          content: '';
+          position: absolute;
+          right: -80px; top: -80px;
+          width: 400px; height: 400px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(200,96,26,.18) 0%, transparent 70%);
+          pointer-events: none;
+        }
+        .mem-hero-eyebrow {
+          font-size: 0.72rem;
+          font-weight: 500;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--accent);
+          margin-bottom: 20px;
+        }
+        .mem-hero h1 {
+          font-family: 'Lora', serif;
+          font-size: clamp(2rem, 4vw, 3.2rem);
+          font-weight: 600;
+          line-height: 1.2;
+          margin-bottom: 20px;
+        }
+        .mem-hero h1 em { font-style: italic; color: var(--accent); }
+        .mem-hero-desc {
+          font-size: 0.98rem;
+          line-height: 1.85;
+          color: rgba(255,255,255,.6);
+          margin-bottom: 36px;
+          max-width: 420px;
+        }
+        .mem-hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+        .btn-accent {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: var(--accent); color: #fff;
+          text-decoration: none; font-size: 0.84rem;
+          font-weight: 500; letter-spacing: 0.06em;
+          text-transform: uppercase; padding: 14px 28px;
+          border: none; cursor: pointer;
+          transition: background .2s, transform .2s;
+        }
+        .btn-accent:hover { background: #a84f14; transform: translateY(-1px); color: #fff; }
+        .btn-outline-light-custom {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: transparent; color: rgba(255,255,255,.7);
+          text-decoration: none; font-size: 0.84rem;
+          font-weight: 500; letter-spacing: 0.06em;
+          text-transform: uppercase; padding: 13px 28px;
+          border: 1px solid rgba(255,255,255,.25);
+          cursor: pointer; transition: border-color .2s, color .2s;
+        }
+        .btn-outline-light-custom:hover { border-color: rgba(255,255,255,.6); color: #fff; }
+
+        /* Points card in hero */
+        .hero-card {
+          background: rgba(255,255,255,.06);
+          border: 1px solid rgba(255,255,255,.12);
+          border-radius: 2px;
+          padding: 40px;
+          backdrop-filter: blur(8px);
+        }
+        .hero-card-title {
+          font-size: 0.72rem; letter-spacing: 0.14em;
+          text-transform: uppercase; color: rgba(255,255,255,.4);
+          margin-bottom: 28px;
+        }
+        .hero-card-stat {
+          margin-bottom: 24px;
+        }
+        .hero-card-stat .num {
+          font-family: 'Lora', serif;
+          font-size: 2.8rem; font-weight: 600;
+          color: #fff; line-height: 1;
+        }
+        .hero-card-stat .num span { font-size: 1.2rem; color: var(--accent); margin-left: 4px; }
+        .hero-card-stat .lbl { font-size: 0.78rem; color: rgba(255,255,255,.45); margin-top: 4px; }
+        .hero-card-divider { height: 1px; background: rgba(255,255,255,.1); margin: 24px 0; }
+        .tier-badge-hero {
+          display: inline-flex; align-items: center; gap: 10px;
+          font-size: 0.82rem; font-weight: 500;
+        }
+        .tier-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
+        .tier-dot.silver { background: var(--silver); }
+        .tier-dot.bronze { background: var(--bronze); }
+        .tier-dot.diamond { background: var(--diamond); }
+        .progress-wrap { margin-top: 20px; }
+        .progress-lbl { display: flex; justify-content: space-between; font-size: 0.75rem; color: rgba(255,255,255,.4); margin-bottom: 8px; }
+        .progress-bar-bg { height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; }
+        .progress-bar-fill { height: 4px; border-radius: 2px; background: var(--gold); width: 62%; }
+
+        /* ── SECTION COMMON ── */
+        .section-rule { border-bottom: 1px solid var(--rule); }
+        .section-header {
+          display: grid;
+          grid-template-columns: 200px 1fr;
+          border-bottom: 1px solid var(--rule);
+        }
+        .section-aside {
+          padding: 40px 32px;
+          border-right: 1px solid var(--rule);
+        }
+        .section-num {
+          font-family: 'Lora', serif;
+          font-size: 3rem; font-weight: 600;
+          color: var(--rule); line-height: 1; display: block;
+        }
+        .section-tag {
+          writing-mode: vertical-rl;
+          font-size: 0.68rem; letter-spacing: 0.16em;
+          text-transform: uppercase; color: var(--ink-muted); margin-top: 16px;
+        }
+        .section-main { padding: 40px 48px; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+        .section-main h2 {
+          font-family: 'Lora', serif;
+          font-size: 1.5rem; font-weight: 600; color: var(--ink); line-height: 1.3;
+        }
+        .section-main p { font-size: 0.88rem; line-height: 1.8; color: var(--ink-muted); max-width: 400px; }
+
+        /* ── TIERS ── */
+        .tiers-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          border-bottom: 1px solid var(--rule);
+        }
+        .tier-card {
+          padding: 48px 36px;
+          border-right: 1px solid var(--rule);
+          transition: background .2s;
+          position: relative;
+        }
+        .tier-card:last-child { border-right: none; }
+        .tier-card:hover { background: var(--off-white); }
+        .tier-icon {
+          width: 48px; height: 48px; border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 1.4rem; margin-bottom: 24px;
+        }
+        .tier-icon.bronze-i { background: var(--bronze-bg); }
+        .tier-icon.silver-i { background: var(--silver-bg); }
+        .tier-icon.gold-i   { background: var(--gold-bg); }
+        .tier-icon.diamond-i { background: var(--diamond-bg); }
+        .tier-name {
+          font-family: 'Lora', serif;
+          font-size: 1.2rem; font-weight: 600;
+          margin-bottom: 6px;
+        }
+        .tier-name.bronze-t  { color: var(--bronze); }
+        .tier-name.silver-t  { color: var(--silver); }
+        .tier-name.gold-t    { color: var(--gold); }
+        .tier-name.diamond-t { color: var(--diamond); }
+        .tier-req {
+          font-size: 0.78rem; color: var(--ink-muted);
+          margin-bottom: 24px; padding-bottom: 20px;
+          border-bottom: 1px solid var(--rule);
+        }
+        .tier-perks { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .tier-perks li {
+          font-size: 0.84rem; color: var(--ink-light);
+          display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+        }
+        .tier-perks li::before {
+          content: '—'; color: var(--accent);
+          font-weight: 600; flex-shrink: 0; margin-top: 1px;
+        }
+        .tier-current-badge {
+          position: absolute; top: 20px; right: 20px;
+          background: var(--accent); color: #fff;
+          font-size: 0.65rem; font-weight: 500;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          padding: 4px 10px;
+        }
+
+        /* ── HOW IT WORKS ── */
+        .how-grid {
+          display: grid;
+          grid-template-columns: 200px 1fr;
+          border-bottom: 1px solid var(--rule);
+        }
+        .how-steps {
+          padding: 56px 48px;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 40px;
+        }
+        .step-item {}
+        .step-num {
+          font-family: 'Lora', serif;
+          font-size: 2.5rem; font-weight: 600;
+          color: var(--rule); line-height: 1;
+          margin-bottom: 16px; display: block;
+        }
+        .step-title {
+          font-family: 'Lora', serif;
+          font-size: 1rem; font-weight: 600;
+          color: var(--ink); margin-bottom: 8px;
+        }
+        .step-desc { font-size: 0.86rem; line-height: 1.8; color: var(--ink-muted); }
+
+        /* ── EARN POINTS TABLE ── */
+        .earn-section { border-bottom: 1px solid var(--rule); }
+        .earn-grid {
+          display: grid;
+          grid-template-columns: 200px 1fr;
+        }
+        .earn-table-wrap { padding: 0; }
+        .earn-table {
+          width: 100%; border-collapse: collapse;
+        }
+        .earn-table thead th {
+          padding: 16px 24px;
+          font-size: 0.72rem; font-weight: 500;
+          letter-spacing: 0.1em; text-transform: uppercase;
+          color: var(--ink-muted);
+          border-bottom: 1px solid var(--rule);
+          text-align: left;
+        }
+        .earn-table tbody td {
+          padding: 18px 24px;
+          font-size: 0.88rem; color: var(--ink-light);
+          border-bottom: 1px solid var(--rule);
+          vertical-align: middle;
+        }
+        .earn-table tbody tr:last-child td { border-bottom: none; }
+        .earn-table tbody tr:hover td { background: var(--off-white); }
+        .earn-action { display: flex; align-items: center; gap: 10px; }
+        .earn-action-icon {
+          width: 32px; height: 32px; border-radius: 50%;
+          background: var(--off-white); display: flex;
+          align-items: center; justify-content: center; font-size: 0.9rem;
+          flex-shrink: 0;
+        }
+        .earn-pts {
+          font-family: 'Lora', serif;
+          font-size: 1rem; font-weight: 600;
+          color: var(--accent);
+        }
+        .badge-tag {
+          font-size: 0.68rem; font-weight: 500;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          padding: 3px 8px;
+          background: var(--off-white); color: var(--ink-muted);
+          border: 1px solid var(--rule);
+        }
+        .badge-tag.hot { background: #fff4f0; color: var(--accent); border-color: #f5c4b0; }
+        .badge-tag.new { background: #eef4ff; color: var(--diamond); border-color: #c0d4f7; }
+
+        /* ── REDEEM ── */
+        .redeem-section { border-bottom: 1px solid var(--rule); }
+        .redeem-items {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .redeem-item {
+          padding: 40px 40px;
+          border-right: 1px solid var(--rule);
+          transition: background .2s;
+        }
+        .redeem-item:last-child { border-right: none; }
+        .redeem-item:hover { background: var(--off-white); }
+        .redeem-pts-badge {
+          display: inline-block;
+          font-family: 'Lora', serif;
+          font-size: 1.4rem; font-weight: 600;
+          color: var(--accent);
+          margin-bottom: 16px;
+        }
+        .redeem-pts-badge span { font-size: 0.75rem; color: var(--ink-muted); margin-left: 4px; font-family: 'DM Sans', sans-serif; }
+        .redeem-title {
+          font-family: 'Lora', serif;
+          font-size: 1rem; font-weight: 600;
+          color: var(--ink); margin-bottom: 8px;
+        }
+        .redeem-desc { font-size: 0.82rem; color: var(--ink-muted); line-height: 1.7; margin-bottom: 20px; }
+        .redeem-btn {
+          font-size: 0.76rem; font-weight: 500;
+          letter-spacing: 0.08em; text-transform: uppercase;
+          color: var(--accent); text-decoration: none;
+          display: flex; align-items: center; gap: 6px;
+          border: none; background: none; cursor: pointer; padding: 0;
+          transition: gap .2s;
+        }
+        .redeem-btn:hover { gap: 10px; }
+
+        /* ── FAQ ── */
+        .faq-section { border-bottom: 1px solid var(--rule); }
+        .faq-grid {
+          display: grid;
+          grid-template-columns: 200px 1fr;
+        }
+        .faq-list { padding: 0; }
+        .faq-item {
+          border-bottom: 1px solid var(--rule);
+          overflow: hidden;
+        }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-q {
+          width: 100%; padding: 24px 48px;
+          display: flex; justify-content: space-between; align-items: center;
+          font-family: 'Lora', serif;
+          font-size: 0.98rem; font-weight: 600;
+          color: var(--ink); background: none;
+          border: none; cursor: pointer; text-align: left; gap: 16px;
+          transition: background .2s;
+        }
+        .faq-q:hover { background: var(--off-white); }
+        .faq-icon {
+          flex-shrink: 0; width: 20px; height: 20px;
+          border: 1px solid var(--rule); border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.8rem; color: var(--ink-muted);
+          transition: transform .3s;
+        }
+        .faq-item.open .faq-icon { transform: rotate(45deg); }
+        .faq-a {
+          max-height: 0; overflow: hidden;
+          transition: max-height .35s ease, padding .35s ease;
+          padding: 0 48px;
+          font-size: 0.88rem; line-height: 1.85; color: var(--ink-muted);
+        }
+        .faq-item.open .faq-a { max-height: 200px; padding: 0 48px 24px; }
+
+        /* ── SUBSCRIBE FORM (inline, not from footer) ── */
+        .sub-section {
+          background: var(--off-white);
+          padding: 64px 48px;
+          border-bottom: 1px solid var(--rule);
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 64px;
+          align-items: center;
+        }
+        .sub-section h2 {
+          font-family: 'Lora', serif;
+          font-size: 1.6rem; font-weight: 600;
+          color: var(--ink); margin-bottom: 12px;
+        }
+        .sub-section p { font-size: 0.9rem; color: var(--ink-muted); line-height: 1.8; }
+        .sub-form { display: flex; gap: 0; }
+        .sub-input {
+          flex: 1; padding: 14px 20px;
+          border: 1px solid var(--rule); border-right: none;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.88rem; background: #fff;
+          outline: none; color: var(--ink);
+        }
+        .sub-input:focus { border-color: var(--accent); }
+        .sub-btn {
+          padding: 14px 28px;
+          background: var(--accent); color: #fff;
+          border: none; font-size: 0.82rem; font-weight: 500;
+          letter-spacing: 0.06em; text-transform: uppercase;
+          cursor: pointer; transition: background .2s;
+          white-space: nowrap;
+        }
+        .sub-btn:hover { background: #a84f14; }
+
+        /* ── FADE ANIMATION ── */
+        .fade-in {
+          opacity: 0; transform: translateY(20px);
+          transition: opacity .65s ease, transform .65s ease;
+        }
+        .fade-in.visible { opacity: 1; transform: none; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+          .mem-hero { grid-template-columns: 1fr; padding: 48px 24px; gap: 40px; }
+          .section-header { grid-template-columns: 1fr; }
+          .section-aside { display: none; }
+          .section-main { padding: 32px 24px; flex-direction: column; align-items: flex-start; }
+          .tiers-grid { grid-template-columns: 1fr 1fr; }
+          .tier-card { border-bottom: 1px solid var(--rule); }
+          .how-grid, .earn-grid, .faq-grid { grid-template-columns: 1fr; }
+          .how-steps { padding: 40px 24px; grid-template-columns: 1fr; gap: 32px; }
+          .redeem-items { grid-template-columns: 1fr; }
+          .redeem-item { border-right: none; border-bottom: 1px solid var(--rule); }
+          .sub-section { grid-template-columns: 1fr; padding: 48px 24px; gap: 32px; }
+          .faq-q, .faq-a, .faq-item.open .faq-a { padding-left: 24px; padding-right: 24px; }
+        }
+        @media (max-width: 600px) {
+          .tiers-grid { grid-template-columns: 1fr; }
+          .mem-hero-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar fragment -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<!-- ══ HERO ══ -->
+<section class="mem-hero">
+    <div class="fade-in">
+        <p class="mem-hero-eyebrow">Chương trình thành viên</p>
+        <h1>Mỗi lần mua hàng,<br/>bạn nhận về <em>nhiều hơn</em></h1>
+        <p class="mem-hero-desc">
+            Tích điểm mỗi khi mua sản phẩm, đổi điểm lấy ưu đãi, và leo hạng để mở khóa
+            quyền lợi đặc biệt dành riêng cho thành viên thân thiết của PetShop.
+        </p>
+        <div class="mem-hero-actions">
+            <a th:href="@{/auth/register}" href="/auth/register" class="btn-accent">
+                Đăng ký miễn phí
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a th:href="@{/auth/login}" href="/auth/login" class="btn-outline-light-custom">Đã có tài khoản</a>
+        </div>
+    </div>
+
+    <!-- Card điểm (minh họa cho user chưa đăng nhập; Thymeleaf có thể bind dữ liệu thật) -->
+    <div class="hero-card fade-in" style="transition-delay:.15s">
+        <p class="hero-card-title">Thẻ thành viên PetShop</p>
+        <div class="hero-card-stat">
+            <div class="num" th:text="${memberPoints != null} ? ${memberPoints} : '1.240'">1.240 <span>pts</span></div>
+            <div class="lbl">Điểm tích lũy hiện tại</div>
+        </div>
+        <div class="hero-card-divider"></div>
+        <div class="tier-badge-hero">
+            <span class="tier-dot"></span>
+            <span style="color:#fff;font-size:.88rem;">Hạng <strong th:text="${memberTier != null} ? ${memberTier} : 'Vàng'">Vàng</strong></span>
+        </div>
+        <div class="progress-wrap">
+            <div class="progress-lbl">
+                <span>1.240 / 2.000 điểm → Kim Cương</span>
+                <span>62%</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ TIER INTRO ══ -->
+<div class="section-rule">
+    <div class="section-header fade-in">
+        <div class="section-aside">
+            <span class="section-num">01</span>
+            <span class="section-tag">Hạng thành viên</span>
+        </div>
+        <div class="section-main">
+            <div>
+                <h2>Bốn hạng thành viên,<br/>bốn cấp độ ưu đãi</h2>
+            </div>
+            <p>Hạng của bạn được tính dựa trên tổng điểm tích lũy. Hạng cao hơn đồng nghĩa với nhiều quyền lợi hơn — từ giảm giá, ưu tiên giao hàng đến quà tặng sinh nhật đặc biệt.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ══ TIERS GRID ══ -->
+<div class="tiers-grid section-rule">
+    <div class="tier-card fade-in">
+        <div class="tier-icon bronze-i">🐾</div>
+        <div class="tier-name bronze-t">Đồng</div>
+        <div class="tier-req">0 – 499 điểm tích lũy</div>
+        <ul class="tier-perks">
+            <li>Tích 1 điểm / 10.000₫ mua hàng</li>
+            <li>Giảm 2% cho đơn hàng tiếp theo</li>
+            <li>Sinh nhật: voucher 20.000₫</li>
+            <li>Truy cập flash sale thành viên</li>
+        </ul>
+    </div>
+    <div class="tier-card fade-in" style="transition-delay:.08s">
+        <div class="tier-icon silver-i">✨</div>
+        <div class="tier-name silver-t">Bạc</div>
+        <div class="tier-req">500 – 999 điểm tích lũy</div>
+        <ul class="tier-perks">
+            <li>Tích 1,5 điểm / 10.000₫ mua hàng</li>
+            <li>Giảm 4% cho đơn hàng tiếp theo</li>
+            <li>Sinh nhật: voucher 50.000₫</li>
+            <li>Ưu tiên hỗ trợ khách hàng</li>
+            <li>Miễn phí giao hàng đơn từ 300k</li>
+        </ul>
+    </div>
+    <div class="tier-card fade-in" style="transition-delay:.16s">
+        <div class="tier-icon gold-i">⭐</div>
+        <div class="tier-name gold-t">Vàng</div>
+        <div class="tier-req">1.000 – 1.999 điểm tích lũy</div>
+        <div class="tier-current-badge">Hạng của bạn</div>
+        <ul class="tier-perks">
+            <li>Tích 2 điểm / 10.000₫ mua hàng</li>
+            <li>Giảm 6% cho đơn hàng tiếp theo</li>
+            <li>Sinh nhật: voucher 100.000₫ + quà</li>
+            <li>Miễn phí giao hàng mọi đơn</li>
+            <li>Xem trước sản phẩm mới</li>
+            <li>Tư vấn dinh dưỡng 1-1 miễn phí</li>
+        </ul>
+    </div>
+    <div class="tier-card fade-in" style="transition-delay:.24s">
+        <div class="tier-icon diamond-i">💎</div>
+        <div class="tier-name diamond-t">Kim Cương</div>
+        <div class="tier-req">2.000+ điểm tích lũy</div>
+        <ul class="tier-perks">
+            <li>Tích 3 điểm / 10.000₫ mua hàng</li>
+            <li>Giảm 10% cho đơn hàng tiếp theo</li>
+            <li>Sinh nhật: voucher 200.000₫ + combo quà</li>
+            <li>Miễn phí giao hàng siêu tốc</li>
+            <li>Hotline riêng cho thành viên VIP</li>
+            <li>Ưu tiên đặt lịch grooming & spa</li>
+            <li>Mời tham gia sự kiện Pet Day</li>
+        </ul>
+    </div>
+</div>
+
+<!-- ══ HOW IT WORKS ══ -->
+<div class="how-grid section-rule">
+    <div class="section-aside fade-in" style="padding:56px 32px;">
+        <span class="section-num">02</span>
+        <span class="section-tag">Cách hoạt động</span>
+    </div>
+    <div class="how-steps">
+        <div class="step-item fade-in">
+            <span class="step-num">01</span>
+            <div class="step-title">Đăng ký tài khoản miễn phí</div>
+            <div class="step-desc">Tạo tài khoản PetShop chỉ trong 30 giây. Bạn sẽ ngay lập tức ở Hạng Đồng và bắt đầu tích điểm từ đơn hàng đầu tiên.</div>
+        </div>
+        <div class="step-item fade-in" style="transition-delay:.08s">
+            <span class="step-num">02</span>
+            <div class="step-title">Mua hàng và tích điểm</div>
+            <div class="step-desc">Mỗi 10.000₫ bạn chi tiêu = 1 điểm (hoặc nhiều hơn tùy hạng). Điểm được cộng tự động sau khi đơn hàng giao thành công.</div>
+        </div>
+        <div class="step-item fade-in" style="transition-delay:.12s">
+            <span class="step-num">03</span>
+            <div class="step-title">Leo hạng & mở khóa quyền lợi</div>
+            <div class="step-desc">Điểm tích lũy quyết định hạng của bạn. Hạng được đánh giá lại mỗi tháng dựa trên tổng điểm 3 tháng gần nhất.</div>
+        </div>
+        <div class="step-item fade-in" style="transition-delay:.16s">
+            <span class="step-num">04</span>
+            <div class="step-title">Đổi điểm lấy ưu đãi</div>
+            <div class="step-desc">Dùng điểm để đổi voucher giảm giá, sản phẩm miễn phí hoặc dịch vụ spa thú cưng ngay trong trang tài khoản của bạn.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ EARN POINTS ══ -->
+<div class="earn-section">
+    <div class="section-header fade-in">
+        <div class="section-aside">
+            <span class="section-num">03</span>
+            <span class="section-tag">Tích điểm</span>
+        </div>
+        <div class="section-main">
+            <div>
+                <h2>Nhiều cách để tích điểm,<br/>không chỉ từ mua hàng</h2>
+            </div>
+            <p>Ngoài mua sắm, bạn còn có thể tích điểm qua đánh giá sản phẩm, giới thiệu bạn bè và tham gia các sự kiện của PetShop.</p>
+        </div>
+    </div>
+    <div class="earn-grid">
+        <div class="section-aside" style="padding:0;border-right:1px solid var(--rule);"></div>
+        <div class="earn-table-wrap fade-in">
+            <table class="earn-table">
+                <thead>
+                <tr>
+                    <th>Hành động</th>
+                    <th>Điểm nhận được</th>
+                    <th>Ghi chú</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><div class="earn-action"><span class="earn-action-icon">🛒</span> Mua hàng</div></td>
+                    <td><span class="earn-pts">1–3 pts</span> / 10.000₫</td>
+                    <td><span class="badge-tag hot">Hot</span></td>
+                </tr>
+                <tr>
+                    <td><div class="earn-action"><span class="earn-action-icon">⭐</span> Đánh giá sản phẩm</div></td>
+                    <td><span class="earn-pts">+50 pts</span></td>
+                    <td>Mỗi sản phẩm một lần</td>
+                </tr>
+                <tr>
+                    <td><div class="earn-action"><span class="earn-action-icon">📸</span> Đánh giá kèm ảnh</div></td>
+                    <td><span class="earn-pts">+100 pts</span></td>
+                    <td>Thêm vào đánh giá thường</td>
+                </tr>
+                <tr>
+                    <td><div class="earn-action"><span class="earn-action-icon">👥</span> Giới thiệu bạn bè</div></td>
+                    <td><span class="earn-pts">+200 pts</span></td>
+                    <td>Khi bạn bè đặt đơn đầu tiên</td>
+                </tr>
+                <tr>
+                    <td><div class="earn-action"><span class="earn-action-icon">🎂</span> Sinh nhật thú cưng</div></td>
+                    <td><span class="earn-pts">+150 pts</span></td>
+                    <td><span class="badge-tag new">Mới</span></td>
+                </tr>
+                <tr>
+                    <td><div class="earn-action"><span class="earn-action-icon">📋</span> Hoàn thiện hồ sơ</div></td>
+                    <td><span class="earn-pts">+80 pts</span></td>
+                    <td>Một lần duy nhất</td>
+                </tr>
+                <tr>
+                    <td><div class="earn-action"><span class="earn-action-icon">🎉</span> Tham gia sự kiện</div></td>
+                    <td><span class="earn-pts">+100–500 pts</span></td>
+                    <td>Tùy từng sự kiện</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ══ REDEEM ══ -->
+<div class="redeem-section">
+    <div class="section-header fade-in">
+        <div class="section-aside">
+            <span class="section-num">04</span>
+            <span class="section-tag">Đổi điểm</span>
+        </div>
+        <div class="section-main">
+            <div><h2>Đổi điểm lấy gì?</h2></div>
+            <p>Điểm tích lũy có thể đổi thành nhiều quyền lợi thực tế, áp dụng ngay trong lần mua tiếp theo của bạn.</p>
+        </div>
+    </div>
+    <div class="redeem-items">
+        <div class="redeem-item fade-in">
+            <div class="redeem-pts-badge">100 <span>điểm</span></div>
+            <div class="redeem-title">Voucher giảm 20.000₫</div>
+            <div class="redeem-desc">Áp dụng cho đơn hàng từ 150.000₫. Không kết hợp với khuyến mãi khác.</div>
+            <button class="redeem-btn">
+                Đổi ngay
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+        </div>
+        <div class="redeem-item fade-in" style="transition-delay:.08s">
+            <div class="redeem-pts-badge">250 <span>điểm</span></div>
+            <div class="redeem-title">Miễn phí giao hàng 3 đơn</div>
+            <div class="redeem-desc">Áp dụng cho 3 đơn hàng tiếp theo, không giới hạn giá trị đơn tối thiểu.</div>
+            <button class="redeem-btn">
+                Đổi ngay
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+        </div>
+        <div class="redeem-item fade-in" style="transition-delay:.16s">
+            <div class="redeem-pts-badge">500 <span>điểm</span></div>
+            <div class="redeem-title">Voucher giảm 100.000₫</div>
+            <div class="redeem-desc">Áp dụng cho đơn hàng từ 500.000₫. Hạn dùng 30 ngày sau khi đổi.</div>
+            <button class="redeem-btn">
+                Đổi ngay
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+        </div>
+        <div class="redeem-item fade-in">
+            <div class="redeem-pts-badge">800 <span>điểm</span></div>
+            <div class="redeem-title">Túi thức ăn hạt 500g miễn phí</div>
+            <div class="redeem-desc">Chọn từ các thương hiệu tham gia chương trình. Giao cùng đơn hàng tiếp theo.</div>
+            <button class="redeem-btn">
+                Đổi ngay
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+        </div>
+        <div class="redeem-item fade-in" style="transition-delay:.08s">
+            <div class="redeem-pts-badge">1.200 <span>điểm</span></div>
+            <div class="redeem-title">Dịch vụ tắm & grooming cơ bản</div>
+            <div class="redeem-desc">Áp dụng tại cửa hàng PetShop TP.HCM. Đặt lịch qua hotline sau khi đổi thành công.</div>
+            <button class="redeem-btn">
+                Đổi ngay
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+        </div>
+        <div class="redeem-item fade-in" style="transition-delay:.16s">
+            <div class="redeem-pts-badge">2.000 <span>điểm</span></div>
+            <div class="redeem-title">Hộp quà PetShop Premium</div>
+            <div class="redeem-desc">Combo sản phẩm tuyển chọn trị giá 350.000₫+, giao tận nhà có hộp quà. Dành riêng hạng Kim Cương.</div>
+            <button class="redeem-btn">
+                Đổi ngay
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ FAQ ══ -->
+<div class="faq-section">
+    <div class="section-header fade-in">
+        <div class="section-aside">
+            <span class="section-num">05</span>
+            <span class="section-tag">FAQ</span>
+        </div>
+        <div class="section-main">
+            <div><h2>Câu hỏi thường gặp</h2></div>
+        </div>
+    </div>
+    <div class="faq-grid">
+        <div class="section-aside" style="border-right:1px solid var(--rule);"></div>
+        <div class="faq-list fade-in">
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Điểm có hết hạn không?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-a">Điểm tích lũy có hiệu lực trong 12 tháng kể từ ngày phát sinh. Nếu bạn có ít nhất 1 giao dịch trong 12 tháng, điểm sẽ được gia hạn thêm 12 tháng tiếp theo.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Hạng thành viên được tính như thế nào?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-a">Hạng được đánh giá dựa trên tổng điểm tích lũy trong 3 tháng gần nhất. Hệ thống cập nhật hạng vào đầu mỗi tháng. Nếu điểm giảm xuống dưới ngưỡng, hạng sẽ hạ xuống vào kỳ đánh giá tiếp theo.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Tôi có thể dùng điểm và voucher cùng lúc không?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-a">Bạn có thể dùng điểm để đổi voucher, sau đó áp dụng voucher đó vào đơn hàng. Tuy nhiên, voucher từ đổi điểm không thể kết hợp với các chương trình khuyến mãi đang chạy cùng thời điểm.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Làm sao để kiểm tra điểm và lịch sử tích lũy?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-a">Đăng nhập vào tài khoản PetShop → vào mục "Tài khoản của tôi" → tab "Điểm thưởng". Tại đây bạn sẽ thấy số điểm hiện tại, lịch sử tích / đổi điểm và ngày hết hạn.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">
+                    Đơn hàng bị hoàn trả có bị trừ điểm không?
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-a">Có. Nếu bạn hoàn trả đơn hàng, số điểm tương ứng từ đơn đó sẽ bị thu hồi. Nếu điểm đã được dùng để đổi ưu đãi, phần chênh lệch sẽ được ghi âm vào tài khoản.</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer fragment -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Fade-in observer
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.07 });
+    document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+    // FAQ toggle
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    }
+</script>
+</body>
+</html>
