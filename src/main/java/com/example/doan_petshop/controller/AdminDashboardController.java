@@ -21,23 +21,25 @@ public class AdminDashboardController {
     public String dashboard(Model model) {
 
         // ======= STATS CARDS =======
-        model.addAttribute("totalOrders",    orderService.countByStatus(OrderStatus.PENDING)
-                + orderService.countByStatus(OrderStatus.CONFIRMED)
-                + orderService.countByStatus(OrderStatus.SHIPPING)
-                + orderService.countByStatus(OrderStatus.COMPLETED)
-                + orderService.countByStatus(OrderStatus.CANCELLED));
-        model.addAttribute("pendingOrders",  orderService.countByStatus(OrderStatus.PENDING));
-        model.addAttribute("revenueMonth",   orderService.revenueThisMonth());
-        model.addAttribute("ordersToday",    orderService.countToday());
-        model.addAttribute("totalProducts",  productService.countActive());
-        model.addAttribute("totalUsers",     userService.findAll().size());
+        long cntPending   = orderService.countByStatus(OrderStatus.PENDING);
+        long cntConfirmed = orderService.countByStatus(OrderStatus.CONFIRMED);
+        long cntShipping  = orderService.countByStatus(OrderStatus.SHIPPING);
+        long cntCompleted = orderService.countByStatus(OrderStatus.COMPLETED);
+        long cntCancelled = orderService.countByStatus(OrderStatus.CANCELLED);
+
+        model.addAttribute("totalOrders",   cntPending + cntConfirmed + cntShipping + cntCompleted + cntCancelled);
+        model.addAttribute("pendingOrders", cntPending);
+        model.addAttribute("revenueMonth",  orderService.revenueThisMonth());
+        model.addAttribute("ordersToday",   orderService.countToday());
+        model.addAttribute("totalProducts", productService.countActive());
+        model.addAttribute("totalUsers",    userService.findAll().size());
 
         // ======= ĐƠN HÀNG THEO TRẠNG THÁI (Biểu đồ doughnut) =======
-        model.addAttribute("cntPending",   orderService.countByStatus(OrderStatus.PENDING));
-        model.addAttribute("cntConfirmed", orderService.countByStatus(OrderStatus.CONFIRMED));
-        model.addAttribute("cntShipping",  orderService.countByStatus(OrderStatus.SHIPPING));
-        model.addAttribute("cntCompleted", orderService.countByStatus(OrderStatus.COMPLETED));
-        model.addAttribute("cntCancelled", orderService.countByStatus(OrderStatus.CANCELLED));
+        model.addAttribute("cntPending",   cntPending);
+        model.addAttribute("cntConfirmed", cntConfirmed);
+        model.addAttribute("cntShipping",  cntShipping);
+        model.addAttribute("cntCompleted", cntCompleted);
+        model.addAttribute("cntCancelled", cntCancelled);
 
         // ======= SẢN PHẨM SẮP HẾT HÀNG =======
         model.addAttribute("lowStockProducts", productService.findLowStock(10));

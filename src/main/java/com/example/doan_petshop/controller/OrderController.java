@@ -16,6 +16,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.math.BigDecimal;
+
 @Controller
 @RequestMapping("/orders")
 @RequiredArgsConstructor
@@ -36,7 +38,12 @@ public class OrderController {
             return "redirect:/cart";
         }
 
-        // Pre-fill form từ thông tin user
+        // Tính phí ship server-side
+        BigDecimal subtotal = cart.getTotalPrice();
+        BigDecimal shippingFee = subtotal.compareTo(new BigDecimal("300000")) >= 0
+                ? BigDecimal.ZERO : new BigDecimal("30000");
+        BigDecimal grandTotal = subtotal.add(shippingFee);
+
         OrderRequestDTO dto = new OrderRequestDTO();
         dto.setFullName(userDetails.getUser().getFullName());
         dto.setPhone(userDetails.getUser().getPhone());
@@ -46,6 +53,9 @@ public class OrderController {
         model.addAttribute("cart",           cart);
         model.addAttribute("orderRequestDTO", dto);
         model.addAttribute("paymentMethods",  PaymentMethod.values());
+        model.addAttribute("subtotal",        subtotal);
+        model.addAttribute("shippingFee",     shippingFee);
+        model.addAttribute("grandTotal",      grandTotal);
         return "user/checkout";
     }
 

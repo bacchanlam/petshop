@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.petshop</groupId>
+    <groupId>com.example.doan_petshop</groupId>
     <artifactId>petshop</artifactId>
     <version>1.0.0</version>
     <name>petshop</name>

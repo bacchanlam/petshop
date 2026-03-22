@@ -79,12 +79,5 @@ public class HomeController {
 
     @GetMapping("/return-policy")
     public String returnpoolicy() { return "pages/return-policy"; }
-    @Controller
-    public class BlogController {
 
-        @GetMapping("/blog")
-        public String blog(Model model) {
-            return "pages/blog"; // trỏ đến templates/pages/blog.html
-        }
-    }
 }
