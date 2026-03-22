@@ -172,19 +172,20 @@
           <hr>
 
           <!-- Tạm tính -->
+          <!-- THAY BẰNG -->
+          <!-- Tạm tính -->
           <div class="d-flex justify-content-between mb-2 small">
             <span class="text-muted">Tạm tính</span>
-            <span th:text="${#numbers.formatDecimal(cart.totalPrice,0,'COMMA',0,'POINT') + ' ₫'}"></span>
+            <span th:text="${#numbers.formatDecimal(subtotal,0,'COMMA',0,'POINT') + ' ₫'}"></span>
           </div>
 
           <!-- Phí ship -->
           <div class="d-flex justify-content-between mb-2 small">
             <span class="text-muted">Phí vận chuyển</span>
-            <span th:if="${cart.totalPrice.compareTo(new java.math.BigDecimal('300000')) >= 0}"
-                  class="text-success">Miễn phí</span>
-            <span th:unless="${cart.totalPrice.compareTo(new java.math.BigDecimal('300000')) >= 0}">
-              30,000 ₫
-            </span>
+            <span th:if="${shippingFee.compareTo(T(java.math.BigDecimal).ZERO) == 0}"
+                  class="text-success fw-semibold">Miễn phí</span>
+            <span th:unless="${shippingFee.compareTo(T(java.math.BigDecimal).ZERO) == 0}"
+                  th:text="${#numbers.formatDecimal(shippingFee,0,'COMMA',0,'POINT') + ' ₫'}"></span>
           </div>
 
           <hr>
@@ -192,12 +193,8 @@
           <!-- Tổng -->
           <div class="d-flex justify-content-between align-items-center mb-4">
             <span class="fw-bold">Tổng thanh toán</span>
-            <span th:if="${cart.totalPrice.compareTo(new java.math.BigDecimal('300000')) >= 0}"
-                  class="fw-bold fs-5 text-danger"
-                  th:text="${#numbers.formatDecimal(cart.totalPrice,0,'COMMA',0,'POINT') + ' ₫'}"></span>
-            <span th:unless="${cart.totalPrice.compareTo(new java.math.BigDecimal('300000')) >= 0}"
-                  class="fw-bold fs-5 text-danger"
-                  th:text="${#numbers.formatDecimal(cart.totalPrice.add(new java.math.BigDecimal('30000')),0,'COMMA',0,'POINT') + ' ₫'}"></span>
+            <span class="fw-bold fs-5 text-danger"
+                  th:text="${#numbers.formatDecimal(grandTotal,0,'COMMA',0,'POINT') + ' ₫'}"></span>
           </div>
 
           <!-- Nút đặt hàng -->
