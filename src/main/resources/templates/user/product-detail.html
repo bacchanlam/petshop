@@ -319,7 +319,7 @@
         });
     });
 
-    fetch('/cart/count').then(r => r.json())
+    fetch('/cart/count'{ credentials: 'same-origin' }).then(r => r.json())
         .then(d => { const el = document.getElementById('cartCount'); if(el && d.count > 0) el.textContent = d.count; })
         .catch(()=>{});
 </script>

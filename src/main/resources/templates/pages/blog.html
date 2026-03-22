@@ -1,0 +1,2317 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Góc Chăm Sóc Boss - PetShop Blog</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --cream: #fdf6ee;
+        --warm-50: #fef9f2;
+        --amber: #d97706;
+        --amber-lt: #fbbf24;
+        --brown: #78350f;
+        --brown-md: #92400e;
+        --sage: #6b7c5c;
+        --sage-lt: #e8edd5;
+        --terracota: #c2622d;
+        --gray-200: #e5e7eb;
+        --gray-600: #4b5563;
+        --text: #1c1309;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--cream);
+        font-family: "DM Sans", sans-serif;
+        color: var(--text);
+      }
+
+      /* ── HERO ── */
+      .blog-hero {
+        background: var(--brown);
+        background-image:
+          radial-gradient(
+            ellipse 50% 70% at 80% 50%,
+            #c2622d44 0%,
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 40% 50% at 10% 80%,
+            #fbbf2415 0%,
+            transparent 60%
+          );
+        color: #fff;
+        padding: 72px 0 64px;
+        position: relative;
+        overflow: hidden;
+      }
+      .blog-hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .hero-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(251, 191, 36, 0.85);
+        margin-bottom: 10px;
+      }
+      .blog-hero h1 {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        font-weight: 700;
+        line-height: 1.2;
+      }
+      .blog-hero p {
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 1rem;
+        max-width: 480px;
+      }
+      .hero-stats {
+        display: flex;
+        gap: 32px;
+        margin-top: 28px;
+      }
+      .hero-stat-num {
+        font-family: "Playfair Display", serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--amber-lt);
+        line-height: 1;
+      }
+      .hero-stat-lbl {
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin-top: 2px;
+      }
+
+      /* ── FILTER TABS ── */
+      .filter-wrap {
+        background: #fff;
+        border-bottom: 1px solid var(--gray-200);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      }
+      .filter-tabs {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 14px 0;
+        scrollbar-width: none;
+      }
+      .filter-tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .ftab {
+        white-space: nowrap;
+        border: 1.5px solid var(--gray-200);
+        background: var(--warm-50);
+        color: var(--gray-600);
+        border-radius: 999px;
+        padding: 8px 20px;
+        font-size: 0.83rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .ftab:hover {
+        border-color: var(--amber);
+        color: var(--amber);
+        background: #fef9f2;
+        transform: translateY(-1px);
+      }
+      .ftab.active {
+        background: var(--brown);
+        border-color: var(--brown);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(120, 53, 15, 0.3);
+      }
+
+      /* ── FEATURED ── */
+      .featured-post {
+        background: #fff;
+        border-radius: 20px;
+        border: 1.5px solid var(--gray-200);
+        overflow: hidden;
+        text-decoration: none;
+        color: var(--text);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s,
+          border-color 0.3s;
+        cursor: pointer;
+      }
+      @media (max-width: 768px) {
+        .featured-post {
+          grid-template-columns: 1fr;
+        }
+      }
+      .featured-post:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.12);
+        border-color: #e5c99a;
+        color: var(--text);
+      }
+      .featured-img {
+        width: 100%;
+        height: 100%;
+        min-height: 300px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.5s ease;
+      }
+      .featured-post:hover .featured-img {
+        transform: scale(1.04);
+      }
+      .feat-img-wrap {
+        overflow: hidden;
+        position: relative;
+      }
+      .featured-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: linear-gradient(135deg, var(--amber), #f59e0b);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 5px 14px;
+        border-radius: 999px;
+        margin-bottom: 16px;
+      }
+      .featured-body {
+        padding: 36px 32px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      @media (max-width: 768px) {
+        .featured-body {
+          padding: 24px 20px;
+        }
+      }
+      .featured-title {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+        font-weight: 700;
+        line-height: 1.35;
+        margin-bottom: 12px;
+      }
+      .featured-excerpt {
+        color: var(--gray-600);
+        font-size: 0.9rem;
+        line-height: 1.65;
+        margin-bottom: 20px;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .feat-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 0.76rem;
+        color: var(--gray-600);
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .feat-meta i {
+        color: var(--amber);
+      }
+      .read-more-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--brown);
+        color: #fff;
+        border-radius: 12px;
+        padding: 11px 24px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+          background 0.2s,
+          transform 0.2s,
+          gap 0.2s;
+        border: none;
+        cursor: pointer;
+      }
+      .read-more-btn:hover {
+        background: var(--brown-md);
+        transform: translateX(3px);
+        gap: 12px;
+        color: #fff;
+      }
+
+      /* ── SECTION ── */
+      .section-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--amber);
+        margin-bottom: 6px;
+      }
+      .section-title {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+        font-weight: 700;
+      }
+
+      /* ── POST CARDS ── */
+      .post-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1.5px solid var(--gray-200);
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: var(--text);
+        transition:
+          transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+          box-shadow 0.28s,
+          border-color 0.28s;
+        position: relative;
+      }
+      .post-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 18px;
+        box-shadow: 0 0 0 0 rgba(217, 119, 6, 0);
+        transition: box-shadow 0.3s;
+        pointer-events: none;
+      }
+      .post-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.11);
+        border-color: #e5c99a;
+        color: var(--text);
+      }
+      .post-card:hover::after {
+        box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+      }
+      .post-img-wrap {
+        position: relative;
+        overflow: hidden;
+      }
+      .post-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.45s ease;
+      }
+      .post-card:hover .post-img {
+        transform: scale(1.07);
+      }
+      .cat-badge {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 5px 13px;
+        border-radius: 999px;
+        color: #fff;
+        backdrop-filter: blur(8px);
+      }
+      /* Read time chip */
+      .read-chip {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(28, 19, 9, 0.65);
+        backdrop-filter: blur(6px);
+        color: #fff;
+        font-size: 0.67rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .post-body {
+        padding: 18px 18px 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      .post-meta {
+        font-size: 0.72rem;
+        color: var(--gray-600);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .post-meta i {
+        color: var(--amber);
+      }
+      .post-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.02rem;
+        font-weight: 700;
+        line-height: 1.4;
+        margin-bottom: 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .post-excerpt {
+        font-size: 0.82rem;
+        color: var(--gray-600);
+        line-height: 1.6;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .post-footer {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .post-readmore {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--amber);
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: gap 0.2s;
+      }
+      .post-card:hover .post-readmore {
+        gap: 9px;
+      }
+      .post-views {
+        font-size: 0.72rem;
+        color: var(--gray-600);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* Card enter animation */
+      .post-item {
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+      }
+      .post-item.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── SIDEBAR ── */
+      .sidebar-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1.5px solid var(--gray-200);
+        padding: 22px;
+        margin-bottom: 20px;
+      }
+      .sidebar-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f3e8d5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .sidebar-title i {
+        color: var(--amber);
+      }
+      .pop-item {
+        display: flex;
+        gap: 14px;
+        padding: 12px 0;
+        border-bottom: 1px solid #f5f0ea;
+        text-decoration: none;
+        color: var(--text);
+        transition:
+          color 0.2s,
+          transform 0.2s;
+        align-items: flex-start;
+      }
+      .pop-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .pop-item:hover {
+        color: var(--amber);
+        transform: translateX(3px);
+      }
+      .pop-rank {
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        background: var(--warm-50);
+        border: 1.5px solid #f3e8d5;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--amber);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .pop-rank.r1 {
+        background: linear-gradient(135deg, #fbbf24, #d97706);
+        color: #fff;
+        border-color: transparent;
+      }
+      .pop-rank.r2 {
+        background: linear-gradient(135deg, #d1d5db, #9ca3af);
+        color: #fff;
+        border-color: transparent;
+      }
+      .pop-rank.r3 {
+        background: linear-gradient(135deg, #f59e0b, #b45309);
+        color: #fff;
+        border-color: transparent;
+      }
+      .pop-text {
+        font-size: 0.82rem;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+      .pop-date {
+        font-size: 0.71rem;
+        color: var(--gray-600);
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tag {
+        background: var(--warm-50);
+        border: 1.5px solid #f3e8d5;
+        border-radius: 999px;
+        padding: 6px 15px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--brown);
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+      .tag:hover {
+        background: var(--brown);
+        color: #fff;
+        border-color: var(--brown);
+        transform: translateY(-1px);
+      }
+      .newsletter-box {
+        background: linear-gradient(135deg, var(--brown) 0%, #5a280a 100%);
+        border-radius: 16px;
+        padding: 26px;
+        color: #fff;
+        margin-bottom: 20px;
+      }
+      .newsletter-box h4 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .newsletter-box p {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.72);
+        margin-bottom: 16px;
+      }
+      .nl-input {
+        border: none;
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-size: 0.85rem;
+        width: 100%;
+        margin-bottom: 10px;
+        outline: none;
+        font-family: "DM Sans", sans-serif;
+      }
+      .nl-btn {
+        background: var(--amber-lt);
+        border: none;
+        border-radius: 10px;
+        padding: 11px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--brown);
+        width: 100%;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+      .nl-btn:hover {
+        background: #fcd34d;
+        transform: scale(1.02);
+      }
+
+      /* ── DIVIDER ── */
+      .section-divider {
+        border: none;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--gray-200) 20%,
+          var(--gray-200) 80%,
+          transparent
+        );
+        margin: 0;
+      }
+
+      /* ── DETAIL OVERLAY ── */
+      .detail-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(28, 19, 9, 0.78);
+        backdrop-filter: blur(8px);
+        z-index: 2000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 24px 16px;
+        overflow-y: auto;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      .detail-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .detail-panel {
+        background: #fff;
+        border-radius: 24px;
+        max-width: 780px;
+        width: 100%;
+        margin: auto;
+        overflow: hidden;
+        transform: translateY(40px) scale(0.97);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+      }
+      .detail-overlay.open .detail-panel {
+        transform: translateY(0) scale(1);
+      }
+      .detail-hero-img {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        display: block;
+      }
+      .detail-close {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 38px;
+        height: 38px;
+        background: rgba(255, 255, 255, 0.92);
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1rem;
+        color: var(--text);
+        transition:
+          background 0.2s,
+          transform 0.2s,
+          box-shadow 0.2s;
+        z-index: 10;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+      }
+      .detail-close:hover {
+        background: #fff;
+        transform: scale(1.1) rotate(90deg);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+      }
+      .detail-content {
+        padding: 30px 36px 40px;
+      }
+      @media (max-width: 600px) {
+        .detail-content {
+          padding: 22px 20px 30px;
+        }
+      }
+      .detail-cat {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .detail-title {
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.35rem, 3vw, 1.85rem);
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: 14px;
+      }
+      .detail-meta {
+        display: flex;
+        gap: 18px;
+        font-size: 0.78rem;
+        color: var(--gray-600);
+        margin-bottom: 22px;
+        padding-bottom: 22px;
+        border-bottom: 1px solid #f3e8d5;
+        flex-wrap: wrap;
+      }
+      .detail-meta i {
+        color: var(--amber);
+      }
+      .detail-body {
+        font-size: 0.93rem;
+        line-height: 1.8;
+        color: #2d1f0f;
+      }
+      .detail-body h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.15rem;
+        margin: 22px 0 10px;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .detail-body p {
+        margin-bottom: 14px;
+      }
+      .detail-body ul {
+        padding-left: 20px;
+        margin-bottom: 14px;
+      }
+      .detail-body ul li {
+        margin-bottom: 7px;
+      }
+      .detail-body .tip-box {
+        background: var(--warm-50);
+        border-left: 3px solid var(--amber);
+        border-radius: 0 12px 12px 0;
+        padding: 14px 18px;
+        margin: 18px 0;
+        font-size: 0.88rem;
+        color: var(--brown);
+      }
+      .detail-body .tip-box strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .detail-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 26px;
+        padding-top: 22px;
+        border-top: 1px solid #f3e8d5;
+      }
+      /* Progress bar at top of detail */
+      .detail-progress {
+        height: 3px;
+        background: linear-gradient(90deg, var(--amber), var(--terracota));
+        width: 0;
+        transition: width 0.1s linear;
+      }
+    </style>
+  </head>
+  <body>
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- HERO -->
+    <section class="blog-hero">
+      <div class="container position-relative">
+        <p class="hero-label">Kiến thức thú cưng</p>
+        <h1 class="mb-3">Góc Chăm Sóc Boss</h1>
+        <p>
+          Bí quyết nuôi dạy, dinh dưỡng và sức khỏe cho những người bạn bốn chân
+          của bạn
+        </p>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">9+</div>
+            <div class="hero-stat-lbl">Bài viết</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">5</div>
+            <div class="hero-stat-lbl">Chủ đề</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">10k+</div>
+            <div class="hero-stat-lbl">Lượt đọc</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER -->
+    <div class="filter-wrap">
+      <div class="container">
+        <div class="filter-tabs">
+          <button class="ftab active" onclick="filterPosts('all', this)">
+            <i class="bi bi-grid-fill"></i>Tất Cả
+          </button>
+          <button class="ftab" onclick="filterPosts('dinh-duong', this)">
+            <i class="bi bi-bowl-hot"></i>Dinh Dưỡng
+          </button>
+          <button class="ftab" onclick="filterPosts('cham-soc', this)">
+            <i class="bi bi-scissors"></i>Chăm Sóc
+          </button>
+          <button class="ftab" onclick="filterPosts('suc-khoe', this)">
+            <i class="bi bi-heart-pulse"></i>Sức Khỏe
+          </button>
+          <button class="ftab" onclick="filterPosts('huan-luyen', this)">
+            <i class="bi bi-patch-check"></i>Huấn Luyện
+          </button>
+          <button class="ftab" onclick="filterPosts('thu-vi', this)">
+            <i class="bi bi-stars"></i>Thú Vị
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="container py-5">
+      <div class="row g-4">
+        <!-- LEFT -->
+        <div class="col-lg-8">
+          <!-- FEATURED -->
+          <div class="mb-5">
+            <p class="section-label">Nổi Bật</p>
+            <a class="featured-post" onclick="openPost('post-featured')">
+              <div class="feat-img-wrap">
+                <img
+                  src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=85&auto=format&fit=crop"
+                  class="featured-img"
+                  alt="Chó ăn uống"
+                />
+              </div>
+              <div class="featured-body">
+                <span class="featured-badge"
+                  ><i class="bi bi-fire"></i> Bài viết nổi bật</span
+                >
+                <div class="featured-title">
+                  Chó Nên Ăn Gì Mỗi Ngày? Khẩu Phần Chuẩn Theo Độ Tuổi
+                </div>
+                <div class="feat-meta">
+                  <span><i class="bi bi-calendar3"></i>10 tháng 3, 2026</span>
+                  <span><i class="bi bi-clock"></i>5 phút đọc</span>
+                  <span><i class="bi bi-eye"></i>2.4k lượt xem</span>
+                </div>
+                <p class="featured-excerpt">
+                  Chế độ dinh dưỡng đúng cách là nền tảng giúp thú cưng phát
+                  triển toàn diện. Tìm hiểu lượng thức ăn phù hợp từ giai đoạn
+                  chó con đến chó cao tuổi.
+                </p>
+                <button class="read-more-btn">
+                  Đọc ngay <i class="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </a>
+          </div>
+
+          <!-- GRID -->
+          <div
+            class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2"
+          >
+            <div>
+              <p class="section-label mb-1">Mới nhất</p>
+              <h2 class="section-title">Tất Cả Bài Viết</h2>
+            </div>
+            <span class="text-muted small" id="post-count">9 bài viết</span>
+          </div>
+
+          <div class="row g-4" id="posts-grid">
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="cham-soc">
+              <a class="post-card h-100" onclick="openPost('post-1')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Mèo"
+                  />
+                  <span class="cat-badge" style="background: var(--sage)"
+                    >Chăm Sóc</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>4 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>8/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Tắm Cho Mèo Đúng Cách — Bí Quyết Để Boss Không Stress
+                  </div>
+                  <p class="post-excerpt">
+                    Mèo vốn không thích nước nhưng việc tắm định kỳ vẫn rất cần
+                    thiết. Hướng dẫn từng bước giúp bạn và boss có trải nghiệm
+                    dễ chịu nhất.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>870</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="suc-khoe">
+              <a class="post-card h-100" onclick="openPost('post-2')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Vaccine"
+                  />
+                  <span class="cat-badge" style="background: var(--terracota)"
+                    >Sức Khỏe</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>6 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>5/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Lịch Tiêm Vaccine Cho Chó & Mèo — Những Mũi Không Thể Bỏ
+                  </div>
+                  <p class="post-excerpt">
+                    Tiêm phòng đầy đủ là nền tảng bảo vệ sức khỏe. Xem lịch tiêm
+                    chuẩn và các loại vaccine bắt buộc ở Việt Nam.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"
+                      ><i class="bi bi-eye"></i>1.8k</span
+                    >
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="huan-luyen">
+              <a class="post-card h-100" onclick="openPost('post-3')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600&q=80&auto=format&fit=crop&crop=entropy"
+                    class="post-img"
+                    alt="Huấn luyện"
+                  />
+                  <span class="cat-badge" style="background: #be185d"
+                    >Huấn Luyện</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>7 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>1/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    10 Lệnh Cơ Bản Mọi Chú Chó Đều Cần Học Từ Nhỏ
+                  </div>
+                  <p class="post-excerpt">
+                    Dạy chó từ nhỏ giúp hình thành thói quen tốt và tăng cường
+                    gắn kết. Ngồi, nằm, lại đây và không được.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>980</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="dinh-duong">
+              <a class="post-card h-100" onclick="openPost('post-4')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1571566882372-1598d88abd90?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Mèo ăn cá"
+                  />
+                  <span class="cat-badge" style="background: var(--amber)"
+                    >Dinh Dưỡng</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>5 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>25/2/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Mèo Có Thể Ăn Cá Hằng Ngày Không? Sự Thật Bất Ngờ
+                  </div>
+                  <p class="post-excerpt">
+                    Nhiều người nghĩ mèo chỉ cần cá là đủ, nhưng thực tế phức
+                    tạp hơn nhiều. Tìm hiểu chế độ cân bằng cho mèo cưng.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>760</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="suc-khoe">
+              <a class="post-card h-100" onclick="openPost('post-5')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Thú cưng"
+                  />
+                  <span class="cat-badge" style="background: #7c3aed"
+                    >Sức Khỏe</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>4 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>20/2/2026</span>
+                  </div>
+                  <div class="post-title">
+                    5 Dấu Hiệu Thú Cưng Đang Bị Stress Mà Chủ Hay Bỏ Qua
+                  </div>
+                  <p class="post-excerpt">
+                    Thú cưng không thể nói nhưng thể hiện cảm xúc qua ngôn ngữ
+                    cơ thể. Nhận biết sớm giúp can thiệp kịp thời.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"
+                      ><i class="bi bi-eye"></i>1.2k</span
+                    >
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="thu-vi">
+              <a class="post-card h-100" onclick="openPost('post-6')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Chó vui chơi"
+                  />
+                  <span class="cat-badge" style="background: var(--sage)"
+                    >Thú Vị</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>3 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>15/2/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Cách Tạo Góc Vui Chơi Hoàn Hảo Cho Thú Cưng Trong Nhà
+                  </div>
+                  <p class="post-excerpt">
+                    Môi trường phong phú giúp thú cưng khỏe mạnh cả thể chất lẫn
+                    tinh thần. Gợi ý đơn giản, tiết kiệm.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>540</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="cham-soc">
+              <a class="post-card h-100" onclick="openPost('post-7')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1591946614720-90a587da4a36?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Grooming chó"
+                  />
+                  <span class="cat-badge" style="background: var(--sage)"
+                    >Chăm Sóc</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>5 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>10/2/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Cắt Tỉa Lông Cho Chó Tại Nhà — Từng Bước Dành Cho Người Mới
+                  </div>
+                  <p class="post-excerpt">
+                    Grooming tại nhà giúp tiết kiệm chi phí và tăng gắn kết.
+                    Dụng cụ cần thiết và kỹ thuật an toàn.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>620</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="dinh-duong">
+              <a class="post-card h-100" onclick="openPost('post-8')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1606425271394-c3ca9aa1fc06?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Thức ăn thú cưng"
+                  />
+                  <span class="cat-badge" style="background: var(--amber)"
+                    >Dinh Dưỡng</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>6 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>5/2/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Thức Ăn Tươi Hay Hạt Khô? So Sánh Toàn Diện Cho Chủ Nuôi
+                  </div>
+                  <p class="post-excerpt">
+                    Raw food vs kibble — phân tích ưu nhược điểm để bạn chọn
+                    đúng cho thú cưng của mình.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>890</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="huan-luyen">
+              <a class="post-card h-100" onclick="openPost('post-9')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1592754862816-1a21a4ea2281?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Mèo trong nhà"
+                  />
+                  <span class="cat-badge" style="background: #0369a1"
+                    >Huấn Luyện</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>5 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>1/2/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Mèo Không Dùng Khay Vệ Sinh? Nguyên Nhân & Cách Khắc Phục
+                  </div>
+                  <p class="post-excerpt">
+                    Vấn đề phổ biến khiến nhiều chủ mèo đau đầu. Nguyên nhân và
+                    giải pháp thực tế giúp boss dùng đúng chỗ.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>710</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="suc-khoe">
+              <a class="post-card h-100" onclick="openPost('post-10')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Chó già"
+                  />
+                  <span class="cat-badge" style="background: var(--terracota)"
+                    >Sức Khỏe</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>6 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>18/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Chăm Sóc Chó Lớn Tuổi — Khi Boss Bước Vào Giai Đoạn Vàng
+                  </div>
+                  <p class="post-excerpt">
+                    Chó từ 7 tuổi trở lên cần chế độ đặc biệt hơn. Những thay
+                    đổi nhỏ mỗi ngày giúp boss sống vui, khỏe và dài lâu bên
+                    bạn.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>430</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="dinh-duong">
+              <a class="post-card h-100" onclick="openPost('post-11')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1585664811087-47f65abbad64?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Thức ăn nguy hiểm"
+                  />
+                  <span class="cat-badge" style="background: var(--amber)"
+                    >Dinh Dưỡng</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>5 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>15/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    15 Thực Phẩm Tuyệt Đối Không Được Cho Thú Cưng Ăn
+                  </div>
+                  <p class="post-excerpt">
+                    Socola, hành tây, nho — những thứ vô hại với người nhưng có
+                    thể gây ngộ độc chết người với thú cưng. Danh sách bạn cần
+                    ghim ngay!
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"
+                      ><i class="bi bi-eye"></i>1.5k</span
+                    >
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="cham-soc">
+              <a class="post-card h-100" onclick="openPost('post-12')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Thú cưng và em bé"
+                  />
+                  <span class="cat-badge" style="background: var(--sage)"
+                    >Chăm Sóc</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>5 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>12/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Thú Cưng & Em Bé Sơ Sinh — Cách Để Hai Bên Cùng An Toàn
+                  </div>
+                  <p class="post-excerpt">
+                    Đón thêm thành viên nhỏ về nhà khi đã có chó mèo? Đừng lo —
+                    chỉ cần chuẩn bị đúng cách, mọi thứ đều ổn thỏa.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>680</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="thu-vi">
+              <a class="post-card h-100" onclick="openPost('post-13')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Du lịch cùng thú cưng"
+                  />
+                  <span class="cat-badge" style="background: var(--sage)"
+                    >Thú Vị</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>6 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>9/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Mang Boss Đi Du Lịch — Checklist Đầy Đủ Từ A Đến Z
+                  </div>
+                  <p class="post-excerpt">
+                    Đi xa cùng thú cưng không khó nếu bạn chuẩn bị kỹ. Từ giấy
+                    tờ, hành lý đến mẹo giữ boss bình tĩnh trên xe.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>920</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="suc-khoe">
+              <a class="post-card h-100" onclick="openPost('post-14')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://images.unsplash.com/photo-1560743641-3914f2c45636?w=600&q=80&auto=format&fit=crop"
+                    class="post-img"
+                    alt="Ve rận thú cưng"
+                  />
+                  <span class="cat-badge" style="background: #7c3aed"
+                    >Sức Khỏe</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>5 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>6/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Ve, Bọ Chét & Giun Sán — Phòng Ngừa Toàn Diện Cho Thú Cưng
+                  </div>
+                  <p class="post-excerpt">
+                    Ký sinh trùng là mối nguy tiềm ẩn quanh năm. Lịch phòng ngừa
+                    định kỳ giúp boss khỏe mạnh và cả nhà an tâm.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"
+                      ><i class="bi bi-eye"></i>1.1k</span
+                    >
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 post-item" data-cat="huan-luyen">
+              <a class="post-card h-100" onclick="openPost('post-15')">
+                <div class="post-img-wrap">
+                  <img
+                    src="https://tse2.mm.bing.net/th/id/OIP.XApU7Pv495b6Qfq6DhDasgHaEK?rs=1&pid=ImgDetMain&o=7&rm=3"
+                    class="post-img"
+                    alt="Mèo và cào"
+                  />
+                  <span class="cat-badge" style="background: #0369a1"
+                    >Huấn Luyện</span
+                  >
+                  <div class="read-chip">
+                    <i class="bi bi-clock" style="font-size: 0.6rem"></i>4 phút
+                  </div>
+                </div>
+                <div class="post-body">
+                  <div class="post-meta">
+                    <span><i class="bi bi-calendar3"></i>3/3/2026</span>
+                  </div>
+                  <div class="post-title">
+                    Mèo Cào Đồ Đạc? Đây Là Cách Dạy Boss Cào Đúng Chỗ
+                  </div>
+                  <p class="post-excerpt">
+                    Cào là bản năng của mèo, không thể ngăn — chỉ có thể hướng
+                    dẫn. Bí quyết để sofa nhà bạn sống sót qua mùa boss trưởng
+                    thành.
+                  </p>
+                  <div class="post-footer">
+                    <span class="post-readmore"
+                      >Đọc ngay <i class="bi bi-arrow-right"></i
+                    ></span>
+                    <span class="post-views"><i class="bi bi-eye"></i>830</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="col-lg-4">
+          <div class="sidebar-card">
+            <div class="sidebar-title">
+              <i class="bi bi-search"></i> Tìm Kiếm
+            </div>
+            <div class="input-group">
+              <input
+                type="text"
+                id="searchInput"
+                class="form-control"
+                placeholder="Tìm bài viết..."
+                style="
+                  border-radius: 10px 0 0 10px;
+                  border: 1.5px solid var(--gray-200);
+                  font-family: &quot;DM Sans&quot;, sans-serif;
+                  font-size: 0.85rem;
+                "
+                oninput="searchPosts(this.value)"
+                onkeydown="if (event.key === 'Enter') searchPosts(this.value);"
+              />
+              <button
+                onclick="
+                  searchPosts(document.getElementById('searchInput').value)
+                "
+                style="
+                  background: var(--brown);
+                  border: none;
+                  color: #fff;
+                  padding: 0 16px;
+                  border-radius: 0 10px 10px 0;
+                  cursor: pointer;
+                "
+              >
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+            <div
+              id="searchEmpty"
+              style="
+                display: none;
+                margin-top: 12px;
+                font-size: 0.82rem;
+                color: var(--gray-600);
+                text-align: center;
+              "
+            >
+              <i
+                class="bi bi-search"
+                style="
+                  font-size: 1.4rem;
+                  opacity: 0.3;
+                  display: block;
+                  margin-bottom: 6px;
+                "
+              ></i>
+              Không tìm thấy bài viết nào
+            </div>
+            <div id="searchClear" style="display: none; margin-top: 10px">
+              <button
+                onclick="clearSearch()"
+                style="
+                  background: none;
+                  border: 1.5px solid var(--gray-200);
+                  border-radius: 999px;
+                  padding: 5px 14px;
+                  font-size: 0.76rem;
+                  font-weight: 600;
+                  color: var(--gray-600);
+                  cursor: pointer;
+                  display: flex;
+                  align-items: center;
+                  gap: 5px;
+                  width: 100%;
+                  justify-content: center;
+                "
+              >
+                <i class="bi bi-x-circle"></i> Xóa tìm kiếm
+              </button>
+            </div>
+          </div>
+
+          <div class="newsletter-box">
+            <h4 class="d-flex align-items-center gap-2">
+              <i
+                class="bi bi-envelope-paper-fill"
+                style="color: var(--amber-lt)"
+              ></i>
+              Nhận Bản Tin
+            </h4>
+            <p>Nhận mẹo chăm sóc thú cưng mỗi tuần, miễn phí!</p>
+            <input
+              class="nl-input"
+              type="email"
+              placeholder="Email của bạn..."
+            />
+            <button class="nl-btn">
+              <i class="bi bi-send-fill me-1"></i> Đăng Ký Ngay
+            </button>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-title">
+              <i class="bi bi-fire"></i> Bài Đọc Nhiều Nhất
+            </div>
+            <a class="pop-item" onclick="openPost('post-featured')">
+              <div class="pop-rank r1">1</div>
+              <div>
+                <div class="pop-text">
+                  Chó Nên Ăn Gì Mỗi Ngày? Khẩu Phần Chuẩn Theo Độ Tuổi
+                </div>
+                <div class="pop-date">
+                  <i class="bi bi-eye" style="font-size: 0.65rem"></i>2.4k lượt
+                  xem
+                </div>
+              </div>
+            </a>
+            <a class="pop-item" onclick="openPost('post-2')">
+              <div class="pop-rank r2">2</div>
+              <div>
+                <div class="pop-text">Lịch Tiêm Vaccine Cho Chó & Mèo</div>
+                <div class="pop-date">
+                  <i class="bi bi-eye" style="font-size: 0.65rem"></i>1.8k lượt
+                  xem
+                </div>
+              </div>
+            </a>
+            <a class="pop-item" onclick="openPost('post-5')">
+              <div class="pop-rank r3">3</div>
+              <div>
+                <div class="pop-text">5 Dấu Hiệu Thú Cưng Đang Bị Stress</div>
+                <div class="pop-date">
+                  <i class="bi bi-eye" style="font-size: 0.65rem"></i>1.2k lượt
+                  xem
+                </div>
+              </div>
+            </a>
+            <a class="pop-item" onclick="openPost('post-3')">
+              <div class="pop-rank">4</div>
+              <div>
+                <div class="pop-text">
+                  10 Lệnh Cơ Bản Mọi Chú Chó Đều Cần Học
+                </div>
+                <div class="pop-date">
+                  <i class="bi bi-eye" style="font-size: 0.65rem"></i>980 lượt
+                  xem
+                </div>
+              </div>
+            </a>
+            <a class="pop-item" onclick="openPost('post-1')">
+              <div class="pop-rank">5</div>
+              <div>
+                <div class="pop-text">Tắm Cho Mèo Đúng Cách</div>
+                <div class="pop-date">
+                  <i class="bi bi-eye" style="font-size: 0.65rem"></i>870 lượt
+                  xem
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div class="sidebar-card">
+            <div class="sidebar-title">
+              <i class="bi bi-tags-fill"></i> Tags
+            </div>
+            <div class="tag-cloud">
+              <a class="tag" onclick="filterPosts('dinh-duong', null)"
+                >#Dinh Dưỡng</a
+              >
+              <a class="tag" onclick="filterPosts('cham-soc', null)"
+                >#Chăm Sóc</a
+              >
+              <a class="tag" onclick="filterPosts('suc-khoe', null)"
+                >#Sức Khỏe</a
+              >
+              <a class="tag" onclick="filterPosts('huan-luyen', null)"
+                >#Huấn Luyện</a
+              >
+              <a class="tag">#Chó Con</a>
+              <a class="tag">#Mèo Cưng</a>
+              <a class="tag">#Grooming</a>
+              <a class="tag">#Vaccine</a>
+              <a class="tag">#Thức Ăn</a>
+              <a class="tag">#Royal Canin</a>
+              <a class="tag">#Mẹo Hay</a>
+              <a class="tag">#Boss</a>
+            </div>
+          </div>
+
+          <div
+            style="
+              background: linear-gradient(135deg, #fef3c7, #fde68a);
+              border-radius: 16px;
+              border: 1.5px solid #fbbf24;
+              padding: 22px;
+              text-align: center;
+            "
+          >
+            <i
+              class="bi bi-bag-heart-fill"
+              style="
+                font-size: 2.5rem;
+                color: var(--brown);
+                margin-bottom: 10px;
+                display: block;
+              "
+            ></i>
+            <div
+              style="
+                font-family: &quot;Playfair Display&quot;, serif;
+                font-weight: 700;
+                font-size: 1rem;
+                color: var(--brown);
+                margin-bottom: 6px;
+              "
+            >
+              Mua sắm tại PetShop
+            </div>
+            <p
+              style="
+                font-size: 0.8rem;
+                color: var(--gray-600);
+                margin-bottom: 16px;
+              "
+            >
+              Sản phẩm chính hãng, giao hàng nhanh toàn quốc
+            </p>
+            <a
+              th:href="@{/}"
+              style="
+                background: var(--brown);
+                color: #fff;
+                border-radius: 10px;
+                padding: 10px 22px;
+                font-size: 0.83rem;
+                font-weight: 700;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                transition: background 0.2s;
+              "
+            >
+              <i class="bi bi-bag-fill"></i> Mua ngay
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <!-- DETAIL OVERLAY -->
+    <div
+      class="detail-overlay"
+      id="detailOverlay"
+      onclick="handleOverlayClick(event)"
+    >
+      <div class="detail-panel">
+        <div class="detail-progress" id="detailProgress"></div>
+        <button class="detail-close" onclick="closePost()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <div id="detailContent"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // ── POST DATA ──────────────────────────────────────────────────────────
+      const dot = `<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24"
+        fill="currentColor" style="color:var(--amber);vertical-align:middle;margin-right:6px">
+        <circle cx="12" cy="12" r="10"/>
+      </svg>`;
+
+      // Lucide SVG icons dùng trong tip-box
+      const ic = {
+        lightbulb: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>`,
+        alertTriangle: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`,
+        checkCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`,
+        stethoscope: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6h0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></svg>`,
+        heart: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`,
+        siren: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M7 18v-6a5 5 0 1 1 10 0v6"/><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2Z"/><path d="M21 12h1"/><path d="M18.5 4.5 18 5"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="M5.5 4.5 6 5"/></svg>`,
+        car: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 17H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h11l3 4v6Z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></svg>`,
+        ruler: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M21.3 8.7 8.7 21.3c-1 1-2.5 1-3.4 0l-2.6-2.6c-1-1-1-2.5 0-3.4L15.3 2.7c1-1 2.5-1 3.4 0l2.6 2.6c1 1 1 2.5 0 3.4Z"/><path d="m7.5 10.5 2 2"/><path d="m10.5 7.5 2 2"/><path d="m13.5 4.5 2 2"/><path d="m4.5 13.5 2 2"/></svg>`,
+        xCircle: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`,
+      };
+
+      const posts = {
+        "post-featured": {
+          img: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900&q=85&auto=format&fit=crop",
+          cat: "Dinh Dưỡng",
+          catColor: "var(--amber)",
+          title: "Chó Nên Ăn Gì Mỗi Ngày? Khẩu Phần Chuẩn Theo Độ Tuổi",
+          date: "10 tháng 3, 2026",
+          readtime: "5 phút đọc",
+          views: "2.4k lượt xem",
+          tags: ["#Dinh Dưỡng", "#Chó Con", "#Thức Ăn", "#Mẹo Hay"],
+          content: `
+    <p>Chế độ dinh dưỡng đóng vai trò quyết định trong sức khỏe và tuổi thọ của chó cưng.</p>
+    <h3>${dot} Chó Con (2–12 tháng)</h3>
+    <p>Chó con cần nhiều protein và canxi hơn. Cho ăn <strong>3–4 bữa/ngày</strong>.</p>
+    <ul>
+      <li>Chọn thức ăn puppy có nhãn "complete nutrition"</li>
+      <li>Protein 25–30% từ thịt gà, bò, cá</li>
+      <li>Tránh socola, hành, tỏi, nho</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.lightbulb} Mẹo nhỏ:</strong> Sờ xương sườn — cảm nhận được nhưng không thấy lồi là cân nặng lý tưởng.</div>
+    <h3>${dot} Chó Trưởng Thành (1–7 tuổi)</h3>
+    <p>Cho ăn <strong>2 bữa/ngày</strong>. Lượng tùy cân nặng và mức hoạt động.</p>
+    <ul>
+      <li>Giống nhỏ (&lt;10kg): 100–200g/ngày</li>
+      <li>Giống trung (10–25kg): 200–350g/ngày</li>
+      <li>Giống lớn (&gt;25kg): 350–600g/ngày</li>
+    </ul>
+    <h3>${dot} Chó Cao Tuổi (7+ tuổi)</h3>
+    <p>Giảm calo, tăng chất xơ, bổ sung glucosamine.</p>
+    <div class="tip-box"><strong>${ic.alertTriangle} Lưu ý:</strong> Thay đổi thức ăn từ từ trong 7–10 ngày để tránh rối loạn tiêu hóa.</div>
+  `,
+        },
+
+        "post-1": {
+          img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=900&q=80&auto=format&fit=crop",
+          cat: "Chăm Sóc",
+          catColor: "var(--sage)",
+          title: "Tắm Cho Mèo Đúng Cách — Bí Quyết Để Boss Không Stress",
+          date: "8 tháng 3, 2026",
+          readtime: "4 phút đọc",
+          views: "870 lượt xem",
+          tags: ["#Chăm Sóc", "#Mèo Cưng", "#Grooming"],
+          content: `
+    <p>Mèo tự vệ sinh rất tốt nhưng đôi khi vẫn cần tắm.</p>
+    <h3>${dot} Chuẩn Bị</h3>
+    <ul>
+      <li>Chải lông trước để gỡ rối</li>
+      <li>Dầu gội dành riêng cho mèo</li>
+      <li>Nước ấm 35–38°C</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.lightbulb} Bí quyết:</strong> Cho mèo chơi mệt trước — boss mệt sẽ ít chống cự hơn!</div>
+    <h3>${dot} Các Bước</h3>
+    <p>
+      <strong>1.</strong> Làm ướt từ thân, tránh mặt tai.
+      <strong>2.</strong> Xoa dầu 2–3 phút.
+      <strong>3.</strong> Xả sạch hoàn toàn.
+      <strong>4.</strong> Sấy khô nhiệt thấp.
+    </p>
+  `,
+        },
+
+        "post-2": {
+          img: "https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?w=900&q=80&auto=format&fit=crop",
+          cat: "Sức Khỏe",
+          catColor: "var(--terracota)",
+          title: "Lịch Tiêm Vaccine Cho Chó & Mèo — Những Mũi Không Thể Bỏ",
+          date: "5 tháng 3, 2026",
+          readtime: "6 phút đọc",
+          views: "1.8k lượt xem",
+          tags: ["#Sức Khỏe", "#Vaccine"],
+          content: `
+    <p>Tiêm phòng là biện pháp phòng bệnh hiệu quả và tiết kiệm nhất.</p>
+    <h3>${dot} Chó</h3>
+    <ul>
+      <li><strong>6–8 tuần:</strong> DHLPPi mũi 1</li>
+      <li><strong>10–12 tuần:</strong> DHLPPi mũi 2 + Coronavirus</li>
+      <li><strong>14–16 tuần:</strong> DHLPPi mũi 3 + Dại</li>
+      <li><strong>Hàng năm:</strong> Nhắc lại</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.alertTriangle} Quan trọng:</strong> Không tiêm khi đang bệnh hoặc chưa tẩy giun đủ 1 tuần.</div>
+    <h3>${dot} Mèo</h3>
+    <ul>
+      <li><strong>8 tuần:</strong> Vaccine 3 trong 1</li>
+      <li><strong>12 tuần:</strong> Nhắc + Dại</li>
+      <li><strong>Hàng năm:</strong> Tiêm nhắc</li>
+    </ul>
+  `,
+        },
+
+        "post-3": {
+          img: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900&q=80&auto=format&fit=crop",
+          cat: "Huấn Luyện",
+          catColor: "#be185d",
+          title: "10 Lệnh Cơ Bản Mọi Chú Chó Đều Cần Học Từ Nhỏ",
+          date: "1 tháng 3, 2026",
+          readtime: "7 phút đọc",
+          views: "980 lượt xem",
+          tags: ["#Huấn Luyện", "#Chó Con"],
+          content: `
+    <p>Huấn luyện sớm (8–16 tuần) giúp chó hình thành thói quen tốt.</p>
+    <h3>${dot} 10 Lệnh Cơ Bản</h3>
+    <ul>
+      <li><strong>1. Ngồi (Sit)</strong></li>
+      <li><strong>2. Nằm (Down)</strong></li>
+      <li><strong>3. Đứng (Stand)</strong></li>
+      <li><strong>4. Lại đây (Come)</strong></li>
+      <li><strong>5. Ở yên (Stay)</strong></li>
+      <li><strong>6. Không được (Leave it)</strong></li>
+      <li><strong>7. Thả ra (Drop it)</strong></li>
+      <li><strong>8. Đi bên (Heel)</strong></li>
+      <li><strong>9. Nhìn đây (Watch me)</strong></li>
+      <li><strong>10. Chào (Shake)</strong></li>
+    </ul>
+    <div class="tip-box"><strong>${ic.lightbulb} Vàng:</strong> Mỗi buổi 5–10 phút. Kết thúc bằng thành công. Khen thưởng, không trừng phạt.</div>
+  `,
+        },
+
+        "post-4": {
+          img: "https://images.unsplash.com/photo-1571566882372-1598d88abd90?w=900&q=80&auto=format&fit=crop",
+          cat: "Dinh Dưỡng",
+          catColor: "var(--amber)",
+          title: "Mèo Có Thể Ăn Cá Hằng Ngày Không? Sự Thật Bất Ngờ",
+          date: "25 tháng 2, 2026",
+          readtime: "5 phút đọc",
+          views: "760 lượt xem",
+          tags: ["#Dinh Dưỡng", "#Mèo Cưng"],
+          content: `
+    <p>Ăn cá mỗi ngày có thể gây hại lâu dài cho mèo!</p>
+    <h3>${dot} Lý Do Không Nên Ăn Cá Hàng Ngày</h3>
+    <ul>
+      <li>Cá sống chứa thiaminase phá hủy vitamin B1</li>
+      <li>Cá biển nhiều iốt → cường giáp</li>
+      <li>Cá béo nhiều → thiếu vitamin E</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.checkCircle} An toàn:</strong> Cá chiếm tối đa 20–30% khẩu phần. Nấu chín, không gia vị.</div>
+  `,
+        },
+
+        "post-5": {
+          img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=900&q=80&auto=format&fit=crop",
+          cat: "Sức Khỏe",
+          catColor: "#7c3aed",
+          title: "5 Dấu Hiệu Thú Cưng Đang Bị Stress Mà Chủ Hay Bỏ Qua",
+          date: "20 tháng 2, 2026",
+          readtime: "4 phút đọc",
+          views: "1.2k lượt xem",
+          tags: ["#Sức Khỏe", "#Chăm Sóc"],
+          content: `
+    <p>Nhận biết sớm dấu hiệu stress giúp can thiệp kịp thời.</p>
+    <h3>${dot} 5 Dấu Hiệu</h3>
+    <ul>
+      <li>Ẩn náu liên tục</li>
+      <li>Thay đổi thói quen ăn</li>
+      <li>Tự liếm quá mức tạo mảng hói</li>
+      <li>Hung hăng bất thường</li>
+      <li>Đi vệ sinh sai chỗ</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.lightbulb} Nguyên nhân hay gặp:</strong> Thay đổi môi trường, thú cưng mới, chủ đi vắng lâu, tiếng ồn.</div>
+  `,
+        },
+
+        "post-6": {
+          img: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=900&q=80&auto=format&fit=crop",
+          cat: "Thú Vị",
+          catColor: "var(--sage)",
+          title: "Cách Tạo Góc Vui Chơi Hoàn Hảo Cho Thú Cưng Trong Nhà",
+          date: "15 tháng 2, 2026",
+          readtime: "3 phút đọc",
+          views: "540 lượt xem",
+          tags: ["#Thú Vị", "#Mẹo Hay"],
+          content: `
+    <p>Môi trường phong phú giúp thú cưng khỏe cả thể chất lẫn tâm lý.</p>
+    <h3>${dot} Cho Mèo</h3>
+    <ul>
+      <li>Cây leo mèo (cat tree)</li>
+      <li>Cửa sổ nhìn ra ngoài — "tivi mèo"</li>
+      <li>Hộp carton và đồ chơi mồi giả</li>
+    </ul>
+    <h3>${dot} Cho Chó</h3>
+    <ul>
+      <li>Puzzle feeder kích thích trí tuệ</li>
+      <li>Snuffle mat tìm đồ ăn bằng mũi</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.lightbulb} Tip:</strong> Xoay vòng đồ chơi mỗi vài ngày để giữ sự mới lạ.</div>
+  `,
+        },
+
+        "post-7": {
+          img: "https://images.unsplash.com/photo-1591946614720-90a587da4a36?w=900&q=80&auto=format&fit=crop",
+          cat: "Chăm Sóc",
+          catColor: "var(--sage)",
+          title: "Cắt Tỉa Lông Cho Chó Tại Nhà — Từng Bước Dành Cho Người Mới",
+          date: "10 tháng 2, 2026",
+          readtime: "5 phút đọc",
+          views: "620 lượt xem",
+          tags: ["#Chăm Sóc", "#Grooming"],
+          content: `
+    <p>Grooming tại nhà tiết kiệm chi phí và tăng gắn kết.</p>
+    <h3>${dot} Dụng Cụ</h3>
+    <ul>
+      <li>Tông đơ chó chuyên dụng</li>
+      <li>Kéo đầu tròn an toàn</li>
+      <li>Lược và kẹp móng</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.alertTriangle} An toàn:</strong> Không dùng tông đơ trên lông ướt. Không ép khi boss sợ.</div>
+    <h3>${dot} Trình Tự</h3>
+    <p>Chải → Tắm & sấy → Cắt theo chiều lông → Cắt móng → Vệ sinh tai mắt.</p>
+  `,
+        },
+
+        "post-8": {
+          img: "https://images.unsplash.com/photo-1606425271394-c3ca9aa1fc06?w=900&q=80&auto=format&fit=crop",
+          cat: "Dinh Dưỡng",
+          catColor: "var(--amber)",
+          title: "Thức Ăn Tươi Hay Hạt Khô? So Sánh Toàn Diện",
+          date: "5 tháng 2, 2026",
+          readtime: "6 phút đọc",
+          views: "890 lượt xem",
+          tags: ["#Dinh Dưỡng", "#Royal Canin"],
+          content: `
+    <h3>${dot} Hạt Khô</h3>
+    <ul>
+      <li>${ic.checkCircle} Tiện lợi, bảo quản lâu</li>
+      <li>${ic.checkCircle} Giúp làm sạch răng nhẹ</li>
+      <li>${ic.xCircle} Ít nước — cần uống đủ</li>
+    </ul>
+    <h3>${dot} Thức Ăn Tươi</h3>
+    <ul>
+      <li>${ic.checkCircle} Độ ẩm cao, tốt cho thận</li>
+      <li>${ic.checkCircle} Thú cưng hứng thú hơn</li>
+      <li>${ic.xCircle} Cần cân bằng dinh dưỡng cẩn thận</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.lightbulb} Tốt nhất:</strong> Kết hợp 70% hạt khô chất lượng + 30% thức ăn tươi nấu chín.</div>
+  `,
+        },
+
+        "post-9": {
+          img: "https://images.unsplash.com/photo-1592754862816-1a21a4ea2281?w=900&q=80&auto=format&fit=crop",
+          cat: "Huấn Luyện",
+          catColor: "#0369a1",
+          title: "Mèo Không Dùng Khay Vệ Sinh? Nguyên Nhân & Cách Khắc Phục",
+          date: "1 tháng 2, 2026",
+          readtime: "5 phút đọc",
+          views: "710 lượt xem",
+          tags: ["#Huấn Luyện", "#Mèo Cưng"],
+          content: `
+    <p>Hầu hết trường hợp đều khắc phục được!</p>
+    <h3>${dot} Nguyên Nhân</h3>
+    <ul>
+      <li>Y tế (nhiễm trùng tiết niệu)</li>
+      <li>Khay bẩn</li>
+      <li>Cát không phù hợp</li>
+      <li>Vị trí khay sai</li>
+      <li>Stress</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.ruler} Quy tắc:</strong> Số khay = số mèo + 1.</div>
+    <h3>${dot} Giải Pháp</h3>
+    <p>Loại trừ y tế → Dọn hàng ngày → Thử cát kết cụm không mùi → Vị trí yên tĩnh → Khen khi dùng đúng.</p>
+  `,
+        },
+
+        "post-10": {
+          img: "https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?w=900&q=85&auto=format&fit=crop",
+          cat: "Sức Khỏe",
+          catColor: "var(--terracota)",
+          title: "Chăm Sóc Chó Lớn Tuổi — Khi Boss Bước Vào Giai Đoạn Vàng",
+          date: "18 tháng 3, 2026",
+          readtime: "6 phút đọc",
+          views: "430 lượt xem",
+          tags: ["#Sức Khỏe", "#Chăm Sóc", "#Mẹo Hay"],
+          content: `
+    <p>Chó được coi là "cao tuổi" từ khoảng 7 tuổi (giống nhỏ) đến 5 tuổi (giống lớn). Đây là giai đoạn cơ thể bắt đầu thay đổi và boss cần bạn quan tâm hơn bao giờ hết.</p>
+    <h3>${dot} Những Thay Đổi Cần Chú Ý</h3>
+    <ul>
+      <li>Khớp cứng hơn — giảm leo cầu thang, dùng đệm dày</li>
+      <li>Thị lực và thính lực suy giảm — đừng giật mình boss</li>
+      <li>Tiêu hóa chậm — chia nhỏ bữa ăn, chọn thức ăn senior</li>
+      <li>Uống nhiều nước hơn — để ý nếu bất thường</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.stethoscope} Khám định kỳ:</strong> Chó lớn tuổi nên khám thú y 6 tháng/lần thay vì 1 năm/lần như trước.</div>
+    <h3>${dot} Chế Độ Dinh Dưỡng Senior</h3>
+    <ul>
+      <li>Giảm 20–30% lượng calo so với giai đoạn trưởng thành</li>
+      <li>Bổ sung Omega-3 (cá hồi, dầu cá) để giữ lớp lông và hỗ trợ não</li>
+      <li>Glucosamine & Chondroitin — giúp khớp linh hoạt hơn</li>
+      <li>Tăng chất xơ từ bí đỏ, khoai lang để hỗ trợ tiêu hóa</li>
+    </ul>
+    <h3>${dot} Vận Động Phù Hợp</h3>
+    <p>Boss già vẫn cần đi bộ mỗi ngày nhưng đừng ép cường độ cao. Hai lần 15–20 phút nhẹ nhàng tốt hơn một buổi chạy dài. Bể bơi là lựa chọn tuyệt vời cho chó viêm khớp.</p>
+    <div class="tip-box"><strong>${ic.heart} Điều quan trọng nhất:</strong> Boss già cần nhiều thời gian bên bạn hơn. Đừng để boss cô đơn — sự đồng hành là liều thuốc tốt nhất.</div>
+  `,
+        },
+
+        "post-11": {
+          img: "https://images.unsplash.com/photo-1585664811087-47f65abbad64?w=900&q=80&auto=format&fit=crop",
+          cat: "Dinh Dưỡng",
+          catColor: "var(--amber)",
+          title: "15 Thực Phẩm Tuyệt Đối Không Được Cho Thú Cưng Ăn",
+          date: "15 tháng 3, 2026",
+          readtime: "5 phút đọc",
+          views: "1.5k lượt xem",
+          tags: ["#Dinh Dưỡng", "#Sức Khỏe", "#Mẹo Hay"],
+          content: `
+    <p>Nhiều thực phẩm quen thuộc trong bếp nhà bạn có thể cực kỳ nguy hiểm với thú cưng. In danh sách này dán lên tủ lạnh ngay!</p>
+    <h3>${dot} Nguy Hiểm Cao — Tuyệt Đối Không</h3>
+    <ul>
+      <li><strong>Socola & Cacao:</strong> Chứa theobromine gây co giật, suy tim</li>
+      <li><strong>Hành, tỏi, tỏi tây:</strong> Phá hủy hồng cầu, gây thiếu máu</li>
+      <li><strong>Nho & Nho khô:</strong> Suy thận cấp — chỉ vài quả cũng đủ nguy hiểm</li>
+      <li><strong>Macadamia:</strong> Gây liệt chi sau tạm thời ở chó</li>
+      <li><strong>Xylitol (đường ăn kiêng):</strong> Có trong kẹo cao su, hạ đường huyết đột ngột</li>
+      <li><strong>Rượu bia & Caffeine:</strong> Hệ thần kinh không xử lý được</li>
+      <li><strong>Hạt đào, mận, táo:</strong> Chứa cyanide trong nhân hạt</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.siren} Nếu thú cưng lỡ ăn:</strong> Đừng tự xử lý tại nhà — gọi thú y ngay và thông báo chính xác thứ boss đã ăn và lượng bao nhiêu.</div>
+    <h3>${dot} Thận Trọng — Ăn Ít Hoặc Không</h3>
+    <ul>
+      <li><strong>Sữa & Phô mai:</strong> Nhiều chó mèo bất dung nạp lactose</li>
+      <li><strong>Muối nhiều:</strong> Gây tăng huyết áp, tổn thương thận dài hạn</li>
+      <li><strong>Xương nấu chín:</strong> Giòn, dễ vỡ thành mảnh nhọn gây thủng ruột</li>
+      <li><strong>Avocado:</strong> Chứa persin — an toàn hơn với chó nhưng độc với chim, thỏ</li>
+      <li><strong>Trứng sống:</strong> Nguy cơ salmonella và ức chế hấp thụ biotin</li>
+      <li><strong>Cá sống nhiều:</strong> Chứa thiaminase phá hủy vitamin B1</li>
+      <li><strong>Đồ ăn cay, nhiều dầu mỡ:</strong> Viêm tụy cấp</li>
+    </ul>
+  `,
+        },
+
+        "post-12": {
+          img: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=900&q=80&auto=format&fit=crop",
+          cat: "Chăm Sóc",
+          catColor: "var(--sage)",
+          title: "Thú Cưng & Em Bé Sơ Sinh — Cách Để Hai Bên Cùng An Toàn",
+          date: "12 tháng 3, 2026",
+          readtime: "5 phút đọc",
+          views: "680 lượt xem",
+          tags: ["#Chăm Sóc", "#Mẹo Hay"],
+          content: `
+    <p>Khi gia đình có thêm thành viên nhỏ, nhiều người lo lắng về việc chung sống giữa thú cưng và em bé. Tin tốt là: hoàn toàn có thể nếu bạn chuẩn bị từ trước.</p>
+    <h3>${dot} Trước Khi Bé Về Nhà</h3>
+    <ul>
+      <li>Đưa thú cưng đi kiểm tra sức khỏe, tẩy giun và tiêm phòng đầy đủ</li>
+      <li>Cho boss ngửi đồ của bé (quần áo, chăn) từ bệnh viện về trước</li>
+      <li>Thiết lập "vùng cấm" — một số phòng boss không được vào</li>
+      <li>Tập cho boss quen với tiếng khóc bé qua video hoặc âm thanh</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.lightbulb} Quan trọng:</strong> Không bao giờ để thú cưng và trẻ dưới 5 tuổi ở một mình dù chỉ vài phút — dù boss hiền đến đâu.</div>
+    <h3>${dot} Khi Bé Đã Về Nhà</h3>
+    <ul>
+      <li>Để boss tiếp cận từ từ, từ xa — không ép gặp ngay</li>
+      <li>Duy trì lịch sinh hoạt của boss để tránh căng thẳng</li>
+      <li>Thưởng khi boss hành xử bình tĩnh quanh bé</li>
+      <li>Vệ sinh tay trước và sau khi tiếp xúc cả hai</li>
+    </ul>
+    <h3>${dot} Lợi Ích Lâu Dài</h3>
+    <p>Nghiên cứu cho thấy trẻ em lớn lên cùng thú cưng có hệ miễn dịch tốt hơn, ít dị ứng hơn và phát triển sự đồng cảm vượt trội. Thời gian đầu có thể khó, nhưng hoàn toàn xứng đáng!</p>
+  `,
+        },
+
+        "post-13": {
+          img: "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=900&q=80&auto=format&fit=crop",
+          cat: "Thú Vị",
+          catColor: "var(--sage)",
+          title: "Mang Boss Đi Du Lịch — Checklist Đầy Đủ Từ A Đến Z",
+          date: "9 tháng 3, 2026",
+          readtime: "6 phút đọc",
+          views: "920 lượt xem",
+          tags: ["#Thú Vị", "#Chăm Sóc", "#Mẹo Hay"],
+          content: `
+    <p>Du lịch cùng thú cưng ngày càng phổ biến — và hoàn toàn khả thi nếu bạn lên kế hoạch cẩn thận!</p>
+    <h3>${dot} Giấy Tờ Cần Có</h3>
+    <ul>
+      <li>Sổ tiêm phòng cập nhật (đặc biệt vaccine dại)</li>
+      <li>Giấy chứng nhận sức khỏe từ thú y (nếu đi tỉnh xa hoặc nước ngoài)</li>
+      <li>Ảnh chụp boss kèm thông tin liên lạc của bạn</li>
+      <li>Chip điện tử hoặc thẻ tên đeo cổ</li>
+    </ul>
+    <h3>${dot} Hành Lý Cho Boss</h3>
+    <ul>
+      <li>Thức ăn quen thuộc đủ cho cả chuyến + vài ngày dự phòng</li>
+      <li>Bát ăn uống gấp gọn</li>
+      <li>Thuốc đang dùng và hồ sơ thú y</li>
+      <li>Đồ chơi yêu thích — mùi quen giúp boss bớt lo</li>
+      <li>Chăn hoặc áo của bạn — mùi chủ là an ủi tốt nhất</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.car} Say xe:</strong> Không cho ăn no 2–3 tiếng trước khi đi. Mở kính xe cho thoáng. Dừng nghỉ mỗi 2 tiếng để boss vận động và vệ sinh.</div>
+    <h3>${dot} Chọn Chỗ Lưu Trú</h3>
+    <p>Tìm khách sạn hoặc homestay "pet-friendly" trước khi đặt. Luôn thông báo có mang theo thú cưng — đừng giấu vì có thể phát sinh vấn đề và phí phạt. Nhiều resort hiện có tiện ích riêng cho boss!</p>
+  `,
+        },
+
+        "post-14": {
+          img: "https://images.unsplash.com/photo-1560743641-3914f2c45636?w=900&q=80&auto=format&fit=crop",
+          cat: "Sức Khỏe",
+          catColor: "#7c3aed",
+          title: "Ve, Bọ Chét & Giun Sán — Phòng Ngừa Toàn Diện Cho Thú Cưng",
+          date: "6 tháng 3, 2026",
+          readtime: "5 phút đọc",
+          views: "1.1k lượt xem",
+          tags: ["#Sức Khỏe", "#Vaccine"],
+          content: `
+    <p>Ký sinh trùng không chỉ gây khó chịu cho boss mà còn có thể lây sang người. Phòng ngừa đúng cách tiết kiệm hơn điều trị rất nhiều.</p>
+    <h3>${dot} Ve & Bọ Chét</h3>
+    <ul>
+      <li><strong>Dấu hiệu:</strong> Boss gãi liên tục, lắc đầu, lông rụng từng mảng, thấy đốm đen nhỏ trong lông</li>
+      <li><strong>Phòng ngừa:</strong> Nhỏ gáy (Frontline, Advocate) hoặc vòng cổ chống ve (Seresto) mỗi 1–3 tháng</li>
+      <li><strong>Môi trường:</strong> Giặt đệm nằm tuần/lần, hút bụi thảm thường xuyên</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.alertTriangle} Lưu ý:</strong> Thuốc chống ve cho chó có thể gây ngộ độc cho mèo (nhất là thuốc chứa Permethrin) — không dùng lẫn lộn.</div>
+    <h3>${dot} Giun Sán</h3>
+    <ul>
+      <li><strong>Các loại thường gặp:</strong> Giun tzròn, giun móc, giun tim, sán dây</li>
+      <li><strong>Lịch tẩy giun:</strong> Chó mèo con mỗi 2 tuần đến 3 tháng tuổi; sau đó 3–6 tháng/lần</li>
+      <li><strong>Giun tim:</strong> Nguy hiểm nhất — phòng bằng thuốc nhỏ gáy hoặc viên uống hàng tháng</li>
+    </ul>
+    <h3>${dot} Lịch Phòng Ngừa Tổng Hợp</h3>
+    <ul>
+      <li>Hàng tháng: Nhỏ gáy chống ve + phòng giun tim</li>
+      <li>3 tháng: Tẩy giun đường ruột</li>
+      <li>6 tháng: Xét nghiệm phân kiểm tra</li>
+      <li>Hàng năm: Kiểm tra giun tim toàn diện</li>
+    </ul>
+  `,
+        },
+
+        "post-15": {
+          img: "https://tse2.mm.bing.net/th/id/OIP.XApU7Pv495b6Qfq6DhDasgHaEK?rs=1&pid=ImgDetMain&o=7&rm=3",
+          cat: "Huấn Luyện",
+          catColor: "#0369a1",
+          title: "Mèo Cào Đồ Đạc? Đây Là Cách Dạy Boss Cào Đúng Chỗ",
+          date: "3 tháng 3, 2026",
+          readtime: "4 phút đọc",
+          views: "830 lượt xem",
+          tags: ["#Huấn Luyện", "#Mèo Cưng", "#Mẹo Hay"],
+          content: `
+    <p>Cào là bản năng không thể tắt — mèo cào để đánh dấu lãnh thổ, mài vuốt và giải tỏa cảm xúc. Thay vì cấm, hãy hướng dẫn boss cào đúng chỗ.</p>
+    <h3>${dot} Chọn Trụ Cào Phù Hợp</h3>
+    <ul>
+      <li><strong>Chất liệu:</strong> Đay (sisal) là lựa chọn số 1 — mèo rất thích. Tránh carpet vì giống sofa</li>
+      <li><strong>Chiều cao:</strong> Đủ để mèo duỗi thẳng hoàn toàn — tối thiểu 60–70cm</li>
+      <li><strong>Độ ổn định:</strong> Phải cứng, không lắc — mèo sẽ bỏ nếu trụ cào bị ngã</li>
+      <li><strong>Vị trí:</strong> Đặt cạnh chỗ mèo hay nằm hoặc ngay cạnh chỗ boss hay cào trộm</li>
+    </ul>
+    <h3>${dot} Dạy Boss Dùng Đúng Chỗ</h3>
+    <ul>
+      <li>Rắc catnip lên trụ cào để thu hút</li>
+      <li>Đặt tay boss lên trụ và nhẹ nhàng mô phỏng động tác cào</li>
+      <li>Thưởng snack ngay khi boss tự cào vào trụ</li>
+      <li>Che chỗ boss hay cào trộm bằng băng keo hai mặt hoặc màng bọc</li>
+    </ul>
+    <div class="tip-box"><strong>${ic.xCircle} Đừng bao giờ:</strong> La hét hay phạt khi boss cào sai chỗ — sẽ gây stress và phản tác dụng. Chỉ cần chuyển hướng nhẹ nhàng sang trụ cào.</div>
+    <h3>${dot} Cắt Móng Định Kỳ</h3>
+    <p>Cắt móng mỗi 2–3 tuần làm giảm thiệt hại khi boss cào nhầm. Dùng kéo chuyên dụng, chỉ cắt phần trong suốt, tránh phần hồng có mạch máu.</p>
+  `,
+        },
+      };
+
+      // ── OPEN / CLOSE ────────────────────────────────────────────────────────
+      function openPost(id) {
+        const p = posts[id];
+        if (!p) return;
+        document.getElementById("detailContent").innerHTML = `
+          <img src="${p.img}" class="detail-hero-img" alt="${p.title}">
+          <div class="detail-content">
+              <div class="detail-cat" style="color:${p.catColor}">
+                  <i class="bi bi-bookmark-fill"></i>${p.cat.toUpperCase()}
+              </div>
+              <div class="detail-title">${p.title}</div>
+              <div class="detail-meta">
+                  <span><i class="bi bi-calendar3"></i>${p.date}</span>
+                  <span><i class="bi bi-clock"></i>${p.readtime}</span>
+                  <span><i class="bi bi-eye"></i>${p.views}</span>
+              </div>
+              <div class="detail-body">${p.content}</div>
+              <div class="detail-tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
+          </div>`;
+        document.getElementById("detailOverlay").classList.add("open");
+        document.body.style.overflow = "hidden";
+        // Read progress
+        const panel = document.querySelector(".detail-panel");
+        const progress = document.getElementById("detailProgress");
+        panel.addEventListener("scroll", () => {
+          const pct =
+            (panel.scrollTop / (panel.scrollHeight - panel.clientHeight)) * 100;
+          progress.style.width = Math.min(pct, 100) + "%";
+        });
+      }
+      function closePost() {
+        document.getElementById("detailOverlay").classList.remove("open");
+        document.body.style.overflow = "";
+        document.getElementById("detailProgress").style.width = "0";
+      }
+      function handleOverlayClick(e) {
+        if (e.target === document.getElementById("detailOverlay")) closePost();
+      }
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closePost();
+      });
+
+      // ── FILTER ──────────────────────────────────────────────────────────────
+      function filterPosts(cat, btn) {
+        if (btn) {
+          document
+            .querySelectorAll(".ftab")
+            .forEach((t) => t.classList.remove("active"));
+          btn.classList.add("active");
+        }
+        const items = document.querySelectorAll(".post-item");
+        let count = 0;
+        items.forEach((item, i) => {
+          const show = cat === "all" || item.dataset.cat === cat;
+          item.style.display = show ? "" : "none";
+          if (show) {
+            count++;
+            item.classList.remove("visible");
+            setTimeout(() => item.classList.add("visible"), i * 60);
+          }
+        });
+        document.getElementById("post-count").textContent = count + " bài viết";
+      }
+
+      // ── SEARCH ──────────────────────────────────────────────────────────────
+      // Map post IDs to their title text in the DOM for searching
+      function getPostTitles() {
+        const map = {};
+        document.querySelectorAll(".post-item").forEach((item) => {
+          const title = item.querySelector(".post-title");
+          const excerpt = item.querySelector(".post-excerpt");
+          if (title)
+            map[item] = (
+              title.textContent +
+              " " +
+              (excerpt ? excerpt.textContent : "")
+            ).toLowerCase();
+        });
+        return map;
+      }
+
+      function searchPosts(query) {
+        const q = query.trim().toLowerCase();
+        const items = document.querySelectorAll(".post-item");
+        const empty = document.getElementById("searchEmpty");
+        const clearBtn = document.getElementById("searchClear");
+
+        // Reset filter tabs when searching
+        if (q) {
+          document
+            .querySelectorAll(".ftab")
+            .forEach((t) => t.classList.remove("active"));
+          document.querySelector(".ftab").classList.add("active"); // reset to "Tất Cả"
+        }
+
+        let count = 0;
+        items.forEach((item, i) => {
+          const title =
+            item.querySelector(".post-title")?.textContent.toLowerCase() || "";
+          const excerpt =
+            item.querySelector(".post-excerpt")?.textContent.toLowerCase() ||
+            "";
+          const show = !q || title.includes(q) || excerpt.includes(q);
+          item.style.display = show ? "" : "none";
+          if (show) {
+            count++;
+            item.classList.remove("visible");
+            setTimeout(() => item.classList.add("visible"), i * 55);
+          }
+        });
+
+        document.getElementById("post-count").textContent = count + " bài viết";
+        empty.style.display = q && count === 0 ? "block" : "none";
+        clearBtn.style.display = q ? "block" : "none";
+
+        // Scroll to results
+      }
+
+      function clearSearch() {
+        document.getElementById("searchInput").value = "";
+        searchPosts("");
+        // Restore all tabs
+        document.querySelectorAll(".post-item").forEach((el, i) => {
+          el.style.display = "";
+          el.classList.remove("visible");
+          setTimeout(() => el.classList.add("visible"), i * 55);
+        });
+        document.getElementById("post-count").textContent = "9 bài viết";
+      }
+
+      // ── INIT: staggered card reveal ─────────────────────────────────────────
+      document.querySelectorAll(".post-item").forEach((el, i) => {
+        setTimeout(() => el.classList.add("visible"), 80 + i * 60);
+      });
+    </script>
+  </body>
+</html>

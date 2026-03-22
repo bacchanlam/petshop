@@ -217,11 +217,24 @@
                             &laquo;
                         </a>
                     </li>
-                    <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-                        class="page-item" th:classappend="${i == currentPage} ? 'active'">
-                        <a class="page-link"
-                           th:href="@{/products(keyword=${filter.keyword},categoryId=${filter.categoryId},petType=${filter.petType},brand=${filter.brand},minPrice=${filter.minPrice},maxPrice=${filter.maxPrice},sortBy=${filter.sortBy},page=${i})}"
-                           th:text="${i + 1}"></a>
+                    <li class="page-item disabled"
+                        th:if="${currentPage > 5}">
+                        <span class="page-link">...</span>
+                    </li>
+                    <th:block th:with="
+                        startPage=${currentPage > 5 ? currentPage - 5 : 0},
+                        endPage=${currentPage > 5 ? (currentPage + 4 < totalPages ? currentPage + 4 : totalPages - 1) : (9 < totalPages - 1 ? 9 : totalPages - 1)}
+                    ">
+                        <li th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                            class="page-item" th:classappend="${i == currentPage} ? 'active'">
+                            <a class="page-link"
+                               th:href="@{/products(keyword=${filter.keyword},categoryId=${filter.categoryId},petType=${filter.petType},brand=${filter.brand},minPrice=${filter.minPrice},maxPrice=${filter.maxPrice},sortBy=${filter.sortBy},page=${i})}"
+                               th:text="${i + 1}"></a>
+                        </li>
+                    </th:block>
+                    <li class="page-item disabled"
+                        th:if="${currentPage < totalPages - 6}">
+                        <span class="page-link">...</span>
                     </li>
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                         <a class="page-link"
