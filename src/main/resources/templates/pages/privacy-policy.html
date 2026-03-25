@@ -7,6 +7,8 @@
   <title>Chính Sách Bảo Mật – PetShop</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -65,7 +67,7 @@
     .sec p:last-child { margin-bottom: 0; }
     .sec ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
     .sec ul li { font-size: .9rem; line-height: 1.8; color: var(--ink-light); display: flex; align-items: flex-start; gap: 12px; }
-    .sec ul li::before { content: '—'; color: var(--blue); font-weight: 600; flex-shrink: 0; margin-top: 2px; }
+    .sec ul li .li-icon { color: var(--blue); flex-shrink: 0; margin-top: 3px; width: 16px; height: 16px; }
 
     /* Boxes */
     .box-quote { background: var(--off-white); border-left: 3px solid var(--blue); padding: 20px 24px; margin: 18px 0; }
@@ -73,10 +75,13 @@
     .box-warn { background: #fff8f4; border: 1px solid #f5c4b0; padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
     .box-warn p { font-size: .88rem; line-height: 1.75; color: var(--ink-light); margin: 0; }
     .box-warn strong { color: var(--accent); }
+    .box-warn .box-icon { color: #e07940; flex-shrink: 0; margin-top: 1px; }
     .box-info { background: var(--blue-bg); border: 1px solid var(--blue-border); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
     .box-info p { font-size: .88rem; line-height: 1.75; color: #3a5a9a; margin: 0; }
+    .box-info .box-icon { color: #4a78cc; flex-shrink: 0; margin-top: 1px; }
     .box-ok { background: #f0faf4; border: 1px solid #a8d8b8; padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
     .box-ok p { font-size: .88rem; line-height: 1.75; color: #2d6a4f; margin: 0; }
+    .box-ok .box-icon { color: #2d9a5f; flex-shrink: 0; margin-top: 1px; }
 
     /* Data table */
     .data-table { width: 100%; border-collapse: collapse; margin: 18px 0; }
@@ -90,12 +95,14 @@
     .rights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
     .right-item { padding: 20px; border: 1px solid var(--rule); background: var(--warm-white); transition: background .2s; }
     .right-item:hover { background: var(--off-white); }
-    .right-icon { font-size: 1.2rem; margin-bottom: 10px; }
+    .right-icon { margin-bottom: 10px; color: var(--blue); display: flex; align-items: center; }
+    .right-icon svg { width: 22px; height: 22px; }
     .right-title { font-family: 'Lora', serif; font-size: .92rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
     .right-desc { font-size: .82rem; line-height: 1.7; color: var(--ink-muted); }
 
     /* Tag */
-    .tag { display: inline-block; font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; padding: 3px 10px; background: var(--off-white); color: var(--ink-muted); border: 1px solid var(--rule); margin-bottom: 14px; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; background: var(--off-white); color: var(--ink-muted); border: 1px solid var(--rule); margin-bottom: 14px; }
+    .tag svg { width: 12px; height: 12px; }
     .tag.blue { background: var(--blue-bg); color: var(--blue); border-color: var(--blue-border); }
 
     /* CTA */
@@ -161,6 +168,7 @@
   <!-- CONTENT -->
   <main class="content">
 
+    <!-- SECTION 01 -->
     <div class="sec fade-in" id="p1">
       <div class="sec-head"><span class="sec-num">01</span><h2>Dữ liệu chúng tôi <em>thu thập</em></h2></div>
       <p>Khi bạn sử dụng dịch vụ của PetShop, chúng tôi có thể thu thập các loại dữ liệu sau:</p>
@@ -207,162 +215,169 @@
         </tbody>
       </table>
       <div class="box-ok">
-        <span>✅</span>
+        <i data-lucide="circle-check-big" class="box-icon"></i>
         <p>PetShop <strong>không thu thập</strong> số thẻ tín dụng, mật khẩu ngân hàng, hay bất kỳ thông tin tài chính nhạy cảm nào. Mọi giao dịch đều qua cổng thanh toán bên thứ ba được mã hóa.</p>
       </div>
     </div>
 
+    <!-- SECTION 02 -->
     <div class="sec fade-in" id="p2">
       <div class="sec-head"><span class="sec-num">02</span><h2>Mục đích <em>sử dụng dữ liệu</em></h2></div>
       <p>Dữ liệu bạn cung cấp được PetShop sử dụng cho các mục đích sau, và chỉ các mục đích này:</p>
       <ul>
-        <li><strong>Xử lý đơn hàng:</strong> Xác nhận, đóng gói, giao hàng và thông báo trạng thái đơn hàng của bạn.</li>
-        <li><strong>Hỗ trợ khách hàng:</strong> Giải quyết yêu cầu đổi trả, khiếu nại và tư vấn sản phẩm.</li>
-        <li><strong>Cải thiện dịch vụ:</strong> Phân tích hành vi mua hàng để đề xuất sản phẩm phù hợp hơn.</li>
-        <li><strong>Chương trình thành viên:</strong> Tính điểm tích lũy, xếp hạng và gửi ưu đãi cá nhân hóa.</li>
-        <li><strong>Thông tin sản phẩm mới:</strong> Gửi email thông báo về sản phẩm, khuyến mãi (nếu bạn đồng ý nhận).</li>
-        <li><strong>Tuân thủ pháp luật:</strong> Lưu trữ hóa đơn, hỗ trợ cơ quan nhà nước khi có yêu cầu hợp pháp.</li>
-        <li><strong>Phòng chống gian lận:</strong> Phát hiện và ngăn chặn các giao dịch gian lận, bảo vệ tài khoản.</li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Xử lý đơn hàng:</strong> Xác nhận, đóng gói, giao hàng và thông báo trạng thái đơn hàng của bạn.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Hỗ trợ khách hàng:</strong> Giải quyết yêu cầu đổi trả, khiếu nại và tư vấn sản phẩm.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Cải thiện dịch vụ:</strong> Phân tích hành vi mua hàng để đề xuất sản phẩm phù hợp hơn.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Chương trình thành viên:</strong> Tính điểm tích lũy, xếp hạng và gửi ưu đãi cá nhân hóa.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Thông tin sản phẩm mới:</strong> Gửi email thông báo về sản phẩm, khuyến mãi (nếu bạn đồng ý nhận).</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Tuân thủ pháp luật:</strong> Lưu trữ hóa đơn, hỗ trợ cơ quan nhà nước khi có yêu cầu hợp pháp.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Phòng chống gian lận:</strong> Phát hiện và ngăn chặn các giao dịch gian lận, bảo vệ tài khoản.</span></li>
       </ul>
       <div class="box-info">
-        <span>ℹ️</span>
+        <i data-lucide="info" class="box-icon"></i>
         <p>PetShop <strong>không bao giờ</strong> sử dụng dữ liệu của bạn để nhắm mục tiêu quảng cáo cho bên thứ ba, hoặc bán thông tin của bạn cho bất kỳ tổ chức nào vì mục đích thương mại.</p>
       </div>
     </div>
 
+    <!-- SECTION 03 -->
     <div class="sec fade-in" id="p3">
       <div class="sec-head"><span class="sec-num">03</span><h2>Chia sẻ dữ liệu <em>bên thứ ba</em></h2></div>
-      <span class="tag blue">Chỉ khi cần thiết</span>
+      <span class="tag blue">
+        <i data-lucide="shield-check"></i>
+        Chỉ khi cần thiết
+      </span>
       <p>PetShop có thể chia sẻ một phần dữ liệu của bạn với các đối tác trong những trường hợp cụ thể và giới hạn sau:</p>
       <ul>
-        <li><strong>Đơn vị vận chuyển (GHN, GHTK, J&T...):</strong> Tên, số điện thoại, địa chỉ giao hàng — chỉ để giao đơn hàng của bạn.</li>
-        <li><strong>Cổng thanh toán (MoMo, VNPay, Stripe...):</strong> Thông tin cần thiết để xử lý giao dịch — không bao gồm mật khẩu hay thông tin tài khoản ngân hàng đầy đủ.</li>
-        <li><strong>Dịch vụ email (gửi thông báo đơn hàng):</strong> Địa chỉ email và tên của bạn — chỉ để gửi email hệ thống.</li>
-        <li><strong>Cơ quan nhà nước:</strong> Khi có yêu cầu hợp pháp từ cơ quan có thẩm quyền theo quy định pháp luật Việt Nam.</li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Đơn vị vận chuyển (GHN, GHTK, J&T...):</strong> Tên, số điện thoại, địa chỉ giao hàng — chỉ để giao đơn hàng của bạn.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Cổng thanh toán (MoMo, VNPay, Stripe...):</strong> Thông tin cần thiết để xử lý giao dịch — không bao gồm mật khẩu hay thông tin tài khoản ngân hàng đầy đủ.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Dịch vụ email (gửi thông báo đơn hàng):</strong> Địa chỉ email và tên của bạn — chỉ để gửi email hệ thống.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Cơ quan nhà nước:</strong> Khi có yêu cầu hợp pháp từ cơ quan có thẩm quyền theo quy định pháp luật Việt Nam.</span></li>
       </ul>
       <div class="box-warn">
-        <span>⚠️</span>
+        <i data-lucide="triangle-alert" class="box-icon"></i>
         <p>Tất cả đối tác của PetShop đều ký kết thỏa thuận bảo mật dữ liệu và <strong>chỉ được phép dùng dữ liệu cho đúng mục đích được giao</strong>. PetShop không chia sẻ dữ liệu vì mục đích quảng cáo hay thương mại ngoài phạm vi trên.</p>
       </div>
     </div>
 
+    <!-- SECTION 04 -->
     <div class="sec fade-in" id="p4">
       <div class="sec-head"><span class="sec-num">04</span><h2>Bảo mật <em>dữ liệu</em></h2></div>
       <p>PetShop áp dụng các biện pháp kỹ thuật và tổ chức phù hợp để bảo vệ dữ liệu của bạn:</p>
       <ul>
-        <li><strong>Mã hóa SSL/TLS:</strong> Toàn bộ dữ liệu truyền giữa trình duyệt và máy chủ đều được mã hóa.</li>
-        <li><strong>Mã hóa mật khẩu:</strong> Mật khẩu được băm (hash) bằng thuật toán bcrypt — ngay cả PetShop cũng không đọc được mật khẩu của bạn.</li>
-        <li><strong>Kiểm soát truy cập:</strong> Chỉ nhân viên có thẩm quyền mới được truy cập dữ liệu cá nhân, theo nguyên tắc tối thiểu cần thiết.</li>
-        <li><strong>Sao lưu định kỳ:</strong> Dữ liệu được sao lưu tự động mỗi ngày và lưu trữ an toàn tại máy chủ dự phòng.</li>
-        <li><strong>Giám sát bảo mật:</strong> Hệ thống được giám sát 24/7 để phát hiện và xử lý kịp thời các truy cập bất thường.</li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Mã hóa SSL/TLS:</strong> Toàn bộ dữ liệu truyền giữa trình duyệt và máy chủ đều được mã hóa.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Mã hóa mật khẩu:</strong> Mật khẩu được băm (hash) bằng thuật toán bcrypt — ngay cả PetShop cũng không đọc được mật khẩu của bạn.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Kiểm soát truy cập:</strong> Chỉ nhân viên có thẩm quyền mới được truy cập dữ liệu cá nhân, theo nguyên tắc tối thiểu cần thiết.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Sao lưu định kỳ:</strong> Dữ liệu được sao lưu tự động mỗi ngày và lưu trữ an toàn tại máy chủ dự phòng.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Giám sát bảo mật:</strong> Hệ thống được giám sát 24/7 để phát hiện và xử lý kịp thời các truy cập bất thường.</span></li>
       </ul>
       <div class="box-quote">
         <p>"Không có hệ thống nào là an toàn tuyệt đối. Nếu xảy ra sự cố bảo mật ảnh hưởng đến dữ liệu của bạn, PetShop cam kết thông báo trong vòng 72 giờ theo quy định pháp luật."</p>
       </div>
     </div>
 
+    <!-- SECTION 05 -->
     <div class="sec fade-in" id="p5">
       <div class="sec-head"><span class="sec-num">05</span><h2>Cookie & <em>Công nghệ theo dõi</em></h2></div>
-      <span class="tag">Có thể tắt</span>
+      <span class="tag">
+        <i data-lucide="settings-2"></i>
+        Có thể tắt
+      </span>
       <p>PetShop sử dụng cookie và các công nghệ tương tự để cải thiện trải nghiệm của bạn. Các loại cookie chúng tôi dùng:</p>
       <ul>
-        <li><strong>Cookie thiết yếu:</strong> Cần thiết để website hoạt động (giỏ hàng, đăng nhập, bảo mật phiên). Không thể tắt.</li>
-        <li><strong>Cookie phân tích:</strong> Thu thập dữ liệu ẩn danh về cách bạn sử dụng website để cải thiện dịch vụ.</li>
-        <li><strong>Cookie chức năng:</strong> Ghi nhớ tùy chọn của bạn (ngôn ngữ, địa chỉ giao hàng mặc định).</li>
-        <li><strong>Cookie tiếp thị:</strong> Hiển thị sản phẩm liên quan đến lịch sử xem của bạn (chỉ trong phạm vi PetShop).</li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Cookie thiết yếu:</strong> Cần thiết để website hoạt động (giỏ hàng, đăng nhập, bảo mật phiên). Không thể tắt.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Cookie phân tích:</strong> Thu thập dữ liệu ẩn danh về cách bạn sử dụng website để cải thiện dịch vụ.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Cookie chức năng:</strong> Ghi nhớ tùy chọn của bạn (ngôn ngữ, địa chỉ giao hàng mặc định).</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Cookie tiếp thị:</strong> Hiển thị sản phẩm liên quan đến lịch sử xem của bạn (chỉ trong phạm vi PetShop).</span></li>
       </ul>
       <div class="box-info">
-        <span>ℹ️</span>
+        <i data-lucide="info" class="box-icon"></i>
         <p>Bạn có thể quản lý cookie qua cài đặt trình duyệt. Tắt cookie có thể ảnh hưởng đến một số tính năng của website như giỏ hàng hoặc đăng nhập tự động.</p>
       </div>
     </div>
 
+    <!-- SECTION 06 -->
     <div class="sec fade-in" id="p6">
       <div class="sec-head"><span class="sec-num">06</span><h2>Lưu trữ <em>& Xóa dữ liệu</em></h2></div>
       <p>PetShop lưu trữ dữ liệu của bạn trong thời gian cần thiết cho các mục đích đã nêu:</p>
       <ul>
-        <li><strong>Dữ liệu tài khoản:</strong> Trong suốt thời gian tài khoản còn hoạt động, và tối đa 3 năm sau khi xóa tài khoản.</li>
-        <li><strong>Lịch sử đơn hàng & hóa đơn:</strong> Tối thiểu 5 năm theo yêu cầu pháp luật về kế toán và thuế.</li>
-        <li><strong>Log truy cập & bảo mật:</strong> 12 tháng để phát hiện và điều tra các hành vi bất thường.</li>
-        <li><strong>Dữ liệu phân tích (ẩn danh):</strong> Không giới hạn thời gian (vì đã được ẩn danh hóa).</li>
-        <li><strong>Email marketing:</strong> Cho đến khi bạn hủy đăng ký nhận email.</li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Dữ liệu tài khoản:</strong> Trong suốt thời gian tài khoản còn hoạt động, và tối đa 3 năm sau khi xóa tài khoản.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Lịch sử đơn hàng & hóa đơn:</strong> Tối thiểu 5 năm theo yêu cầu pháp luật về kế toán và thuế.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Log truy cập & bảo mật:</strong> 12 tháng để phát hiện và điều tra các hành vi bất thường.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Dữ liệu phân tích (ẩn danh):</strong> Không giới hạn thời gian (vì đã được ẩn danh hóa).</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Email marketing:</strong> Cho đến khi bạn hủy đăng ký nhận email.</span></li>
       </ul>
       <p>Khi bạn yêu cầu xóa tài khoản, PetShop sẽ xóa hoặc ẩn danh hóa dữ liệu cá nhân nhận dạng trong vòng 30 ngày, ngoại trừ dữ liệu phải giữ theo quy định pháp luật.</p>
     </div>
 
+    <!-- SECTION 07 -->
     <div class="sec fade-in" id="p7">
       <div class="sec-head"><span class="sec-num">07</span><h2>Quyền <em>của bạn</em></h2></div>
       <p>Theo pháp luật Việt Nam về bảo vệ dữ liệu cá nhân, bạn có các quyền sau đối với dữ liệu của mình:</p>
       <div class="rights-grid">
         <div class="right-item">
-          <div class="right-icon">👁️</div>
+          <div class="right-icon"><i data-lucide="eye"></i></div>
           <div class="right-title">Quyền truy cập</div>
           <div class="right-desc">Yêu cầu xem toàn bộ dữ liệu cá nhân PetShop đang lưu trữ về bạn.</div>
         </div>
         <div class="right-item">
-          <div class="right-icon">✏️</div>
+          <div class="right-icon"><i data-lucide="pencil"></i></div>
           <div class="right-title">Quyền chỉnh sửa</div>
           <div class="right-desc">Cập nhật, sửa chữa thông tin cá nhân không chính xác hoặc không đầy đủ.</div>
         </div>
         <div class="right-item">
-          <div class="right-icon">🗑️</div>
+          <div class="right-icon"><i data-lucide="trash-2"></i></div>
           <div class="right-title">Quyền xóa</div>
           <div class="right-desc">Yêu cầu xóa dữ liệu cá nhân trong phạm vi pháp luật cho phép.</div>
         </div>
         <div class="right-item">
-          <div class="right-icon">🚫</div>
+          <div class="right-icon"><i data-lucide="ban"></i></div>
           <div class="right-title">Quyền phản đối</div>
           <div class="right-desc">Phản đối việc xử lý dữ liệu cho mục đích tiếp thị hoặc phân tích hành vi.</div>
         </div>
         <div class="right-item">
-          <div class="right-icon">📦</div>
+          <div class="right-icon"><i data-lucide="package"></i></div>
           <div class="right-title">Quyền chuyển dữ liệu</div>
           <div class="right-desc">Nhận bản sao dữ liệu của bạn ở định dạng có thể đọc được (JSON/CSV).</div>
         </div>
         <div class="right-item">
-          <div class="right-icon">⏸️</div>
+          <div class="right-icon"><i data-lucide="pause-circle"></i></div>
           <div class="right-title">Quyền hạn chế xử lý</div>
           <div class="right-desc">Yêu cầu tạm dừng xử lý dữ liệu trong khi xem xét khiếu nại của bạn.</div>
         </div>
       </div>
       <div class="box-info">
-        <span>ℹ️</span>
+        <i data-lucide="info" class="box-icon"></i>
         <p>Để thực hiện bất kỳ quyền nào trên, gửi yêu cầu đến <strong>privacy@petshop.vn</strong> kèm thông tin xác minh danh tính. PetShop xử lý trong vòng <strong>30 ngày</strong> kể từ ngày nhận yêu cầu.</p>
       </div>
     </div>
 
+    <!-- SECTION 08 -->
     <div class="sec fade-in" id="p8">
       <div class="sec-head"><span class="sec-num">08</span><h2>Trẻ em <em>& Người chưa thành niên</em></h2></div>
-      <p>
-        Dịch vụ của PetShop không dành cho trẻ em dưới 13 tuổi. PetShop không cố ý thu thập dữ liệu cá nhân của trẻ em dưới 13 tuổi.
-      </p>
-      <p>
-        Người dùng từ 13 đến dưới 18 tuổi cần có sự đồng ý của cha/mẹ hoặc người giám hộ hợp pháp trước khi đăng ký tài khoản và thực hiện giao dịch trên PetShop.
-      </p>
+      <p>Dịch vụ của PetShop không dành cho trẻ em dưới 13 tuổi. PetShop không cố ý thu thập dữ liệu cá nhân của trẻ em dưới 13 tuổi.</p>
+      <p>Người dùng từ 13 đến dưới 18 tuổi cần có sự đồng ý của cha/mẹ hoặc người giám hộ hợp pháp trước khi đăng ký tài khoản và thực hiện giao dịch trên PetShop.</p>
       <div class="box-warn">
-        <span>⚠️</span>
+        <i data-lucide="triangle-alert" class="box-icon"></i>
         <p>Nếu bạn phát hiện trẻ em dưới 13 tuổi đã cung cấp dữ liệu cá nhân cho PetShop, vui lòng liên hệ ngay <strong>privacy@petshop.vn</strong> để chúng tôi xóa dữ liệu đó.</p>
       </div>
     </div>
 
+    <!-- SECTION 09 -->
     <div class="sec fade-in" id="p9">
       <div class="sec-head"><span class="sec-num">09</span><h2>Thay đổi <em>chính sách</em></h2></div>
-      <p>
-        PetShop có thể cập nhật Chính Sách Bảo Mật này định kỳ. Khi có thay đổi đáng kể, chúng tôi sẽ thông báo qua email và hiển thị thông báo nổi bật trên website ít nhất 7 ngày trước khi áp dụng.
-      </p>
-      <p>
-        Tiếp tục sử dụng dịch vụ sau ngày thay đổi có hiệu lực đồng nghĩa với việc bạn chấp nhận chính sách mới. Nếu không đồng ý, bạn có thể xóa tài khoản trước ngày hiệu lực.
-      </p>
+      <p>PetShop có thể cập nhật Chính Sách Bảo Mật này định kỳ. Khi có thay đổi đáng kể, chúng tôi sẽ thông báo qua email và hiển thị thông báo nổi bật trên website ít nhất 7 ngày trước khi áp dụng.</p>
+      <p>Tiếp tục sử dụng dịch vụ sau ngày thay đổi có hiệu lực đồng nghĩa với việc bạn chấp nhận chính sách mới. Nếu không đồng ý, bạn có thể xóa tài khoản trước ngày hiệu lực.</p>
     </div>
 
+    <!-- SECTION 10 -->
     <div class="sec fade-in" id="p10">
       <div class="sec-head"><span class="sec-num">10</span><h2>Liên hệ <em>về quyền riêng tư</em></h2></div>
       <p>Nếu bạn có câu hỏi, khiếu nại hoặc muốn thực hiện quyền đối với dữ liệu của mình, hãy liên hệ:</p>
       <ul>
-        <li><strong>Email bảo mật:</strong> privacy@petshop.vn — phản hồi trong 2 ngày làm việc.</li>
-        <li><strong>Email hỗ trợ chung:</strong> support@petshop.vn</li>
-        <li><strong>Hotline:</strong> 0900 000 000 — 8:00 đến 20:00, mỗi ngày.</li>
-        <li><strong>Địa chỉ bưu điện:</strong> 123 Đường Thú Cưng, Quận 1, TP. Hồ Chí Minh.</li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Email bảo mật:</strong> privacy@petshop.vn — phản hồi trong 2 ngày làm việc.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Email hỗ trợ chung:</strong> support@petshop.vn</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Hotline:</strong> 0900 000 000 — 8:00 đến 20:00, mỗi ngày.</span></li>
+        <li><i data-lucide="minus" class="li-icon"></i><span><strong>Địa chỉ bưu điện:</strong> 123 Đường Thú Cưng, Quận 1, TP. Hồ Chí Minh.</span></li>
       </ul>
       <div class="box-quote">
         <p>"Quyền riêng tư của bạn là ưu tiên của chúng tôi. Chúng tôi không chỉ tuân thủ luật — chúng tôi tin rằng dữ liệu của bạn thuộc về bạn."</p>
@@ -377,20 +392,26 @@
     <h3>Câu hỏi về quyền riêng tư?</h3>
     <p>Đội ngũ bảo mật của PetShop sẵn sàng giải đáp mọi thắc mắc về cách chúng tôi xử lý dữ liệu của bạn.</p>
   </div>
-  <a href="mailto:privacy@petshop.vn" class="btn-blue">
+  <a href="https://zalo.me/0865706232" target="_blank" rel="noopener" class="btn-blue">
     Liên hệ privacy team
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
   </a>
 </div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
+  // Initialize all Lucide icons
+  lucide.createIcons();
+
+  // Fade-in animation
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
   }, { threshold: 0.06 });
   document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 
+  // Sidebar active state on scroll
   const sections = document.querySelectorAll('.sec[id]');
   const links = document.querySelectorAll('.toc-list a');
   window.addEventListener('scroll', () => {
