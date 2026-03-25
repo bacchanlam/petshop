@@ -1,10 +1,14 @@
 package com.example.doan_petshop.config;
 
+import com.example.doan_petshop.security.CustomAuthenticationFailureHandler;
 import com.example.doan_petshop.security.CustomUserDetailsService;
+import com.example.doan_petshop.security.EmailVerificationAuthenticationProvider;
+import com.example.doan_petshop.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +27,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final EmailVerificationAuthenticationProvider emailVerificationAuthenticationProvider;
+    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -30,9 +37,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder authenticationManagerBuilder =
+                http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder
+                .authenticationProvider(emailVerificationAuthenticationProvider);
+        return authenticationManagerBuilder.build();
     }
 
     @Bean
@@ -61,6 +71,8 @@ public class SecurityConfig {
                                 "/products/**",
                                 "/categories/**",
                                 "/auth/**",
+                                "/oauth2/**",
+                                "/login/oauth2/**",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
@@ -78,8 +90,14 @@ public class SecurityConfig {
                         .usernameParameter("username")
                         .passwordParameter("password")
                         .defaultSuccessUrl("/", true)
-                        .failureUrl("/auth/login?error=true")
+                        .failureHandler(customAuthenticationFailureHandler)
                         .permitAll()
+                )
+
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/auth/login")
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureUrl("/auth/login?error=oauth2")
                 )
 
                 .logout(logout -> logout

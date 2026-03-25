@@ -1,0 +1,107 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Xác nhận Email Thất Bại - PetShop</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+      .card {
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        padding: 2rem;
+        text-align: center;
+      }
+      .icon-header {
+        width: 48px;
+        height: 48px;
+        stroke: white;
+      }
+      .icon-sm {
+        width: 16px;
+        height: 16px;
+        vertical-align: -2px;
+      }
+      .btn-action {
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body class="d-flex align-items-center justify-content-center py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+          <div class="card border-0">
+            <!-- Header -->
+            <div class="header text-white">
+              <div class="mb-2 d-flex justify-content-center">
+                <i data-lucide="alert-circle" class="icon-header"></i>
+              </div>
+              <h3 class="mb-0 fw-bold">Xác nhận Thất Bại</h3>
+            </div>
+
+            <!-- Body -->
+            <div class="card-body p-4">
+              <div class="alert alert-danger rounded-3 py-2 mb-3">
+                <small>
+                  <i
+                    data-lucide="triangle-alert"
+                    class="icon-sm text-danger me-1"
+                  ></i>
+                  <span th:text="${errorMsg}"></span>
+                </small>
+              </div>
+
+              <p class="text-center mb-3">
+                Link xác nhận của bạn không hợp lệ hoặc đã hết hạn.
+              </p>
+
+              <div class="d-flex flex-column gap-2">
+                <a
+                  th:href="@{/auth/resend-verification-email}"
+                  class="btn btn-warning btn-action w-100 text-white d-flex align-items-center justify-content-center gap-2"
+                >
+                  <i data-lucide="mail" class="icon-sm"></i>
+                  Gửi lại Email Xác nhận
+                </a>
+                <a
+                  th:href="@{/auth/login}"
+                  class="btn btn-primary btn-action w-100 d-flex align-items-center justify-content-center gap-2"
+                >
+                  <i data-lucide="log-in" class="icon-sm"></i>
+                  Về Đăng Nhập
+                </a>
+                <a
+                  th:href="@{/}"
+                  class="btn btn-secondary btn-action w-100 d-flex align-items-center justify-content-center gap-2"
+                >
+                  <i data-lucide="home" class="icon-sm"></i>
+                  Trang Chủ
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

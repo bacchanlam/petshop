@@ -25,6 +25,10 @@ public class AccountController {
     @GetMapping("/profile")
     public String profilePage(@AuthenticationPrincipal CustomUserDetails userDetails,
                               Model model) {
+        // Nếu chưa đăng nhập, redirect về login
+        if (userDetails == null) {
+            return "redirect:/auth/login";
+        }
         model.addAttribute("user", userDetails.getUser());
         return "user/account/profile";
     }
@@ -40,6 +44,11 @@ public class AccountController {
             @RequestParam(required = false) String address,
             RedirectAttributes redirectAttributes) {
 
+        // Nếu chưa đăng nhập, redirect về login
+        if (userDetails == null) {
+            return "redirect:/auth/login";
+        }
+
         try {
             userService.updateProfile(userDetails.getId(), fullName, phone, address);
             redirectAttributes.addFlashAttribute("successMsg", "Cập nhật thông tin thành công!");
@@ -53,8 +62,15 @@ public class AccountController {
     // GET /account/change-password
     // ========================
     @GetMapping("/change-password")
-    public String changePasswordPage(Model model) {
+    public String changePasswordPage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                     Model model) {
+        // Nếu chưa đăng nhập, redirect về login
+        if (userDetails == null) {
+            return "redirect:/auth/login";
+        }
         model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
+        model.addAttribute("user", userDetails.getUser());
+        model.addAttribute("hasPassword", userDetails.getUser().getPassword() != null);
         return "user/account/change-password";
     }
 
@@ -67,6 +83,11 @@ public class AccountController {
             @Valid @ModelAttribute("changePasswordDTO") ChangePasswordDTO dto,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
+
+        // Nếu chưa đăng nhập, redirect về login
+        if (userDetails == null) {
+            return "redirect:/auth/login";
+        }
 
         if (bindingResult.hasErrors()) {
             return "user/account/change-password";
