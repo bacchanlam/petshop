@@ -30,7 +30,6 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    // Password có thể null cho OAuth2 users (login bằng Google, Facebook, etc)
     @Column(nullable = true)
     private String password;
 

@@ -20,9 +20,6 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String mailFrom;
 
-    /**
-     * Gửi email xác nhận email
-     */
     public void sendVerificationEmail(String toEmail, String username, String verificationUrl) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

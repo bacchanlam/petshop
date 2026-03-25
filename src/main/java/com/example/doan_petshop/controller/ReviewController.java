@@ -27,7 +27,7 @@ public class ReviewController {
         try {
             reviewService.addReview(userDetails.getId(), productId, rating, comment);
             redirectAttributes.addFlashAttribute("successMsg",
-                    "Cảm ơn bạn đã đánh giá sản phẩm! ⭐");
+                    "Cảm ơn bạn đã đánh giá sản phẩm!");
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
