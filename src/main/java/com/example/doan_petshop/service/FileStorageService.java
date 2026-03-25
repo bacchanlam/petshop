@@ -75,7 +75,6 @@ public class FileStorageService {
 
     // ========================
     // Lấy URL để hiển thị trong Thymeleaf
-    // VD: /uploads/products/abc123.jpg
     // ========================
     public String getImageUrl(String filename) {
         if (filename == null || filename.isBlank()) return "/images/no-image.png";

@@ -12,8 +12,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${app.upload.dir:uploads/products}")
     private String uploadDir;
 
-    // Ánh xạ URL /uploads/products/** → thư mục vật lý uploads/products/
-    // Nhờ đó Thymeleaf dùng <img th:src="@{/uploads/products/abc.jpg}"> là hiển thị được
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String absolutePath = Paths.get(uploadDir).toAbsolutePath().toUri().toString();

@@ -30,8 +30,7 @@ public class User {
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @NotBlank
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Column(name = "full_name", length = 100)
@@ -49,6 +48,10 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private Boolean enabled = true;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean emailVerified = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

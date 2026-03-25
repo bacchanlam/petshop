@@ -1,0 +1,40 @@
+
+.alert-autohide {
+  position: relative;
+  overflow: hidden;
+  animation: slideOut 0.5s ease-out 4.5s forwards;
+}
+
+.alert-autohide::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.6);
+  animation: shrink 5s linear forwards;
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    opacity: 1;
+    max-height: 500px;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1.25rem;
+  }
+  100% {
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: 0;
+    padding: 0;
+  }
+}

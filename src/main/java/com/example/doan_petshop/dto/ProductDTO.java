@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductDTO {
 
-    private Long id; // null khi thêm mới, có giá trị khi sửa
+    private Long id;
 
     @NotBlank(message = "Tên sản phẩm không được để trống")
     @Size(max = 200, message = "Tên sản phẩm tối đa 200 ký tự")

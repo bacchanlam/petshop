@@ -16,7 +16,7 @@ public class ProductFilterDTO {
     private String     brand;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
-    private String     sortBy;    // price_asc | price_desc | newest
+    private String     sortBy;
     private int        page = 0;
     private int        size = 12;
 }
