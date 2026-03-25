@@ -158,7 +158,7 @@ public class ProductService {
     }
 
     // ========================
-    // XÓA sản phẩm (xóa mềm = ẩn)
+    // XÓA sản phẩm
     // ========================
     @Transactional
     public void delete(Long id) {

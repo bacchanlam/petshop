@@ -89,6 +89,12 @@
       font-size: 0.68rem;
       color: #adb5bd;
     }
+    .sc-time-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
     .sc-preview {
       font-size: 0.76rem;
       color: #6c757d;
@@ -115,9 +121,6 @@
       background: #adb5bd;
     }
     .sc-badge {
-      position: absolute;
-      top: 12px;
-      right: 14px;
       min-width: 18px;
       height: 18px;
       background: #ef4444;
@@ -532,7 +535,8 @@
       currentSid = null,
       sessions = {},
       typTimer = null,
-      clientTypEl = null;
+      clientTypEl = null,
+      renderQueued = false;
 
     // ── Lucide SVG strings cho avatar ──────────────────────────────
     // paw-print icon (admin)
@@ -559,6 +563,54 @@
       });
     }
 
+    function msgKey(m) {
+      // Dùng để merge tin nhắn khi history load về muộn so với realtime
+      return [
+        m && m.type,
+        m && m.content,
+        m && m.sender,
+        m && m.time,
+        m && m.fromAdmin,
+      ].join("|");
+    }
+
+    function countUnreadMessages(msgs) {
+      // Chỉ tính tin nhắn từ khách (loại bỏ JOIN/LEAVE/TYPING/CLOSE)
+      return (msgs || []).filter((m) => {
+        if (!m || m.fromAdmin) return false;
+        return m.type === "CHAT" || m.type == null;
+      }).length;
+    }
+
+    function scheduleRender() {
+      // Tránh rerender liên tục khi có nhiều event realtime
+      if (renderQueued) return;
+      renderQueued = true;
+      setTimeout(() => {
+        renderQueued = false;
+        renderSidebar();
+        updateTotalBadge();
+      }, 0);
+    }
+
+    function getLastMessage(session) {
+      // Ưu tiên lastMessage (được backend trả về + được realtime update),
+      // tránh phụ thuộc messages[] (có thể chỉ là placeholder để render sidebar)
+      if (session?.lastMessage) return session.lastMessage;
+      const msgs = session?.messages || [];
+      return msgs.length ? msgs[msgs.length - 1] : null;
+    }
+
+    function parseHHmmToMinutes(hhmm) {
+      if (!hhmm || typeof hhmm !== "string") return -1;
+      const parts = hhmm.split(":");
+      if (parts.length !== 2) return -1;
+      const hh = Number(parts[0]);
+      const mm = Number(parts[1]);
+      if (Number.isNaN(hh) || Number.isNaN(mm)) return -1;
+      return hh * 60 + mm;
+    }
+
     async function loadSessions() {
       try {
         const list = await (await fetch("/admin/chat/sessions")).json();
@@ -568,15 +620,23 @@
               sessionId: s.sessionId,
               customerName: s.customerName,
               online: s.online,
-              messages: [],
-              unread: 0,
+              lastMessage: s.lastMessage || null,
+              // Placeholder để render preview ngay (không cần chờ loadHistory)
+              messages: s.lastMessage ? [s.lastMessage] : [],
+              unread: s.unread || 0,
             };
           } else {
             sessions[s.sessionId].online = s.online;
             sessions[s.sessionId].customerName = s.customerName;
+            // Không override unread (tránh nhảy số khi admin đang đọc một session)
+            if (s.lastMessage) {
+              sessions[s.sessionId].lastMessage = s.lastMessage;
+              // messages[] chỉ cần placeholder; realtime đã push vào messages rồi thì giữ lại
+            }
           }
         });
-        renderSidebar();
+        // Render (debounce) để hiển thị tin nhắn mới nhất ngay khi admin vào trang
+        scheduleRender();
       } catch (e) {
         console.error(e);
       }
@@ -587,7 +647,19 @@
         const msgs = await (
           await fetch("/admin/chat/history/" + sid)
         ).json();
-        if (sessions[sid]) sessions[sid].messages = msgs;
+        if (sessions[sid]) {
+          // Merge để tránh mất tin nhắn nếu realtime đẩy tới trong lúc fetch
+          const current = sessions[sid].messages || [];
+          const existingKeys = new Set((msgs || []).map((m) => msgKey(m)));
+          const extras = current.filter((m) => !existingKeys.has(msgKey(m)));
+          sessions[sid].messages = (msgs || []).concat(extras);
+          sessions[sid].lastMessage = sessions[sid].messages.length
+            ? sessions[sid].messages[sessions[sid].messages.length - 1]
+            : sessions[sid].lastMessage || null;
+
+          sessions[sid].unread =
+            currentSid === sid ? 0 : countUnreadMessages(sessions[sid].messages);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -619,20 +691,25 @@
             sessionId: sid,
             customerName: d.sender,
             online: true,
+            lastMessage: d,
             messages: [],
             unread: 0,
           };
         else {
           sessions[sid].online = true;
           sessions[sid].customerName = d.sender;
+          sessions[sid].lastMessage = d;
         }
-        renderSidebar();
+        scheduleRender();
         if (currentSid === sid) updateTopbar();
         return;
       }
       if (d.type === "LEAVE") {
-        if (sessions[sid]) sessions[sid].online = false;
-        renderSidebar();
+        if (sessions[sid]) {
+          sessions[sid].online = false;
+          sessions[sid].lastMessage = d;
+        }
+        scheduleRender();
         if (currentSid === sid) updateTopbar();
         return;
       }
@@ -644,8 +721,7 @@
           document.getElementById('emptyState').style.display = 'flex';
           document.getElementById('chatMessages').innerHTML = '';
         }
-        renderSidebar();
-        updateTotalBadge();
+        scheduleRender();
         return;
       }
       if (d.type === "TYPING" && !d.fromAdmin) {
@@ -657,18 +733,19 @@
           sessionId: sid,
           customerName: d.sender || "Khách",
           online: true,
+          lastMessage: d,
           messages: [],
           unread: 0,
         };
       sessions[sid].messages.push(d);
+      sessions[sid].lastMessage = d;
       if (currentSid === sid) {
         hideClientTyping();
         appendMsg(d);
       } else if (!d.fromAdmin) {
         sessions[sid].unread = (sessions[sid].unread || 0) + 1;
       }
-      renderSidebar();
-      updateTotalBadge();
+      scheduleRender();
     }
 
     window.selectSession = async function (sid) {
@@ -746,35 +823,59 @@
         ? "none"
         : "flex";
       list.querySelectorAll(".session-card").forEach((e) => e.remove());
+      // Giống UI chat hiện đại: sort theo tin nhắn mới nhất (desc)
       keys.sort((a, b) => {
+        const la = getLastMessage(sessions[a]);
+        const lb = getLastMessage(sessions[b]);
+        const ta = parseHHmmToMinutes(la?.time);
+        const tb = parseHHmmToMinutes(lb?.time);
+        if (tb !== ta) return tb - ta; // sort desc
         const ao = sessions[a].online,
           bo = sessions[b].online;
-        return ao === bo ? 0 : ao ? -1 : 1;
+        // Online trước khi cùng time
+        if (ao === bo) return 0;
+        return bo ? 1 : -1;
       });
       keys.forEach((sid) => {
         const s = sessions[sid];
-        const last = s.messages.length
-          ? s.messages[s.messages.length - 1]
-          : null;
+        const last = getLastMessage(s);
+        let previewText = "Vừa kết nối";
+        if (last) {
+          if (last.content) previewText = esc(last.content);
+          else {
+            // Fallback cho JOIN/LEAVE/CLOSE để preview không bị rỗng
+            if (last.type === "LEAVE") previewText = "Khách đã rời đi";
+            else if (last.type === "CLOSE") previewText = "Cuộc trò chuyện kết thúc";
+            else if (last.type === "JOIN") previewText = "Vừa kết nối";
+            else if (last.type === "CHAT") previewText = "Tin nhắn mới";
+          }
+        }
         const el = document.createElement("div");
         el.className =
           "session-card" +
           (currentSid === sid ? " active" : "") +
           (!s.online ? " offline" : "");
         el.onclick = () => selectSession(sid);
+        const unreadBadge =
+          s.unread > 0
+            ? `<span class="sc-badge">${s.unread > 9 ? "9+" : s.unread}</span>`
+            : "";
         el.innerHTML = `
                 <div class="sc-top">
                     <span class="sc-name">${esc(s.customerName || "Khách")}</span>
-                    <span class="sc-time">${last ? last.time || "" : ""}</span>
+                    <span class="sc-time-wrap">
+                      <span class="sc-time">${last ? last.time || "" : ""}</span>
+                      ${unreadBadge}
+                    </span>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-1">
-                    <span class="sc-preview">${last ? esc(last.content) : "Vừa kết nối"}</span>
+                    <span class="sc-preview">${previewText}</span>
                     <span class="sc-status">
                         <span class="sc-dot ${s.online ? "online" : "offline"}"></span>
                         <span style="font-size:.68rem;color:${s.online ? "#22c55e" : "#adb5bd"}">${s.online ? "Online" : "Offline"}</span>
                     </span>
                 </div>
-                ${s.unread > 0 ? `<span class="sc-badge">${s.unread > 9 ? "9+" : s.unread}</span>` : ""}`;
+                `;
         list.appendChild(el);
       });
     }
@@ -867,7 +968,9 @@
     };
 
     connect();
-    setInterval(loadSessions, 10000);
+    // Poll sessions định kỳ chỉ để đồng bộ trạng thái Online khi có edge case
+    // (mất sự kiện websocket/đóng tab bất thường). Tăng chu kỳ để giảm tải.
+    setInterval(loadSessions, 30000);
   })();
 </script>
 

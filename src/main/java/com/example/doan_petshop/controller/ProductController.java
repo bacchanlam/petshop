@@ -79,7 +79,7 @@ public class ProductController {
             return "redirect:/products";
         }
 
-        // Sản phẩm liên quan (cùng danh mục, lấy 6 cái)
+        // Sản phẩm liên quan
         Long catId = product.getCategory() != null ? product.getCategory().getId() : null;
         if (catId != null) {
             model.addAttribute("relatedProducts",

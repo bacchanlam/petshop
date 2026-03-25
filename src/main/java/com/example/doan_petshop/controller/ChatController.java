@@ -68,7 +68,26 @@ public class ChatController {
             m.put("online",       s.online);
             m.put("lastMessage",  s.messages.isEmpty() ? null
                     : s.messages.get(s.messages.size() - 1));
-            m.put("unread", 0);
+
+            // unread = số tin nhắn từ khách kể từ sau tin nhắn CHAT gần nhất của admin
+            // (JOIN/LEAVE/TYPING/CLOSE không tính unread)
+            int unreadCount = 0;
+            for (int i = s.messages.size() - 1; i >= 0; i--) {
+                ChatMessage msg = s.messages.get(i);
+                if (msg == null) continue;
+                boolean isCustomerChat =
+                        !msg.isFromAdmin() &&
+                        (msg.getType() == ChatMessage.MessageType.CHAT || msg.getType() == null);
+
+                boolean isAdminChat =
+                        msg.isFromAdmin() &&
+                        (msg.getType() == ChatMessage.MessageType.CHAT || msg.getType() == null);
+
+                if (isAdminChat) break;
+                if (isCustomerChat) unreadCount++;
+            }
+
+            m.put("unread", unreadCount);
             result.add(m);
         }
         result.sort((a, b) -> Boolean.compare(
