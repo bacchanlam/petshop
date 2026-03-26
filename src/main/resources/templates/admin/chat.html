@@ -538,8 +538,6 @@
       clientTypEl = null,
       renderQueued = false;
 
-    // ── Lucide SVG strings cho avatar ──────────────────────────────
-    // paw-print icon (admin)
     const ICON_ADMIN =
       '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
       '<circle cx="11" cy="4" r="2"/>' +
@@ -549,7 +547,6 @@
       '<path d="M17 14.5c0 3.5-2.5 6-5 6s-5-2.5-5-6c0-1.5 1-3 3-4l2-1 2 1c2 1 3 2.5 3 4z"/>' +
       '</svg>';
 
-    // user icon (client)
     const ICON_CLIENT =
       '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
       '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>' +
@@ -564,7 +561,6 @@
     }
 
     function msgKey(m) {
-      // Dùng để merge tin nhắn khi history load về muộn so với realtime
       return [
         m && m.type,
         m && m.content,
@@ -575,7 +571,6 @@
     }
 
     function countUnreadMessages(msgs) {
-      // Chỉ tính tin nhắn từ khách (loại bỏ JOIN/LEAVE/TYPING/CLOSE)
       return (msgs || []).filter((m) => {
         if (!m || m.fromAdmin) return false;
         return m.type === "CHAT" || m.type == null;
@@ -583,7 +578,6 @@
     }
 
     function scheduleRender() {
-      // Tránh rerender liên tục khi có nhiều event realtime
       if (renderQueued) return;
       renderQueued = true;
       setTimeout(() => {
@@ -594,8 +588,6 @@
     }
 
     function getLastMessage(session) {
-      // Ưu tiên lastMessage (được backend trả về + được realtime update),
-      // tránh phụ thuộc messages[] (có thể chỉ là placeholder để render sidebar)
       if (session?.lastMessage) return session.lastMessage;
       const msgs = session?.messages || [];
       return msgs.length ? msgs[msgs.length - 1] : null;
@@ -621,21 +613,18 @@
               customerName: s.customerName,
               online: s.online,
               lastMessage: s.lastMessage || null,
-              // Placeholder để render preview ngay (không cần chờ loadHistory)
               messages: s.lastMessage ? [s.lastMessage] : [],
               unread: s.unread || 0,
             };
           } else {
             sessions[s.sessionId].online = s.online;
             sessions[s.sessionId].customerName = s.customerName;
-            // Không override unread (tránh nhảy số khi admin đang đọc một session)
             if (s.lastMessage) {
               sessions[s.sessionId].lastMessage = s.lastMessage;
               // messages[] chỉ cần placeholder; realtime đã push vào messages rồi thì giữ lại
             }
           }
         });
-        // Render (debounce) để hiển thị tin nhắn mới nhất ngay khi admin vào trang
         scheduleRender();
       } catch (e) {
         console.error(e);
@@ -648,7 +637,6 @@
           await fetch("/admin/chat/history/" + sid)
         ).json();
         if (sessions[sid]) {
-          // Merge để tránh mất tin nhắn nếu realtime đẩy tới trong lúc fetch
           const current = sessions[sid].messages || [];
           const existingKeys = new Set((msgs || []).map((m) => msgKey(m)));
           const extras = current.filter((m) => !existingKeys.has(msgKey(m)));
@@ -698,7 +686,11 @@
         else {
           sessions[sid].online = true;
           sessions[sid].customerName = d.sender;
-          sessions[sid].lastMessage = d;
+          const existingMsgs = sessions[sid].messages || [];
+          const hasChat = existingMsgs.some((m) => !m.type || m.type === "CHAT");
+          if (!hasChat && !sessions[sid].lastMessage) {
+            sessions[sid].lastMessage = d;
+          }
         }
         scheduleRender();
         if (currentSid === sid) updateTopbar();
@@ -756,27 +748,28 @@
       s.unread = 0;
       updateTotalBadge();
 
-      // Hiện panel TRƯỚC
       document.getElementById("emptyState").style.display = "none";
       const panel = document.getElementById("chatPanel");
       panel.style.display = "flex";
       panel.style.flex = "1";
 
-      // Rồi mới load + update
-      await loadHistory(sid);
-      updateTopbar(); // ← gọi SAU khi panel đã hiện
+      updateTopbar();
 
       const box = document.getElementById("chatMessages");
       box.innerHTML = "";
-
-      console.log("Messages để render:", sessions[sid].messages);
-
-      const msgs = sessions[sid].messages || [];
-      msgs.forEach((m) => appendMsg(m, false));
+      (sessions[sid].messages || []).forEach((m) => appendMsg(m, false));
       box.scrollTop = box.scrollHeight;
 
       renderSidebar();
       document.getElementById("adminInput").focus();
+
+      const prevLen = (sessions[sid].messages || []).length;
+      await loadHistory(sid);
+      if ((sessions[sid].messages || []).length !== prevLen && currentSid === sid) {
+        box.innerHTML = "";
+        (sessions[sid].messages || []).forEach((m) => appendMsg(m, false));
+        box.scrollTop = box.scrollHeight;
+      }
     };
 
     window.aSend = function () {
@@ -823,7 +816,6 @@
         ? "none"
         : "flex";
       list.querySelectorAll(".session-card").forEach((e) => e.remove());
-      // Giống UI chat hiện đại: sort theo tin nhắn mới nhất (desc)
       keys.sort((a, b) => {
         const la = getLastMessage(sessions[a]);
         const lb = getLastMessage(sessions[b]);
@@ -832,7 +824,6 @@
         if (tb !== ta) return tb - ta; // sort desc
         const ao = sessions[a].online,
           bo = sessions[b].online;
-        // Online trước khi cùng time
         if (ao === bo) return 0;
         return bo ? 1 : -1;
       });
@@ -843,7 +834,6 @@
         if (last) {
           if (last.content) previewText = esc(last.content);
           else {
-            // Fallback cho JOIN/LEAVE/CLOSE để preview không bị rỗng
             if (last.type === "LEAVE") previewText = "Khách đã rời đi";
             else if (last.type === "CLOSE") previewText = "Cuộc trò chuyện kết thúc";
             else if (last.type === "JOIN") previewText = "Vừa kết nối";
@@ -916,6 +906,8 @@
     function appendMsg(d, scroll = true) {
       const box = document.getElementById("chatMessages");
       if (!box) return;
+      if (d.type && d.type !== "CHAT") return;
+      if (!d.content) return;
       const isAdm = d.fromAdmin;
       const el = document.createElement("div");
       el.className = "msg-row " + (isAdm ? "is-admin" : "is-client");
@@ -968,8 +960,6 @@
     };
 
     connect();
-    // Poll sessions định kỳ chỉ để đồng bộ trạng thái Online khi có edge case
-    // (mất sự kiện websocket/đóng tab bất thường). Tăng chu kỳ để giảm tải.
     setInterval(loadSessions, 30000);
   })();
 </script>

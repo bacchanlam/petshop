@@ -10,11 +10,11 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,6 +27,11 @@ public class ChatController {
     private final Map<String, SessionInfo> sessions = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> chatSessionToWsSessions = new ConcurrentHashMap<>();
     private final Map<String, String> wsSessionToChatSession = new ConcurrentHashMap<>();
+
+    // Grace period: chờ 10 giây trước khi broadcast LEAVE,
+    // để user chuyển trang kịp reconnect mà không bị đánh dấu offline
+    private final ScheduledExecutorService leaveScheduler = Executors.newSingleThreadScheduledExecutor();
+    private final Map<String, ScheduledFuture<?>> pendingLeaves = new ConcurrentHashMap<>();
 
     // Inner class lưu thông tin 1 phiên chat
     static class SessionInfo {
@@ -151,7 +156,7 @@ public class ChatController {
         message.setTime(ChatMessage.nowTime());
         message.setFromAdmin(false);
 
-        // Nếu đã có session cùng customerName đang online → dùng lại SID cũ
+        // Nếu đã có session cùng customerName → dùng lại SID cũ
         String existingSid = sessions.values().stream()
                 .filter(s -> s.customerName.equals(message.getSender()))
                 .map(s -> s.sessionId)
@@ -159,7 +164,6 @@ public class ChatController {
                 .orElse(null);
 
         if (existingSid != null && !existingSid.equals(message.getSessionId())) {
-            // Xóa SID mới trùng, cập nhật SID cũ
             sessions.remove(message.getSessionId());
             SessionInfo s = sessions.get(existingSid);
             s.online = true;
@@ -171,6 +175,10 @@ public class ChatController {
             s.online       = true;
             s.customerName = message.getSender();
         }
+
+        // Hủy LEAVE đang chờ (user chuyển trang rồi reconnect → không cần offline)
+        ScheduledFuture<?> pending = pendingLeaves.remove(message.getSessionId());
+        if (pending != null) pending.cancel(false);
 
         messagingTemplate.convertAndSend("/topic/admin", message);
         messagingTemplate.convertAndSend(
@@ -195,18 +203,27 @@ public class ChatController {
             if (wsSet.isEmpty()) {
                 chatSessionToWsSessions.remove(chatSessionId);
                 SessionInfo s = sessions.get(chatSessionId);
-                if (s != null) {
-                    s.online = false;
-                    ChatMessage leaveMsg = ChatMessage.builder()
-                            .type(ChatMessage.MessageType.LEAVE)
-                            .sessionId(chatSessionId)
-                            .sender(s.customerName)
-                            .fromAdmin(false)
-                            .time(ChatMessage.nowTime())
-                            .content(null)
-                            .build();
-                    messagingTemplate.convertAndSend("/topic/admin", leaveMsg);
-                }
+                if (s == null) return;
+                s.online = false;
+                // Delay 10 giây: nếu user chỉ chuyển trang thì sẽ reconnect kịp
+                // và JOIN sẽ hủy task này → admin không thấy offline/LEAVE
+                final String sid = chatSessionId;
+                ScheduledFuture<?> task = leaveScheduler.schedule(() -> {
+                    SessionInfo si = sessions.get(sid);
+                    if (si != null && !si.online) {
+                        ChatMessage leaveMsg = ChatMessage.builder()
+                                .type(ChatMessage.MessageType.LEAVE)
+                                .sessionId(sid)
+                                .sender(si.customerName)
+                                .fromAdmin(false)
+                                .time(ChatMessage.nowTime())
+                                .content(null)
+                                .build();
+                        messagingTemplate.convertAndSend("/topic/admin", leaveMsg);
+                    }
+                    pendingLeaves.remove(sid);
+                }, 10, TimeUnit.SECONDS);
+                pendingLeaves.put(chatSessionId, task);
             }
         }
     }
@@ -251,6 +268,29 @@ public class ChatController {
         SessionInfo s = sessions.get(sessionId);
         return s != null ? s.messages : Collections.emptyList();
     }
-    
+
+    // Xóa session khi user logout (gọi qua REST, đảm bảo hoạt động dù WebSocket ngắt)
+    // POST /chat/close
+    @PostMapping("/chat/close")
+    @ResponseBody
+    public ResponseEntity<Void> closeSessionRest(@RequestParam String sessionId) {
+        // Hủy pending leave nếu có
+        ScheduledFuture<?> pending = pendingLeaves.remove(sessionId);
+        if (pending != null) pending.cancel(false);
+
+        SessionInfo s = sessions.remove(sessionId);
+        if (s != null) {
+            ChatMessage closeMsg = ChatMessage.builder()
+                    .type(ChatMessage.MessageType.CLOSE)
+                    .sessionId(sessionId)
+                    .sender(s.customerName)
+                    .fromAdmin(false)
+                    .time(ChatMessage.nowTime())
+                    .content(null)
+                    .build();
+            messagingTemplate.convertAndSend("/topic/admin", closeMsg);
+        }
+        return ResponseEntity.ok().build();
+    }
 
 }
