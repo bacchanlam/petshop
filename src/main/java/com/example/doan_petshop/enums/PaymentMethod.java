@@ -2,7 +2,8 @@ package com.example.doan_petshop.enums;
 
 public enum PaymentMethod {
     COD("Thanh toán khi nhận hàng"),
-    TRANSFER("Chuyển khoản ngân hàng");
+    TRANSFER("Chuyển khoản ngân hàng"),
+    MOMO("Thanh toán qua MoMo");
 
     private final String displayName;
 

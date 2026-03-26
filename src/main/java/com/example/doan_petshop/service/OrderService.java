@@ -3,16 +3,20 @@ package com.example.doan_petshop.service;
 import com.example.doan_petshop.dto.OrderRequestDTO;
 import com.example.doan_petshop.entity.*;
 import com.example.doan_petshop.enums.OrderStatus;
+import com.example.doan_petshop.enums.PaymentMethod;
 import com.example.doan_petshop.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -211,5 +215,47 @@ public class OrderService {
     public Order findById(Long id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng id: " + id));
+    }
+
+    @Transactional
+    public void confirmPayment(Long orderId, PaymentMethod paymentMethod) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng id: " + orderId));
+
+        // Chỉ xác nhận khi đơn đang PENDING
+        if (order.getStatus() != OrderStatus.PENDING) {
+            log.info("Order #{} already in status {}, skip confirm", orderId, order.getStatus());
+            return;
+        }
+
+        order.setStatus(OrderStatus.CONFIRMED);
+        order.setPaymentMethod(paymentMethod);
+        orderRepository.save(order);
+        log.info("Order #{} confirmed with payment method {}", orderId, paymentMethod);
+    }
+
+    // ========================
+    // HỦY ĐƠN HÀNG BY SYSTEM (khi thanh toán thất bại)
+    // Không check userId - dùng nội bộ
+    // ========================
+    @Transactional
+    public void cancelOrderByAdmin(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng id: " + orderId));
+
+        if (order.getStatus() != OrderStatus.PENDING) return;
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        // Hoàn lại tồn kho
+        for (OrderItem item : order.getOrderItems()) {
+            if (item.getProduct() != null) {
+                Product p = item.getProduct();
+                p.setStock(p.getStock() + item.getQuantity());
+                productRepository.save(p);
+            }
+        }
+        orderRepository.save(order);
+        log.info("Order #{} cancelled by system (payment failed)", orderId);
     }
 }

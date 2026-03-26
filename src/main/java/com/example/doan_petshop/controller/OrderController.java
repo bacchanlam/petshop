@@ -78,6 +78,8 @@ public class OrderController {
         try {
             Order order = orderService.placeOrder(userDetails.getId(), dto);
             redirectAttributes.addFlashAttribute("orderId", order.getId());
+            redirectAttributes.addFlashAttribute("paymentMethod", order.getPaymentMethod().name());
+            redirectAttributes.addFlashAttribute("totalAmount", order.getTotalAmount().longValue());
             return "redirect:/orders/success";
         } catch (IllegalStateException e) {
             model.addAttribute("errorMsg", e.getMessage());
