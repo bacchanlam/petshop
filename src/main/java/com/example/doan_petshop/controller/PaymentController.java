@@ -70,11 +70,10 @@ public class PaymentController {
         }
 
         try {
-// 1. Lưu đơn hàng với status PENDING, paymentMethod MOMO
             dto.setPaymentMethod(PaymentMethod.MOMO);
             Order order = orderService.placeOrder(userDetails.getId(), dto);
 
-            // 2. Gọi MoMo API tạo payment URL
+            // Gọi MoMo API tạo payment URL
             String orderInfo = "Thanh toan don hang #" + order.getId() + " - PetShop";
             long amount = order.getTotalAmount().longValue();
 
@@ -86,7 +85,7 @@ public class PaymentController {
                 // 3. Redirect sang MoMo để user thanh toán
                 return "redirect:" + momoResp.payUrl();
             } else {
-                // MoMo lỗi → hủy đơn, quay về checkout
+                // MoMo lỗi, hủy đơn, quay về checkout
                 log.error("[MoMo] Create payment failed: {} - {}", momoResp.resultCode(), momoResp.message());
                 orderService.cancelOrder(order.getId(), userDetails.getId());
                 redirectAttributes.addFlashAttribute("errorMsg",
@@ -123,7 +122,7 @@ public class PaymentController {
 
         Long orderId = momoService.extractOrderId(extraData);
 
-        // resultCode = 0 → thành công
+        // resultCode = 0 ,thành công
         if ("0".equals(resultCode)) {
             if (orderId != null) {
                 try {
@@ -192,7 +191,7 @@ public class PaymentController {
             response.put("resultCode", 0);
             response.put("message", "success");
         } else {
-            response.put("resultCode", 0); // Vẫn phải trả 0 để MoMo không retry
+            response.put("resultCode", 0);
             response.put("message", "payment failed, order not confirmed");
         }
 

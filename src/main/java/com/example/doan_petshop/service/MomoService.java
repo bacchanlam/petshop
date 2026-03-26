@@ -14,21 +14,10 @@ import java.net.http.HttpResponse;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * MoMo Payment Service
- * Tài liệu: https://developers.momo.vn/v3/docs/payment/api/payment-method/atm-card/
- *
- * Dùng MoMo Sandbox — lấy credentials tại: https://developers.momo.vn
- * partnerCode : MOMO
- * accessKey   : F8BBA842ECF85
- * secretKey   : K951B6PE1waDMi640xX08PD3vg6EkVlz
- * (Đây là credentials test mặc định của MoMo sandbox)
- */
 @Slf4j
 @Service
 public class MomoService {
 
-    // ===== CREDENTIALS (cấu hình trong application.properties) =====
     @Value("${momo.partner-code:MOMO}")
     private String partnerCode;
 
@@ -38,30 +27,27 @@ public class MomoService {
     @Value("${momo.secret-key:K951B6PE1waDMi640xX08PD3vg6EkVlz}")
     private String secretKey;
 
-    // Endpoint sandbox của MoMo
     @Value("${momo.endpoint:https://test-payment.momo.vn/v2/gateway/api/create}")
     private String momoEndpoint;
 
-    // URL callback từ MoMo sau khi thanh toán (IPN)
     @Value("${momo.ipn-url:http://localhost:8080/payment/momo/ipn}")
     private String ipnUrl;
 
-    // URL redirect về app sau khi thanh toán xong
     @Value("${app.base-url:http://localhost:8080}")
     private String appBaseUrl;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final HttpClient httpClient = HttpClient.newHttpClient();
 
-    // ===== TẠO PAYMENT URL =====
+    // ===== Tạo payment url =====
     public MomoPaymentResponse createPayment(Long orderId, long amount, String orderInfo) throws Exception {
         String requestId    = partnerCode + System.currentTimeMillis();
         String momoOrderId  = partnerCode + "_" + orderId + "_" + System.currentTimeMillis();
         String redirectUrl  = appBaseUrl + "/payment/momo/return";
-        String requestType  = "captureWallet"; // QR Code MoMo
-        String extraData    = "orderId=" + orderId; // truyền orderId DB qua extraData
+        String requestType  = "captureWallet";
+        String extraData    = "orderId=" + orderId;
 
-        // ===== TẠO CHỮ KÝ HMAC-SHA256 =====
+        // ===== Tạo chữ kí  =====
         String rawSignature = "accessKey="   + accessKey
                 + "&amount="     + amount
                 + "&extraData="  + extraData
@@ -75,7 +61,6 @@ public class MomoService {
 
         String signature = hmacSHA256(rawSignature, secretKey);
 
-        // ===== BODY REQUEST =====
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("partnerCode", partnerCode);
         body.put("accessKey",   accessKey);
@@ -93,7 +78,6 @@ public class MomoService {
         String jsonBody = objectMapper.writeValueAsString(body);
         log.info("[MoMo] Request body: {}", jsonBody);
 
-        // ===== GỌI API MOMO =====
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(momoEndpoint))
                 .header("Content-Type", "application/json")
@@ -113,10 +97,8 @@ public class MomoService {
         return new MomoPaymentResponse(resultCode, payUrl, message, momoOrderId);
     }
 
-    // ===== XÁC THỰC IPN CALLBACK TỪ MOMO =====
     public boolean verifyIpnSignature(Map<String, String> params) {
         try {
-            // MoMo gửi các params theo thứ tự alphabetical
             String rawSignature = "accessKey="   + accessKey
                     + "&amount="     + params.get("amount")
                     + "&extraData="  + params.getOrDefault("extraData", "")
@@ -145,7 +127,6 @@ public class MomoService {
         }
     }
 
-    // ===== LẤY orderId DB TỪ extraData =====
     public Long extractOrderId(String extraData) {
         // extraData = "orderId=123"
         if (extraData == null || extraData.isBlank()) return null;
@@ -158,7 +139,6 @@ public class MomoService {
         return null;
     }
 
-    // ===== UTILITY: HMAC-SHA256 =====
     private String hmacSHA256(String data, String key) throws Exception {
         Mac mac = Mac.getInstance("HmacSHA256");
         mac.init(new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256"));
@@ -168,7 +148,6 @@ public class MomoService {
         return sb.toString();
     }
 
-    // ===== INNER RECORD: Response =====
     public record MomoPaymentResponse(
             int resultCode,
             String payUrl,

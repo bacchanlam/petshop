@@ -97,10 +97,7 @@ public class OrderService {
 
         Order saved = orderRepository.save(order);
 
-        // Xóa giỏ hàng sau khi đặt xong
         cartService.clearCart(userId);
-
-        // Xóa luôn collection trong memory để tránh Hibernate cache cũ
         cart.getItems().clear();
 
         return saved;
@@ -235,7 +232,7 @@ public class OrderService {
     }
 
     // ========================
-    // HỦY ĐƠN HÀNG BY SYSTEM (khi thanh toán thất bại)
+    // Hủy đơn hàng (khi thanh toán thất bại)
     // Không check userId - dùng nội bộ
     // ========================
     @Transactional
