@@ -78,7 +78,8 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/uploads/**",
                                 "/error",
-                                "/cart/count"
+                                "/cart/count",
+                                "/payment/momo/ipn"
                         ).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
