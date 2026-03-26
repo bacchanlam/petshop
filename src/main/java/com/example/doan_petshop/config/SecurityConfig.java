@@ -54,8 +54,8 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf
-                                .csrfTokenRequestHandler(requestHandler)
-                        // Bỏ CookieCsrfTokenRepository, dùng mặc định HttpSession
+                        .csrfTokenRequestHandler(requestHandler)
+                        .ignoringRequestMatchers("/chat/close", "/ws-chat/**")
                 )
 
                 .authorizeHttpRequests(auth -> auth

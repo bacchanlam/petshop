@@ -1,91 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
-<head>
+  <head>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
-        /* Sidebar nav icon alignment */
-        .nav-link { display: flex; align-items: center; gap: 10px; border-radius: 8px; font-size: .9rem; padding: 8px 12px; }
-        .nav-link svg { width: 17px; height: 17px; flex-shrink: 0; stroke: currentColor; }
-        .nav-link:not(.active) { color: rgba(255,255,255,.7) !important; }
-        .nav-link:not(.active):hover { color: #fff !important; background: rgba(255,255,255,.08); }
-        .nav-link.active { background: #0d6efd !important; color: #fff !important; }
+      /* Sidebar nav icon alignment */
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        padding: 8px 12px;
+      }
+      .nav-link svg {
+        width: 17px;
+        height: 17px;
+        flex-shrink: 0;
+        stroke: currentColor;
+      }
+      .nav-link:not(.active) {
+        color: rgba(255, 255, 255, 0.7) !important;
+      }
+      .nav-link:not(.active):hover {
+        color: #fff !important;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .nav-link.active {
+        background: #0d6efd !important;
+        color: #fff !important;
+      }
 
-        .sidebar-logo svg { width: 22px; height: 22px; stroke: #0d6efd; flex-shrink: 0; }
-        .sidebar-footer svg { width: 15px; height: 15px; }
+      .sidebar-logo svg {
+        width: 22px;
+        height: 22px;
+        stroke: #0d6efd;
+        flex-shrink: 0;
+      }
+      .sidebar-footer svg {
+        width: 15px;
+        height: 15px;
+      }
     </style>
-</head>
-<body>
-
-<!-- ======= ADMIN SIDEBAR ======= -->
-<div th:fragment="sidebar" class="d-flex flex-column p-3 bg-dark text-white"
-     style="width:240px; min-height:100vh;">
-
-    <a th:href="@{/admin/dashboard}"
-       class="d-flex align-items-center gap-2 mb-3 text-white text-decoration-none sidebar-logo">
+  </head>
+  <body>
+    <!-- ======= ADMIN SIDEBAR ======= -->
+    <div
+      th:fragment="sidebar"
+      class="d-flex flex-column p-3 bg-dark text-white"
+      style="width: 240px; min-height: 100vh"
+    >
+      <a
+        th:href="@{/admin/dashboard}"
+        class="d-flex align-items-center gap-2 mb-3 text-white text-decoration-none sidebar-logo"
+      >
         <i data-lucide="paw-print"></i>
         <span class="fs-5 fw-bold">PetShop Admin</span>
-    </a>
-    <hr class="border-secondary">
+      </a>
+      <hr class="border-secondary" />
 
-    <ul class="nav nav-pills flex-column mb-auto gap-1">
+      <ul class="nav nav-pills flex-column mb-auto gap-1">
         <li class="nav-item">
-            <a th:href="@{/admin/dashboard}"
-               th:classappend="${activePage == 'dashboard'} ? 'active'"
-               class="nav-link text-white">
-                <i data-lucide="layout-dashboard"></i>
-                Dashboard
-            </a>
+          <a
+            th:href="@{/admin/dashboard}"
+            th:classappend="${activePage == 'dashboard'} ? 'active'"
+            class="nav-link text-white"
+          >
+            <i data-lucide="layout-dashboard"></i>
+            Dashboard
+          </a>
         </li>
         <li class="nav-item">
-            <a th:href="@{/admin/products}"
-               th:classappend="${activePage == 'products'} ? 'active'"
-               class="nav-link text-white">
-                <i data-lucide="package"></i>
-                Sản phẩm
-            </a>
+          <a
+            th:href="@{/admin/products}"
+            th:classappend="${activePage == 'products'} ? 'active'"
+            class="nav-link text-white"
+          >
+            <i data-lucide="package"></i>
+            Sản phẩm
+          </a>
         </li>
         <li class="nav-item">
-            <a th:href="@{/admin/categories}"
-               th:classappend="${activePage == 'categories'} ? 'active'"
-               class="nav-link text-white">
-                <i data-lucide="folder-open"></i>
-                Danh mục
-            </a>
+          <a
+            th:href="@{/admin/categories}"
+            th:classappend="${activePage == 'categories'} ? 'active'"
+            class="nav-link text-white"
+          >
+            <i data-lucide="folder-open"></i>
+            Danh mục
+          </a>
         </li>
         <li class="nav-item">
-            <a th:href="@{/admin/orders}"
-               th:classappend="${activePage == 'orders'} ? 'active'"
-               class="nav-link text-white">
-                <i data-lucide="shopping-bag"></i>
-                Đơn hàng
-            </a>
+          <a
+            th:href="@{/admin/orders}"
+            th:classappend="${activePage == 'orders'} ? 'active'"
+            class="nav-link text-white"
+          >
+            <i data-lucide="shopping-bag"></i>
+            Đơn hàng
+          </a>
         </li>
         <li class="nav-item">
-            <a th:href="@{/admin/users}"
-               th:classappend="${activePage == 'users'} ? 'active'"
-               class="nav-link text-white">
-                <i data-lucide="users"></i>
-                Người dùng
-            </a>
+          <a
+            th:href="@{/admin/users}"
+            th:classappend="${activePage == 'users'} ? 'active'"
+            class="nav-link text-white"
+          >
+            <i data-lucide="users"></i>
+            Người dùng
+          </a>
         </li>
-    </ul>
+        <li class="nav-item">
+          <a
+            th:href="@{/admin/chat}"
+            th:classappend="${activePage == 'chat'} ? 'active'"
+            class="nav-link text-white"
+          >
+            <i data-lucide="message-circle"></i>
+            Chat trực tiếp
+          </a>
+        </li>
+      </ul>
 
-    <hr class="border-secondary">
-    <div class="d-flex align-items-center gap-2 sidebar-footer">
-        <i data-lucide="circle-user" style="color:rgba(255,255,255,.5)"></i>
+      <hr class="border-secondary" />
+      <div class="d-flex align-items-center gap-2 sidebar-footer">
+        <i
+          data-lucide="circle-user"
+          style="color: rgba(255, 255, 255, 0.5)"
+        ></i>
         <span class="small text-secondary">Admin</span>
-        <a th:href="@{/auth/logout}" class="btn btn-sm btn-outline-danger ms-auto d-flex align-items-center gap-1">
-            <i data-lucide="log-out" style="width:13px;height:13px"></i>
-            Đăng xuất
+        <a
+          th:href="@{/auth/logout}"
+          class="btn btn-sm btn-outline-danger ms-auto d-flex align-items-center gap-1"
+          onclick="
+            window.__psIsLoggingOut = true;
+            if (window.psDoLogout) {
+              window.psDoLogout();
+            }
+          "
+        >
+          <i data-lucide="log-out" style="width: 13px; height: 13px"></i>
+          Đăng xuất
         </a>
-    </div>
-    <a th:href="@{/}" class="btn btn-sm btn-outline-light mt-2 d-flex align-items-center justify-content-center gap-1">
-        <i data-lucide="globe" style="width:14px;height:14px"></i>
+      </div>
+      <a
+        th:href="@{/}"
+        class="btn btn-sm btn-outline-light mt-2 d-flex align-items-center justify-content-center gap-1"
+      >
+        <i data-lucide="globe" style="width: 14px; height: 14px"></i>
         Xem trang web
-    </a>
+      </a>
 
-    <script>lucide.createIcons();</script>
-</div>
-
-</body>
+      <script>
+        lucide.createIcons();
+      </script>
+    </div>
+  </body>
 </html>

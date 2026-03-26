@@ -1,0 +1,972 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat Trực Tiếp - Admin PetShop</title>
+  <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+  />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: #f8f9fa;
+    }
+    .layout {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* ── Sessions panel ── */
+    .sessions-panel {
+      width: 280px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid #e9ecef;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .sessions-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #1a1a1a;
+      flex-shrink: 0;
+    }
+    .sessions-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .sessions-list::-webkit-scrollbar {
+      width: 3px;
+    }
+    .sessions-list::-webkit-scrollbar-thumb {
+      background: #dee2e6;
+    }
+    .session-card {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .session-card:hover {
+      background: #f8f9fa;
+    }
+    .session-card.active {
+      background: #e8f0fe;
+      border-left: 3px solid #0d6efd;
+    }
+    .session-card.offline {
+      opacity: 0.65;
+    }
+    .sc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .sc-name {
+      font-weight: 700;
+      font-size: 0.86rem;
+      color: #1a1a1a;
+    }
+    .sc-time {
+      font-size: 0.68rem;
+      color: #adb5bd;
+    }
+    .sc-time-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .sc-preview {
+      font-size: 0.76rem;
+      color: #6c757d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+    }
+    .sc-status {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+    }
+    .sc-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .sc-dot.online {
+      background: #22c55e;
+    }
+    .sc-dot.offline {
+      background: #adb5bd;
+    }
+    .sc-badge {
+      min-width: 18px;
+      height: 18px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.67rem;
+      font-weight: 800;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+    .no-session {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      color: #adb5bd;
+      text-align: center;
+      gap: 10px;
+    }
+
+    /* ── Chat area ── */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Topbar */
+    .chat-topbar {
+      padding: 12px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e9ecef;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .ct-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #e8f0fe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .ct-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #1a1a1a;
+    }
+    .ct-status {
+      font-size: 0.72rem;
+      color: #6c757d;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .chat-empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #adb5bd;
+      gap: 12px;
+      text-align: center;
+    }
+
+    /* ── Messages ── */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #f8f9fa;
+    }
+    .chat-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: #dee2e6;
+      border-radius: 2px;
+    }
+
+    /* Row */
+    .msg-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      animation: mIn 0.25s ease;
+    }
+    @keyframes mIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+    .msg-row.is-admin {
+      flex-direction: row-reverse;
+    }
+
+    /* Avatar */
+    .msg-av {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #e8f0fe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .msg-av svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+    }
+    /* Client avatar */
+    .msg-row.is-client .msg-av {
+      background: #f0f4ff;
+    }
+    .msg-row.is-client .msg-av svg {
+      stroke: #5b7fff;
+    }
+    /* Admin avatar */
+    .msg-row.is-admin .msg-av {
+      background: #78350f;
+    }
+    .msg-row.is-admin .msg-av svg {
+      stroke: #fde68a;
+    }
+
+    /* Body wrapper */
+    .msg-body {
+      display: flex;
+      flex-direction: column;
+      max-width: 65%;
+    }
+    .msg-row.is-admin .msg-body {
+      align-items: flex-end;
+    }
+
+    /* Bubble */
+    .msg-bbl {
+      padding: 9px 14px;
+      border-radius: 18px;
+      font-size: 0.86rem;
+      line-height: 1.55;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+    .msg-row.is-client .msg-bbl {
+      background: #fff;
+      color: #1a1a1a;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+    .msg-row.is-admin .msg-bbl {
+      background: #78350f;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-time {
+      font-size: 0.64rem;
+      color: #adb5bd;
+      margin-top: 3px;
+      padding: 0 2px;
+    }
+    .msg-sys {
+      text-align: center;
+      font-size: 0.73rem;
+      color: #adb5bd;
+      padding: 4px 0;
+    }
+
+    /* Typing */
+    .typing-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .typing-bbl {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 9px 14px;
+      background: #fff;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+    .t-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #adb5bd;
+      animation: tb 0.9s ease infinite;
+    }
+    .t-dot:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+    .t-dot:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+    @keyframes tb {
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-5px);
+      }
+    }
+
+    /* Input */
+    .chat-input-bar {
+      padding: 10px 16px 14px;
+      background: #fff;
+      border-top: 1px solid #e9ecef;
+      flex-shrink: 0;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .admin-input {
+      flex: 1;
+      border: 1.5px solid #dee2e6;
+      border-radius: 22px;
+      padding: 9px 16px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: #1a1a1a;
+      background: #f8f9fa;
+      outline: none;
+      resize: none;
+      max-height: 110px;
+      overflow-y: hidden;
+      transition: border-color 0.2s;
+      line-height: 1.4;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    .admin-input::-webkit-inner-spin-button,
+    .admin-input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .admin-input:focus {
+      border-color: #0d6efd;
+      background: #fff;
+    }
+    .admin-input::placeholder {
+      color: #adb5bd;
+    }
+    .btn-send {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #0d6efd;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition:
+        background 0.2s,
+        transform 0.15s;
+      box-shadow: 0 3px 10px rgba(13, 110, 253, 0.3);
+    }
+    .btn-send:hover {
+      background: #0b5ed7;
+      transform: scale(1.06);
+    }
+    .btn-send:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-send svg {
+      width: 16px;
+      height: 16px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  </style>
+</head>
+<body>
+<div class="d-flex" style="height: 100vh; overflow: hidden">
+  <div
+          th:replace="~{fragments/admin-sidebar :: sidebar}"
+          th:with="activePage='chat'"
+  ></div>
+
+  <div class="layout flex-grow-1">
+    <!-- Sessions -->
+    <div class="sessions-panel">
+      <div class="sessions-header">
+        <i
+                data-lucide="message-circle"
+                style="width: 17px; height: 17px; color: #0d6efd; flex-shrink: 0"
+        ></i>
+        Chat trực tiếp
+        <span
+                class="badge bg-danger ms-auto"
+                id="totalBadge"
+                style="display: none"
+        >0</span
+        >
+      </div>
+      <div class="sessions-list" id="sessionsList">
+        <div class="no-session" id="noSessionMsg">
+          <i
+                  data-lucide="inbox"
+                  style="width: 36px; height: 36px; opacity: 0.3"
+          ></i>
+          <p class="mb-0 small">
+            Chưa có khách nào<br /><span style="font-size: 0.72rem"
+          >Tự động cập nhật...</span
+          >
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat area -->
+    <div class="chat-area">
+      <!-- Empty state -->
+      <div class="chat-empty-state" id="emptyState">
+        <i
+                data-lucide="message-square"
+                style="width: 52px; height: 52px; opacity: 0.2"
+        ></i>
+        <p class="mb-0">
+          Chọn một cuộc trò chuyện<br /><small style="font-size: 0.78rem"
+        >để bắt đầu hỗ trợ khách hàng</small
+        >
+        </p>
+      </div>
+
+      <!-- Chat panel -->
+      <div
+              id="chatPanel"
+              style="
+              display: none;
+              flex: 1;
+              flex-direction: column;
+              height: 100%;
+              overflow: hidden;
+            "
+              class="d-flex flex-column"
+      >
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-bar">
+          <div class="input-row">
+                <textarea
+                        class="admin-input"
+                        id="adminInput"
+                        rows="1"
+                        placeholder="Nhập tin nhắn trả lời..."
+                        oninput="
+                    aResize(this);
+                    aTyping();
+                  "
+                        onkeydown="
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                      event.preventDefault();
+                      aSend();
+                    }
+                  "
+                ></textarea>
+            <button class="btn-send" onclick="aSend()">
+              <svg viewBox="0 0 24 24">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    let stomp = null,
+      currentSid = null,
+      sessions = {},
+      typTimer = null,
+      clientTypEl = null,
+      renderQueued = false;
+
+    const ICON_ADMIN =
+      '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<circle cx="11" cy="4" r="2"/>' +
+      '<circle cx="18" cy="8" r="2"/>' +
+      '<circle cx="4" cy="8" r="2"/>' +
+      '<circle cx="8.5" cy="14.5" r="2.5"/>' +
+      '<path d="M17 14.5c0 3.5-2.5 6-5 6s-5-2.5-5-6c0-1.5 1-3 3-4l2-1 2 1c2 1 3 2.5 3 4z"/>' +
+      '</svg>';
+
+    const ICON_CLIENT =
+      '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>' +
+      '<circle cx="12" cy="7" r="4"/>' +
+      '</svg>';
+
+    function now() {
+      return new Date().toLocaleTimeString("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function msgKey(m) {
+      return [
+        m && m.type,
+        m && m.content,
+        m && m.sender,
+        m && m.time,
+        m && m.fromAdmin,
+      ].join("|");
+    }
+
+    function countUnreadMessages(msgs) {
+      return (msgs || []).filter((m) => {
+        if (!m || m.fromAdmin) return false;
+        return m.type === "CHAT" || m.type == null;
+      }).length;
+    }
+
+    function scheduleRender() {
+      if (renderQueued) return;
+      renderQueued = true;
+      setTimeout(() => {
+        renderQueued = false;
+        renderSidebar();
+        updateTotalBadge();
+      }, 0);
+    }
+
+    function getLastMessage(session) {
+      if (session?.lastMessage) return session.lastMessage;
+      const msgs = session?.messages || [];
+      return msgs.length ? msgs[msgs.length - 1] : null;
+    }
+
+    function parseHHmmToMinutes(hhmm) {
+      if (!hhmm || typeof hhmm !== "string") return -1;
+      const parts = hhmm.split(":");
+      if (parts.length !== 2) return -1;
+      const hh = Number(parts[0]);
+      const mm = Number(parts[1]);
+      if (Number.isNaN(hh) || Number.isNaN(mm)) return -1;
+      return hh * 60 + mm;
+    }
+
+    async function loadSessions() {
+      try {
+        const list = await (await fetch("/admin/chat/sessions")).json();
+        list.forEach((s) => {
+          if (!sessions[s.sessionId]) {
+            sessions[s.sessionId] = {
+              sessionId: s.sessionId,
+              customerName: s.customerName,
+              online: s.online,
+              lastMessage: s.lastMessage || null,
+              messages: s.lastMessage ? [s.lastMessage] : [],
+              unread: s.unread || 0,
+            };
+          } else {
+            sessions[s.sessionId].online = s.online;
+            sessions[s.sessionId].customerName = s.customerName;
+            if (s.lastMessage) {
+              sessions[s.sessionId].lastMessage = s.lastMessage;
+              // messages[] chỉ cần placeholder; realtime đã push vào messages rồi thì giữ lại
+            }
+          }
+        });
+        scheduleRender();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function loadHistory(sid) {
+      try {
+        const msgs = await (
+          await fetch("/admin/chat/history/" + sid)
+        ).json();
+        if (sessions[sid]) {
+          const current = sessions[sid].messages || [];
+          const existingKeys = new Set((msgs || []).map((m) => msgKey(m)));
+          const extras = current.filter((m) => !existingKeys.has(msgKey(m)));
+          sessions[sid].messages = (msgs || []).concat(extras);
+          sessions[sid].lastMessage = sessions[sid].messages.length
+            ? sessions[sid].messages[sessions[sid].messages.length - 1]
+            : sessions[sid].lastMessage || null;
+
+          sessions[sid].unread =
+            currentSid === sid ? 0 : countUnreadMessages(sessions[sid].messages);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function connect() {
+      const sock = new SockJS("/ws-chat");
+      stomp = Stomp.over(sock);
+      stomp.debug = null;
+      stomp.connect(
+        {},
+        function () {
+          stomp.subscribe("/topic/admin", (m) =>
+            handleIncoming(JSON.parse(m.body)),
+          );
+          loadSessions();
+        },
+        () => setTimeout(connect, 4000),
+      );
+    }
+
+    function handleIncoming(d) {
+      const sid = d.sessionId;
+      if (!sid) return;
+
+      if (d.type === "JOIN") {
+        if (!sessions[sid])
+          sessions[sid] = {
+            sessionId: sid,
+            customerName: d.sender,
+            online: true,
+            lastMessage: d,
+            messages: [],
+            unread: 0,
+          };
+        else {
+          sessions[sid].online = true;
+          sessions[sid].customerName = d.sender;
+          const existingMsgs = sessions[sid].messages || [];
+          const hasChat = existingMsgs.some((m) => !m.type || m.type === "CHAT");
+          if (!hasChat && !sessions[sid].lastMessage) {
+            sessions[sid].lastMessage = d;
+          }
+        }
+        scheduleRender();
+        if (currentSid === sid) updateTopbar();
+        return;
+      }
+      if (d.type === "LEAVE") {
+        if (sessions[sid]) {
+          sessions[sid].online = false;
+          sessions[sid].lastMessage = d;
+        }
+        scheduleRender();
+        if (currentSid === sid) updateTopbar();
+        return;
+      }
+      if (d.type === 'CLOSE') {
+        delete sessions[sid];
+        if (currentSid === sid) {
+          currentSid = null;
+          document.getElementById('chatPanel').style.display = 'none';
+          document.getElementById('emptyState').style.display = 'flex';
+          document.getElementById('chatMessages').innerHTML = '';
+        }
+        scheduleRender();
+        return;
+      }
+      if (d.type === "TYPING" && !d.fromAdmin) {
+        if (currentSid === sid) showClientTyping();
+        return;
+      }
+      if (!sessions[sid])
+        sessions[sid] = {
+          sessionId: sid,
+          customerName: d.sender || "Khách",
+          online: true,
+          lastMessage: d,
+          messages: [],
+          unread: 0,
+        };
+      sessions[sid].messages.push(d);
+      sessions[sid].lastMessage = d;
+      if (currentSid === sid) {
+        hideClientTyping();
+        appendMsg(d);
+      } else if (!d.fromAdmin) {
+        sessions[sid].unread = (sessions[sid].unread || 0) + 1;
+      }
+      scheduleRender();
+    }
+
+    window.selectSession = async function (sid) {
+      currentSid = sid;
+      const s = sessions[sid];
+      if (!s) return;
+
+      s.unread = 0;
+      updateTotalBadge();
+
+      document.getElementById("emptyState").style.display = "none";
+      const panel = document.getElementById("chatPanel");
+      panel.style.display = "flex";
+      panel.style.flex = "1";
+
+      updateTopbar();
+
+      const box = document.getElementById("chatMessages");
+      box.innerHTML = "";
+      (sessions[sid].messages || []).forEach((m) => appendMsg(m, false));
+      box.scrollTop = box.scrollHeight;
+
+      renderSidebar();
+      document.getElementById("adminInput").focus();
+
+      const prevLen = (sessions[sid].messages || []).length;
+      await loadHistory(sid);
+      if ((sessions[sid].messages || []).length !== prevLen && currentSid === sid) {
+        box.innerHTML = "";
+        (sessions[sid].messages || []).forEach((m) => appendMsg(m, false));
+        box.scrollTop = box.scrollHeight;
+      }
+    };
+
+    window.aSend = function () {
+      if (!currentSid || !stomp) return;
+      if (!sessions[currentSid]?.online) return;
+      const el = document.getElementById("adminInput");
+      const txt = el.value.trim();
+      if (!txt) return;
+      el.value = "";
+      aResize(el);
+      stomp.send(
+        "/app/admin.reply",
+        {},
+        JSON.stringify({
+          type: "CHAT",
+          content: txt,
+          sender: "PetShop",
+          sessionId: currentSid,
+          fromAdmin: true,
+          time: now(),
+        }),
+      );
+    };
+
+    window.aTyping = function () {
+      if (!currentSid || !stomp) return;
+      clearTimeout(typTimer);
+      stomp.send(
+        "/app/chat.typing",
+        {},
+        JSON.stringify({
+          sessionId: currentSid,
+          sender: "Admin",
+          fromAdmin: true,
+        }),
+      );
+      typTimer = setTimeout(() => {}, 2000);
+    };
+
+    function renderSidebar() {
+      const list = document.getElementById("sessionsList");
+      const keys = Object.keys(sessions);
+      document.getElementById("noSessionMsg").style.display = keys.length
+        ? "none"
+        : "flex";
+      list.querySelectorAll(".session-card").forEach((e) => e.remove());
+      keys.sort((a, b) => {
+        const la = getLastMessage(sessions[a]);
+        const lb = getLastMessage(sessions[b]);
+        const ta = parseHHmmToMinutes(la?.time);
+        const tb = parseHHmmToMinutes(lb?.time);
+        if (tb !== ta) return tb - ta; // sort desc
+        const ao = sessions[a].online,
+          bo = sessions[b].online;
+        if (ao === bo) return 0;
+        return bo ? 1 : -1;
+      });
+      keys.forEach((sid) => {
+        const s = sessions[sid];
+        const last = getLastMessage(s);
+        let previewText = "Vừa kết nối";
+        if (last) {
+          if (last.content) previewText = esc(last.content);
+          else {
+            if (last.type === "LEAVE") previewText = "Khách đã rời đi";
+            else if (last.type === "CLOSE") previewText = "Cuộc trò chuyện kết thúc";
+            else if (last.type === "JOIN") previewText = "Vừa kết nối";
+            else if (last.type === "CHAT") previewText = "Tin nhắn mới";
+          }
+        }
+        const el = document.createElement("div");
+        el.className =
+          "session-card" +
+          (currentSid === sid ? " active" : "") +
+          (!s.online ? " offline" : "");
+        el.onclick = () => selectSession(sid);
+        const unreadBadge =
+          s.unread > 0
+            ? `<span class="sc-badge">${s.unread > 9 ? "9+" : s.unread}</span>`
+            : "";
+        el.innerHTML = `
+                <div class="sc-top">
+                    <span class="sc-name">${esc(s.customerName || "Khách")}</span>
+                    <span class="sc-time-wrap">
+                      <span class="sc-time">${last ? last.time || "" : ""}</span>
+                      ${unreadBadge}
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <span class="sc-preview">${previewText}</span>
+                    <span class="sc-status">
+                        <span class="sc-dot ${s.online ? "online" : "offline"}"></span>
+                        <span style="font-size:.68rem;color:${s.online ? "#22c55e" : "#adb5bd"}">${s.online ? "Online" : "Offline"}</span>
+                    </span>
+                </div>
+                `;
+        list.appendChild(el);
+      });
+    }
+
+    function updateTopbar() {
+      const s = sessions[currentSid];
+      if (!s) return;
+      const topName = document.getElementById("topName");
+      const topDot = document.getElementById("topDot");
+      const topText = document.getElementById("topStatusText");
+      if (topName) topName.textContent = s.customerName || "Khách";
+      if (topDot)
+        topDot.className = "sc-dot " + (s.online ? "online" : "offline");
+      if (topText)
+        topText.textContent = s.online ? "Đang trực tuyến" : "Offline";
+      const input = document.getElementById("adminInput");
+      const btnSend = document.querySelector(".btn-send");
+      if (input) {
+        input.disabled = !s.online;
+        input.placeholder = s.online
+          ? "Nhập tin nhắn trả lời..."
+          : "Khách đã offline — không thể nhắn tin";
+      }
+      if (btnSend) btnSend.disabled = !s.online;
+    }
+
+    function updateTotalBadge() {
+      const total = Object.values(sessions).reduce(
+        (a, s) => a + (s.unread || 0),
+        0,
+      );
+      const el = document.getElementById("totalBadge");
+      el.style.display = total > 0 ? "inline" : "none";
+      el.textContent = total > 9 ? "9+" : total;
+    }
+
+    /* ── Avatar dùng Lucide SVG inline thay vì emoji ── */
+    function appendMsg(d, scroll = true) {
+      const box = document.getElementById("chatMessages");
+      if (!box) return;
+      if (d.type && d.type !== "CHAT") return;
+      if (!d.content) return;
+      const isAdm = d.fromAdmin;
+      const el = document.createElement("div");
+      el.className = "msg-row " + (isAdm ? "is-admin" : "is-client");
+      el.innerHTML =
+        `<div class="msg-av">${isAdm ? ICON_ADMIN : ICON_CLIENT}</div>` +
+        `<div class="msg-body">` +
+        `<div class="msg-bbl">${esc(d.content)}</div>` +
+        `<div class="msg-time">${d.time || now()}</div>` +
+        `</div>`;
+      box.appendChild(el);
+      if (scroll) box.scrollTop = box.scrollHeight;
+    }
+
+    /* ── Typing indicator cũng dùng Lucide user icon ── */
+    function showClientTyping() {
+      if (clientTypEl) return;
+      const box = document.getElementById("chatMessages");
+      if (!box) return;
+      clientTypEl = document.createElement("div");
+      clientTypEl.className = "typing-row";
+      clientTypEl.innerHTML =
+        `<div class="msg-av is-client-av" style="background:#f0f4ff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${ICON_CLIENT}</div>` +
+        '<div class="typing-bbl"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span></div>';
+      // Set SVG stroke color for client typing avatar
+      const svg = clientTypEl.querySelector('svg');
+      if (svg) { svg.style.width='15px'; svg.style.height='15px'; svg.style.stroke='#5b7fff'; svg.style.strokeWidth='2'; }
+      box.appendChild(clientTypEl);
+      box.scrollTop = box.scrollHeight;
+      setTimeout(hideClientTyping, 4000);
+    }
+    function hideClientTyping() {
+      if (clientTypEl) {
+        clientTypEl.remove();
+        clientTypEl = null;
+      }
+    }
+
+    function esc(t) {
+      return String(t || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\n/g, "<br>");
+    }
+    window.aResize = function (el) {
+      el.style.height = "auto";
+      const h = Math.min(el.scrollHeight, 110);
+      el.style.height = h + "px";
+      el.style.overflowY = el.scrollHeight > 110 ? "auto" : "hidden";
+    };
+
+    connect();
+    setInterval(loadSessions, 30000);
+  })();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

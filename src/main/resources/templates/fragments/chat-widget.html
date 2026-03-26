@@ -1,0 +1,732 @@
+<!doctype html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+        xmlns="http://www.w3.org/1999/xhtml"
+        lang="vi"
+>
+<head>
+  <meta charset="UTF-8" />
+  <title>PetShop Chat</title>
+</head>
+<body>
+<div th:fragment="petshopChat">
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+  <div id="ps-styles">
+    <script th:inline="none" type="text/javascript">
+      (function injectChatStyles() {
+        if (document.getElementById("ps-chat-style")) return;
+        var s = document.createElement("style");
+        s.id = "ps-chat-style";
+        s.textContent = [
+          ":root{--cp:#78350f;--ca:#c8601a;--cb:#fdfbf8;--cs:#fff;--cbr:#e8ddd0;--ct:#1c1309;--cm:#8a7060;}",
+          ".ps-toggle{position:fixed;bottom:28px;left:22px;z-index:9998;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--ca),var(--cp));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(120,53,15,.4);transition:transform .25s,box-shadow .25s;animation:ps-pulse 2.8s ease infinite;}",
+          ".ps-toggle:hover{transform:scale(1.1);animation:none;}",
+          ".ps-toggle svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s;}",
+          ".ps-toggle.open svg{transform:rotate(90deg);}",
+          "@keyframes ps-pulse{0%{box-shadow:0 0 0 0 rgba(200,96,26,.5)}70%{box-shadow:0 0 0 14px rgba(200,96,26,0)}100%{box-shadow:0 0 0 0 rgba(200,96,26,0)}}",
+          ".ps-badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #fff;}",
+          ".ps-badge.hidden{display:none;}",
+          ".ps-window{position:fixed;bottom:96px;left:22px;z-index:9997;width:340px;height:480px;background:var(--cb);border-radius:18px;border:1.5px solid var(--cbr);box-shadow:0 20px 60px rgba(120,53,15,.2),0 4px 16px rgba(0,0,0,.08);display:flex;flex-direction:column;overflow:hidden;transform-origin:bottom left;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .25s;}",
+          ".ps-window.hidden{transform:scale(.85) translateY(20px);opacity:0;pointer-events:none;}",
+          "@media(max-width:480px){.ps-window{left:8px;right:8px;bottom:90px;width:auto;}}",
+          ".ps-head{background:linear-gradient(135deg,var(--cp),var(--ca));padding:13px 15px;display:flex;align-items:center;gap:11px;flex-shrink:0;}",
+          ".ps-head-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;}",
+          ".ps-head-av svg{width:20px;height:20px;stroke:#fde68a;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}",
+          ".ps-head-name{font-weight:700;font-size:.9rem;color:#fff;line-height:1.2;}",
+          ".ps-head-status{font-size:.7rem;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:4px;}",
+          ".ps-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:ps-blink 2s ease infinite;}",
+          "@keyframes ps-blink{0%,100%{opacity:1}50%{opacity:.4}}",
+          ".ps-close{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.15);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;margin-left:auto;}",
+          ".ps-close:hover{background:rgba(255,255,255,.3);}",
+          ".ps-close svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2.5;}",
+          ".ps-login-screen{padding:32px 24px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:0;}",
+          ".ps-login-icon{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#fef3c7,#fde68a);display:flex;align-items:center;justify-content:center;margin-bottom:16px;border:3px solid rgba(200,96,26,.15);}",
+          ".ps-login-icon svg{width:30px;height:30px;stroke:var(--cp);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}",
+          '.ps-login-title{font-family:"Playfair Display",Georgia,serif;font-size:1.1rem;font-weight:700;color:var(--ct);margin-bottom:8px;line-height:1.3;}',
+          ".ps-login-desc{font-size:.82rem;color:var(--cm);line-height:1.65;margin-bottom:22px;max-width:240px;}",
+          ".ps-btn-login{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px 0;border-radius:12px;background:linear-gradient(135deg,var(--ca),var(--cp));color:#fff;font-weight:700;font-size:.88rem;text-decoration:none;border:none;cursor:pointer;transition:opacity .2s,transform .15s;box-shadow:0 4px 14px rgba(120,53,15,.28);margin-bottom:10px;}",
+          ".ps-btn-login:hover{opacity:.9;transform:translateY(-1px);color:#fff;}",
+          ".ps-btn-login svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}",
+          ".ps-btn-register{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 0;border-radius:12px;background:transparent;color:var(--ca);font-weight:700;font-size:.88rem;text-decoration:none;border:1.5px solid var(--ca);cursor:pointer;transition:background .2s,color .2s;}",
+          ".ps-btn-register:hover{background:var(--ca);color:#fff;}",
+          ".ps-btn-register svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}",
+          ".ps-quick-label{font-size:.72rem;color:var(--cm);text-align:center;margin-bottom:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;}",
+          ".ps-quick-btns{display:flex;gap:8px;justify-content:center;}",
+          ".ps-quick-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;font-size:.76rem;font-weight:700;color:#fff;text-decoration:none;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 3px 10px rgba(0,0,0,.18);}",
+          ".ps-quick-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.22);color:#fff;}",
+          ".ps-quick-btn.zalo{background:#0068ff;}",
+          ".ps-quick-btn.phone{background:#25d366;}",
+          ".ps-quick-btn svg{width:14px;height:14px;}",
+          ".ps-msgs{flex:1;overflow-y:auto;padding:12px 12px 4px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth;min-height:0;}",
+          ".ps-msgs::-webkit-scrollbar{width:3px;}",
+          ".ps-msgs::-webkit-scrollbar-thumb{background:var(--cbr);border-radius:2px;}",
+          ".ps-msg{display:flex;gap:8px;align-items:flex-end;animation:ps-in .28s ease;}",
+          "@keyframes ps-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}",
+          ".ps-msg.me{flex-direction:row-reverse;}",
+          ".ps-msg-av{width:28px;height:28px;border-radius:50%;background:#f0e6da;display:flex;align-items:center;justify-content:center;flex-shrink:0;}",
+          ".ps-msg-av svg{width:14px;height:14px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}",
+          ".ps-msg.bot .ps-msg-av{background:#f0e6da;}",
+          ".ps-msg.bot .ps-msg-av svg{stroke:var(--ca);}",
+          ".ps-msg.me .ps-msg-av{background:var(--cp);}",
+          ".ps-msg.me .ps-msg-av svg{stroke:#fde68a;}",
+          ".ps-msg-body{display:flex;flex-direction:column;max-width:72%;}",
+          ".ps-msg.me .ps-msg-body{align-items:flex-end;}",
+          ".ps-bbl{padding:9px 13px;border-radius:18px;font-size:.84rem;line-height:1.55;word-break:break-word;overflow-wrap:anywhere;}",
+          ".ps-msg.bot .ps-bbl{background:#f0e6da;color:var(--ct);border-bottom-left-radius:4px;}",
+          ".ps-msg.me .ps-bbl{background:var(--cp);color:#fff;border-bottom-right-radius:4px;}",
+          ".ps-time{font-size:.63rem;color:var(--cm);margin-top:3px;padding:0 2px;}",
+          ".ps-typing{display:flex;align-items:center;gap:4px;padding:10px 14px;background:#f0e6da;border-radius:18px;border-bottom-left-radius:4px;}",
+          ".ps-tdot{width:6px;height:6px;border-radius:50%;background:var(--cm);animation:ps-bounce .9s ease infinite;}",
+          ".ps-tdot:nth-child(2){animation-delay:.15s;}",
+          ".ps-tdot:nth-child(3){animation-delay:.3s;}",
+          "@keyframes ps-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}",
+          ".ps-sys{text-align:center;font-size:.72rem;color:var(--cm);padding:4px 0;}",
+          ".ps-input-area{padding:9px 11px 13px;border-top:1.5px solid var(--cbr);background:var(--cs);flex-shrink:0;}",
+          ".ps-input-row{display:flex;gap:7px;align-items:flex-end;}",
+          ".ps-input{flex:1;border:1.5px solid var(--cbr);border-radius:22px;padding:8px 14px;font-size:.84rem;font-family:inherit;color:var(--ct);background:var(--cb);outline:none;resize:none;max-height:90px;overflow-y:hidden;transition:border-color .2s;line-height:1.45;}",
+          ".ps-input:focus{border-color:var(--ca);}",
+          ".ps-input::placeholder{color:var(--cm);}",
+          ".ps-send{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--ca),var(--cp));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s,opacity .2s;box-shadow:0 3px 10px rgba(200,96,26,.35);flex-shrink:0;}",
+          ".ps-send:hover{transform:scale(1.1);}",
+          ".ps-send:disabled{opacity:.5;cursor:not-allowed;transform:none;}",
+          ".ps-send svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}",
+        ].join("");
+        document.head.appendChild(s);
+      })();
+    </script>
+  </div>
+
+  <!-- Toggle Button -->
+  <button
+          class="ps-toggle"
+          id="psChatToggle"
+          onclick="psToggle()"
+          aria-label="Mở chat hỗ trợ"
+          type="button"
+  >
+    <svg viewBox="0 0 24 24">
+      <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+      />
+    </svg>
+    <span class="ps-badge hidden" id="psBadge">1</span>
+  </button>
+
+  <!-- Chat Window -->
+  <div
+          class="ps-window hidden"
+          id="psChatWindow"
+          role="dialog"
+          aria-label="Cửa sổ chat hỗ trợ"
+  >
+    <div class="ps-head">
+      <div class="ps-head-av">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="4" r="2" />
+          <circle cx="18" cy="8" r="2" />
+          <circle cx="4" cy="8" r="2" />
+          <circle cx="8.5" cy="14.5" r="2.5" />
+          <path
+                  d="M17 14.5c0 3.5-2.5 6-5 6s-5-2.5-5-6c0-1.5 1-3 3-4l2-1 2 1c2 1 3 2.5 3 4z"
+          />
+        </svg>
+      </div>
+      <div style="flex: 1">
+        <div class="ps-head-name">PetShop Hỗ Trợ</div>
+        <div class="ps-head-status">
+          <span class="ps-dot"></span>Trực tuyến
+        </div>
+      </div>
+      <button
+              class="ps-close"
+              onclick="psAskClose()"
+              aria-label="Đóng chat"
+              type="button"
+      >
+        <svg viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      <!-- Modal xác nhận đóng -->
+      <div
+              id="psCloseModal"
+              style="
+              display: none;
+              position: absolute;
+              inset: 0;
+              background: rgba(0, 0, 0, 0.45);
+              z-index: 10;
+              border-radius: 18px;
+              align-items: center;
+              justify-content: center;
+            "
+      >
+        <div
+                style="
+                background: #fff;
+                border-radius: 16px;
+                padding: 28px 24px;
+                margin: 20px;
+                text-align: center;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+              "
+        >
+          <div
+                  style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-bottom: 10px;
+                "
+          >
+            <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    style="
+                    width: 36px;
+                    height: 36px;
+                    stroke: #c8601a;
+                    stroke-width: 1.8;
+                    stroke-linecap: round;
+                    stroke-linejoin: round;
+                  "
+            >
+              <path
+                      d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+              />
+            </svg>
+          </div>
+          <div
+                  style="
+                  font-weight: 700;
+                  font-size: 0.95rem;
+                  color: #1c1309;
+                  margin-bottom: 8px;
+                "
+          >
+            Đóng cuộc trò chuyện?
+          </div>
+          <div
+                  style="
+                  font-size: 0.8rem;
+                  color: #8a7060;
+                  margin-bottom: 20px;
+                  line-height: 1.6;
+                "
+          >
+            Lịch sử tin nhắn sẽ bị xóa.<br />Bạn có chắc muốn kết thúc?
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: center">
+            <button
+                    onclick="psCancelClose()"
+                    type="button"
+                    style="
+                    padding: 8px 20px;
+                    border-radius: 10px;
+                    border: 1.5px solid #e8ddd0;
+                    background: #fdfbf8;
+                    color: #8a7060;
+                    font-weight: 600;
+                    font-size: 0.84rem;
+                    cursor: pointer;
+                  "
+            >
+              Huỷ
+            </button>
+            <button
+                    onclick="psConfirmClose()"
+                    type="button"
+                    style="
+                    padding: 8px 20px;
+                    border-radius: 10px;
+                    border: none;
+                    background: linear-gradient(135deg, #c8601a, #78350f);
+                    color: #fff;
+                    font-weight: 700;
+                    font-size: 0.84rem;
+                    cursor: pointer;
+                  "
+            >
+              Đóng cuộc trò chuyện
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chưa đăng nhập -->
+    <div
+            th:if="${#authorization.expression('isAnonymous()')}"
+            class="ps-login-screen"
+    >
+      <div class="ps-login-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      </div>
+      <div class="ps-login-title">Đăng nhập để chat<br />với chúng tôi</div>
+      <div class="ps-login-desc">
+        Để được hỗ trợ nhanh nhất, bạn cần đăng nhập tài khoản PetShop trước
+        nhé!
+      </div>
+      <a th:href="@{/auth/login}" class="ps-btn-login">
+        <svg viewBox="0 0 24 24">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+          <polyline points="10 17 15 12 10 7" />
+          <line x1="15" y1="12" x2="3" y2="12" />
+        </svg>
+        Đăng nhập ngay
+      </a>
+      <a th:href="@{/auth/register}" class="ps-btn-register">
+        <svg viewBox="0 0 24 24">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <line x1="19" y1="8" x2="19" y2="14" />
+          <line x1="22" y1="11" x2="16" y2="11" />
+        </svg>
+        Chưa có tài khoản? Đăng ký
+      </a>
+    </div>
+
+    <!-- Đã đăng nhập -->
+    <div
+            th:if="${#authorization.expression('isAuthenticated()')}"
+            style="
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+          "
+    >
+      <div class="ps-msgs" id="psMsgs">
+        <div class="ps-msg bot">
+          <div class="ps-msg-av">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="11" cy="4" r="2" />
+              <circle cx="18" cy="8" r="2" />
+              <circle cx="4" cy="8" r="2" />
+              <circle cx="8.5" cy="14.5" r="2.5" />
+              <path
+                      d="M17 14.5c0 3.5-2.5 6-5 6s-5-2.5-5-6c0-1.5 1-3 3-4l2-1 2 1c2 1 3 2.5 3 4z"
+              />
+            </svg>
+          </div>
+          <div class="ps-msg-body">
+            <div class="ps-bbl">
+              Xin chào <strong th:text="${#authentication.name}"></strong>!
+              👋 Mình có thể giúp gì cho bạn?
+            </div>
+            <div class="ps-time" id="psWelcomeTime"></div>
+          </div>
+        </div>
+      </div>
+      <div class="ps-input-area">
+        <div class="ps-input-row">
+          <label
+                  for="psInput"
+                  style="
+                  position: absolute;
+                  width: 1px;
+                  height: 1px;
+                  overflow: hidden;
+                  clip: rect(0 0 0 0);
+                  white-space: nowrap;
+                "
+          >Nhập tin nhắn</label
+          >
+          <textarea
+                  class="ps-input"
+                  id="psInput"
+                  rows="1"
+                  placeholder="Nhập tin nhắn..."
+                  oninput="
+                  psResize(this);
+                  psSendTyping();
+                "
+                  onkeydown="
+                  if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
+                    psSend();
+                  }
+                "
+          ></textarea>
+          <button
+                  class="ps-send"
+                  onclick="psSend()"
+                  aria-label="Gửi tin nhắn"
+                  type="button"
+          >
+            <svg viewBox="0 0 24 24">
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script khi đã đăng nhập -->
+  <div th:if="${#authorization.expression('isAuthenticated()')}">
+    <script th:inline="javascript">
+      (function () {
+        let SID = sessionStorage.getItem("ps_chat_sid");
+        if (!SID) {
+          SID = "ps_" + Math.random().toString(36).substr(2, 9);
+          sessionStorage.setItem("ps_chat_sid", SID);
+        }
+        const NAME = /*[[${#authentication.name}]]*/ "Khách";
+        let stomp = null,
+          conn = false,
+          connecting = false,
+          open = false,
+          unread = 0;
+        let typTimer = null,
+          typing = false,
+          adminTypEl = null;
+
+        const ICON_BOT =
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+          '<circle cx="11" cy="4" r="2"/>' +
+          '<circle cx="18" cy="8" r="2"/>' +
+          '<circle cx="4" cy="8" r="2"/>' +
+          '<circle cx="8.5" cy="14.5" r="2.5"/>' +
+          '<path d="M17 14.5c0 3.5-2.5 6-5 6s-5-2.5-5-6c0-1.5 1-3 3-4l2-1 2 1c2 1 3 2.5 3 4z"/>' +
+          "</svg>";
+
+        const ICON_ME =
+          '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+          '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>' +
+          '<circle cx="12" cy="7" r="4"/>' +
+          "</svg>";
+
+        function now() {
+          return new Date().toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        }
+
+        function connect() {
+          if (conn || connecting) return;
+          connecting = true;
+          const sock = new SockJS("/ws-chat");
+          stomp = Stomp.over(sock);
+          stomp.debug = null;
+          stomp.connect(
+            {},
+            function () {
+              conn = true;
+              connecting = false;
+              stomp.subscribe("/topic/chat." + SID, function (m) {
+                const d = JSON.parse(m.body);
+                if (d.type === "TYPING") {
+                  showAdminTyp();
+                  return;
+                }
+                hideAdminTyp();
+                if (d.fromAdmin) {
+                  addMsg("bot", d.content, d.time);
+                  if (!open) {
+                    unread++;
+                    badge();
+                  }
+                }
+              });
+              fetch("/chat/history/" + SID)
+                .then((r) => r.json())
+                .then((msgs) => {
+                  if (!msgs || !msgs.length) return;
+                  msgs.forEach((m) =>
+                    addMsg(m.fromAdmin ? "bot" : "me", m.content, m.time),
+                  );
+                })
+                .catch(() => {});
+              stomp.send(
+                "/app/chat.join",
+                {},
+                JSON.stringify({
+                  type: "JOIN",
+                  sender: NAME,
+                  sessionId: SID,
+                  content: NAME + " bắt đầu cuộc trò chuyện",
+                  fromAdmin: false,
+                }),
+              );
+            },
+            function () {
+              conn = false;
+              connecting = false;
+              setTimeout(connect, 5000);
+            },
+          );
+        }
+
+        window.psAskClose = function () {
+          document.getElementById("psCloseModal").style.display = "flex";
+        };
+
+        window.psCancelClose = function () {
+          document.getElementById("psCloseModal").style.display = "none";
+        };
+
+        window.psConfirmClose = function () {
+          document.getElementById("psCloseModal").style.display = "none";
+          if (conn && stomp) {
+            stomp.send(
+              "/app/chat.leave",
+              {},
+              JSON.stringify({
+                type: "CLOSE",
+                sessionId: SID,
+                sender: NAME,
+                fromAdmin: false,
+              }),
+            );
+            stomp.disconnect();
+          }
+          conn = false;
+          connecting = false;
+
+          open = false;
+          unread = 0;
+          badge();
+          document.getElementById("psChatWindow").classList.add("hidden");
+          document.getElementById("psChatToggle").classList.remove("open");
+
+          SID = "ps_" + Math.random().toString(36).substr(2, 9);
+          sessionStorage.setItem("ps_chat_sid", SID);
+
+          const msgs = document.getElementById("psMsgs");
+          if (msgs)
+            msgs.innerHTML =
+              '<div class="ps-msg bot">' +
+              '<div class="ps-msg-av">' +
+              ICON_BOT +
+              "</div>" +
+              '<div class="ps-msg-body">' +
+              '<div class="ps-bbl">Xin chào <strong>' +
+              NAME +
+              "</strong>!  Mình có thể giúp gì cho bạn?</div>" +
+              '<div class="ps-time">' +
+              now() +
+              "</div>" +
+              "</div></div>";
+
+          const inp = document.getElementById("psInput");
+          const btn = document.querySelector(".ps-send");
+          if (inp) {
+            inp.disabled = false;
+            inp.placeholder = "Nhập tin nhắn...";
+            inp.value = "";
+          }
+          if (btn) btn.disabled = false;
+        };
+
+        connect();
+
+        window.psToggle = function () {
+          open = !open;
+          document
+            .getElementById("psChatWindow")
+            .classList.toggle("hidden", !open);
+          document
+            .getElementById("psChatToggle")
+            .classList.toggle("open", open);
+          if (open) {
+            unread = 0;
+            badge();
+            if (!conn && !connecting) connect();
+            setTimeout(() => {
+              const i = document.getElementById("psInput");
+              if (i) i.focus();
+              scrollBot();
+            }, 300);
+          }
+        };
+
+        window.psSend = function () {
+          const el = document.getElementById("psInput");
+          const txt = el.value.trim();
+          if (!txt || !conn) return;
+          el.value = "";
+          psResize(el);
+          addMsg("me", txt, now());
+          stomp.send(
+            "/app/chat.send",
+            {},
+            JSON.stringify({
+              type: "CHAT",
+              content: txt,
+              sender: NAME,
+              sessionId: SID,
+              fromAdmin: false,
+            }),
+          );
+        };
+
+        window.psSendTyping = function () {
+          if (!conn || !stomp) return;
+          if (!typing) {
+            typing = true;
+            stomp.send(
+              "/app/chat.typing",
+              {},
+              JSON.stringify({
+                sessionId: SID,
+                sender: NAME,
+                fromAdmin: false,
+              }),
+            );
+          }
+          clearTimeout(typTimer);
+          typTimer = setTimeout(() => {
+            typing = false;
+          }, 2000);
+        };
+
+        function addMsg(role, txt, t) {
+          const box = document.getElementById("psMsgs");
+          if (!box) return;
+          const isMe = role === "me";
+          const el = document.createElement("div");
+          el.className = "ps-msg " + (isMe ? "me" : "bot");
+          el.innerHTML =
+            '<div class="ps-msg-av">' +
+            (isMe ? ICON_ME : ICON_BOT) +
+            "</div>" +
+            '<div class="ps-msg-body">' +
+            '<div class="ps-bbl">' +
+            esc(txt) +
+            "</div>" +
+            '<div class="ps-time">' +
+            (t || "") +
+            "</div>" +
+            "</div>";
+          box.appendChild(el);
+          scrollBot();
+        }
+
+        function showAdminTyp() {
+          if (adminTypEl) return;
+          const box = document.getElementById("psMsgs");
+          if (!box) return;
+          adminTypEl = document.createElement("div");
+          adminTypEl.className = "ps-msg bot";
+          adminTypEl.innerHTML =
+            '<div class="ps-msg-av">' +
+            ICON_BOT +
+            "</div>" +
+            '<div class="ps-msg-body"><div class="ps-typing">' +
+            '<span class="ps-tdot"></span>' +
+            '<span class="ps-tdot"></span>' +
+            '<span class="ps-tdot"></span>' +
+            "</div></div>";
+          box.appendChild(adminTypEl);
+          scrollBot();
+          setTimeout(hideAdminTyp, 4000);
+        }
+
+        function hideAdminTyp() {
+          if (adminTypEl) {
+            adminTypEl.remove();
+            adminTypEl = null;
+          }
+        }
+
+        function scrollBot() {
+          const b = document.getElementById("psMsgs");
+          if (b) b.scrollTop = b.scrollHeight;
+        }
+
+        function badge() {
+          const b = document.getElementById("psBadge");
+          if (unread > 0) {
+            b.classList.remove("hidden");
+            b.textContent = unread > 9 ? "9+" : unread;
+          } else b.classList.add("hidden");
+        }
+
+        function esc(t) {
+          return String(t || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\n/g, "<br>");
+        }
+
+        window.psResize = function (el) {
+          el.style.height = "auto";
+          const h = Math.min(el.scrollHeight, 90);
+          el.style.height = h + "px";
+          el.style.overflowY = el.scrollHeight > 90 ? "auto" : "hidden";
+        };
+
+        const wt = document.getElementById("psWelcomeTime");
+        if (wt) wt.textContent = now();
+
+        setTimeout(() => {
+          if (!open) {
+            unread = 1;
+            badge();
+          }
+        }, 4000);
+        window.psDoLogout = function () {
+          if (!window.__psIsLoggingOut) return;
+          try {
+            navigator.sendBeacon("/chat/close?sessionId=" + encodeURIComponent(SID));
+          } catch (e) {}
+          if (conn && stomp) {
+            try { stomp.disconnect(); } catch (e) {}
+          }
+          conn = false;
+        };
+      })();
+    </script>
+  </div>
+
+  <!-- Script toggle cho chưa đăng nhập -->
+  <div th:if="${#authorization.expression('isAnonymous()')}">
+    <script>
+      window.psToggle = function () {
+        const win = document.getElementById("psChatWindow");
+        const btn = document.getElementById("psChatToggle");
+        const isHidden = win.classList.contains("hidden");
+        win.classList.toggle("hidden", !isHidden);
+        btn.classList.toggle("open", isHidden);
+        if (isHidden)
+          document.getElementById("psBadge").classList.add("hidden");
+      };
+
+      window.psAskClose = function () {
+        const win = document.getElementById("psChatWindow");
+        const btn = document.getElementById("psChatToggle");
+        if (win) win.classList.add("hidden");
+        if (btn) btn.classList.remove("open");
+
+        const badge = document.getElementById("psBadge");
+        if (badge) {
+          badge.classList.remove("hidden");
+          badge.textContent = badge.textContent?.trim()
+            ? badge.textContent
+            : "1";
+        }
+
+        const modal = document.getElementById("psCloseModal");
+        if (modal) modal.style.display = "none";
+      };
+      setTimeout(() => {
+        document.getElementById("psBadge").classList.remove("hidden");
+        document.getElementById("psBadge").textContent = "1";
+      }, 4000);
+    </script>
+  </div>
+</div>
+</body>
+</html>

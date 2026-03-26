@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head><meta charset="UTF-8"></head>
+<body>
+<div th:fragment="contactFloat">
+
+    <style>
+        .fc-wrap {
+            position: fixed;
+            right: 18px;
+            bottom: 110px;
+            z-index: 9990;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fc-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Nút tròn đồng đều */
+        .fc-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(0,0,0,.22);
+            transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .fc-btn:hover {
+            transform: scale(1.13);
+            box-shadow: 0 8px 24px rgba(0,0,0,.3);
+        }
+
+        .fc-btn svg {
+            width: 28px;
+            height: 28px;
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .fc-zalo  { background: #0068ff; }
+        .fc-fb    { background: #0084ff; }
+        .fc-phone { background: #25d366; }
+
+        /* Tooltip bên trái */
+        .fc-tip {
+            position: absolute;
+            right: 62px;
+            background: rgba(15,15,15,.85);
+            color: #fff;
+            font-size: .76rem;
+            font-weight: 600;
+            white-space: nowrap;
+            padding: 6px 11px;
+            border-radius: 7px;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateX(5px);
+            transition: opacity .18s ease, transform .18s ease;
+        }
+        .fc-tip::after {
+            content: '';
+            position: absolute;
+            top: 50%; right: -5px;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-right: none;
+            border-left-color: rgba(15,15,15,.85);
+        }
+        .fc-item:hover .fc-tip {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Pulse điện thoại */
+        @keyframes fc-pulse {
+            0%,100% { box-shadow: 0 4px 14px rgba(37,211,102,.35); }
+            50%     { box-shadow: 0 4px 14px rgba(37,211,102,.35), 0 0 0 9px rgba(37,211,102,.12); }
+        }
+        .fc-phone { animation: fc-pulse 2.2s ease infinite; }
+        .fc-phone:hover { animation: none; }
+
+        /* Đường kẻ phân cách */
+        .fc-sep {
+            width: 26px;
+            height: 1px;
+            background: rgba(0,0,0,.1);
+            border-radius: 1px;
+        }
+
+        @media (max-width: 480px) {
+            .fc-wrap { right: 10px; bottom: 88px; gap: 8px; }
+            .fc-btn  { width: 44px; height: 44px; }
+            .fc-tip  { display: none; }
+        }
+    </style>
+
+    <div class="fc-wrap">
+
+        <!-- ZALO -->
+        <div class="fc-item">
+            <span class="fc-tip">Zalo</span>
+            <a href="https://zalo.me/0865706232"
+               target="_blank" rel="noopener"
+               class="fc-btn fc-zalo" title="Chat Zalo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/240px-Icon_of_Zalo.svg.png"
+                     style="width:30px;height:30px;object-fit:contain;display:block;"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='block'"
+                     alt="Zalo">
+                <span style="display:none;color:#fff;font-weight:900;font-size:14px;font-family:'Arial Black',Arial;">Zalo</span>
+            </a>
+        </div>
+
+        <div class="fc-sep"></div>
+
+        <!-- FACEBOOK MESSENGER -->
+        <div class="fc-item">
+            <span class="fc-tip">Facebook</span>
+            <a href="https://www.messenger.com/t/1097443210111792"
+               target="_blank" rel="noopener"
+               class="fc-btn fc-fb" title="Facebook Messenger">
+                <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#fff"
+                          d="M14 2C7.373 2 2 7.06 2 13.32c0 3.174 1.32 6.02 3.46 8.05V27l4.7-2.58A12.86 12.86 0 0014 24.65c6.627 0 12-5.06 12-11.33C26 7.06 20.627 2 14 2z"/>
+                    <path fill="#0084ff"
+                          d="M15.02 16.99l-3.06-3.26-5.97 3.26 6.57-6.98 3.13 3.26 5.9-3.26-6.57 6.98z"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="fc-sep"></div>
+
+        <!-- PHONE -->
+        <div class="fc-item">
+            <span class="fc-tip">Phone</span>
+            <a href="tel:0865706232"
+               class="fc-btn fc-phone" title="Gọi ngay">
+                <svg viewBox="0 0 24 24" fill="none"
+                     stroke="#fff" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 01-2.18 2
+                         19.79 19.79 0 01-8.63-3.07
+                         A19.5 19.5 0 014.69 12
+                         19.79 19.79 0 011.62 3.38
+                         2 2 0 013.58 1h3a2 2 0 012 1.72
+                         c.127.96.361 1.903.7 2.81
+                         a2 2 0 01-.45 2.11L7.91 8.6
+                         a16 16 0 006.06 6.06l.96-.96
+                         a2 2 0 012.12-.45
+                         c.907.339 1.85.573 2.81.7
+                         A2 2 0 0122 16.92z"/>
+                </svg>
+            </a>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

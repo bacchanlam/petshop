@@ -7,6 +7,8 @@
   <title>Chính Sách Đổi Trả – PetShop</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -63,7 +65,16 @@
     .sec p:last-child { margin-bottom: 0; }
     .sec ul, .sec ol { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
     .sec ul li, .sec ol li { font-size: .9rem; line-height: 1.8; color: var(--ink-light); display: flex; align-items: flex-start; gap: 12px; }
-    .sec ul li::before { content: '—'; color: var(--accent); font-weight: 600; flex-shrink: 0; margin-top: 2px; }
+
+    /* Lucide bullet icon for ul */
+    .sec ul li .li-icon {
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 3px;
+      width: 16px;
+      height: 16px;
+    }
+
     .sec ol { counter-reset: c; }
     .sec ol li { counter-increment: c; }
     .sec ol li::before { content: counter(c,decimal-leading-zero); font-family: 'Lora', serif; font-size: .75rem; font-weight: 600; color: var(--accent); flex-shrink: 0; margin-top: 3px; min-width: 24px; }
@@ -74,10 +85,13 @@
     .box-warn { background: #fff8f4; border: 1px solid #f5c4b0; padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
     .box-warn p { font-size: .88rem; line-height: 1.75; color: var(--ink-light); margin: 0; }
     .box-warn strong { color: var(--accent); }
+    .box-warn .box-icon { color: #e07940; flex-shrink: 0; margin-top: 1px; }
     .box-info { background: #eef4ff; border: 1px solid #c0d4f7; padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
     .box-info p { font-size: .88rem; line-height: 1.75; color: #3a5a9a; margin: 0; }
+    .box-info .box-icon { color: #4a78cc; flex-shrink: 0; margin-top: 1px; }
     .box-ok { background: #f0faf4; border: 1px solid #a8d8b8; padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
     .box-ok p { font-size: .88rem; line-height: 1.75; color: #2d6a4f; margin: 0; }
+    .box-ok .box-icon { color: #2d9a5f; flex-shrink: 0; margin-top: 1px; }
 
     /* Steps timeline */
     .steps { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
@@ -89,7 +103,8 @@
     .step-desc { font-size: .86rem; line-height: 1.75; color: var(--ink-muted); }
 
     /* Tag */
-    .tag { display: inline-block; font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; padding: 3px 10px; background: var(--off-white); color: var(--ink-muted); border: 1px solid var(--rule); margin-bottom: 14px; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; font-size: .68rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; background: var(--off-white); color: var(--ink-muted); border: 1px solid var(--rule); margin-bottom: 14px; }
+    .tag svg { width: 12px; height: 12px; }
     .tag.ok { background: #f0faf4; color: #2d6a4f; border-color: #a8d8b8; }
     .tag.no { background: #fff4f0; color: var(--accent); border-color: #f5c4b0; }
 
@@ -152,56 +167,114 @@
   <!-- CONTENT -->
   <main class="content">
 
+    <!-- SECTION 01 -->
     <div class="sec fade-in" id="r1">
       <div class="sec-head"><span class="sec-num">01</span><h2>Điều kiện <em>đổi trả</em></h2></div>
       <p>PetShop chấp nhận đổi trả trong vòng <strong>7 ngày</strong> kể từ ngày bạn nhận được hàng (theo xác nhận giao hàng của đơn vị vận chuyển). Sản phẩm cần đáp ứng đầy đủ các điều kiện sau:</p>
       <ul>
-        <li>Còn nguyên vẹn, chưa qua sử dụng, không bị trầy xước hay biến dạng.</li>
-        <li>Còn đầy đủ bao bì gốc, tem nhãn, phụ kiện đi kèm (nếu có).</li>
-        <li>Có hóa đơn mua hàng hoặc mã đơn hàng để đối chiếu.</li>
-        <li>Yêu cầu được gửi trong vòng 7 ngày kể từ ngày nhận hàng.</li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Còn nguyên vẹn, chưa qua sử dụng, không bị trầy xước hay biến dạng.
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Còn đầy đủ bao bì gốc, tem nhãn, phụ kiện đi kèm (nếu có).
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Có hóa đơn mua hàng hoặc mã đơn hàng để đối chiếu.
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Yêu cầu được gửi trong vòng 7 ngày kể từ ngày nhận hàng.
+        </li>
       </ul>
       <div class="box-quote">
         <p>"Chúng tôi hiểu rằng đôi khi sản phẩm không như mong đợi — và đó hoàn toàn không phải lỗi của bạn. Quy trình đổi trả được thiết kế để đơn giản và không gây khó chịu."</p>
       </div>
     </div>
 
+    <!-- SECTION 02 -->
     <div class="sec fade-in" id="r2">
       <div class="sec-head"><span class="sec-num">02</span><h2>Trường hợp <em>được đổi trả</em></h2></div>
-      <span class="tag ok">✓ Được chấp nhận</span>
+      <span class="tag ok">
+        <i data-lucide="check"></i>
+        Được chấp nhận
+      </span>
       <p>PetShop chịu toàn bộ chi phí xử lý (bao gồm phí vận chuyển chiều về) trong các trường hợp sau:</p>
       <ul>
-        <li><strong>Sản phẩm bị lỗi nhà sản xuất:</strong> Bao bì bị vỡ từ bên trong, sản phẩm không hoạt động đúng chức năng, lỗi kỹ thuật không do tác động bên ngoài.</li>
-        <li><strong>Giao sai sản phẩm:</strong> Sản phẩm nhận được khác với sản phẩm đã đặt về tên, loại, kích thước hoặc số lượng.</li>
-        <li><strong>Hư hỏng do vận chuyển:</strong> Sản phẩm bị móp, vỡ, biến dạng do quá trình vận chuyển — cần có ảnh chụp tại thời điểm mở hộp.</li>
-        <li><strong>Hết hạn sử dụng:</strong> Thực phẩm, thức ăn thú cưng có hạn sử dụng đã hết trước khi giao đến tay bạn.</li>
-        <li><strong>Sản phẩm không đúng mô tả:</strong> Có sự khác biệt đáng kể so với thông tin được đăng trên website.</li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Sản phẩm bị lỗi nhà sản xuất:</strong> Bao bì bị vỡ từ bên trong, sản phẩm không hoạt động đúng chức năng, lỗi kỹ thuật không do tác động bên ngoài.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Giao sai sản phẩm:</strong> Sản phẩm nhận được khác với sản phẩm đã đặt về tên, loại, kích thước hoặc số lượng.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Hư hỏng do vận chuyển:</strong> Sản phẩm bị móp, vỡ, biến dạng do quá trình vận chuyển — cần có ảnh chụp tại thời điểm mở hộp.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Hết hạn sử dụng:</strong> Thực phẩm, thức ăn thú cưng có hạn sử dụng đã hết trước khi giao đến tay bạn.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Sản phẩm không đúng mô tả:</strong> Có sự khác biệt đáng kể so với thông tin được đăng trên website.</span>
+        </li>
       </ul>
       <div class="box-ok">
-        <span>✅</span>
+        <i data-lucide="circle-check-big" class="box-icon"></i>
         <p>Trong các trường hợp trên, bạn có thể chọn: <strong>đổi sản phẩm mới</strong> hoặc <strong>hoàn tiền 100%</strong> giá trị sản phẩm.</p>
       </div>
     </div>
 
+    <!-- SECTION 03 -->
     <div class="sec fade-in" id="r3">
       <div class="sec-head"><span class="sec-num">03</span><h2>Trường hợp <em>không được đổi trả</em></h2></div>
-      <span class="tag no">✗ Không áp dụng</span>
+      <span class="tag no">
+        <i data-lucide="x"></i>
+        Không áp dụng
+      </span>
       <p>Để đảm bảo quyền lợi và vệ sinh cho tất cả khách hàng, PetShop không chấp nhận đổi trả trong các trường hợp sau:</p>
       <ul>
-        <li>Sản phẩm đã được mở seal, sử dụng một phần hoặc toàn bộ.</li>
-        <li>Thực phẩm, thức ăn, bánh thưởng cho thú cưng đã mở bao bì.</li>
-        <li>Cát vệ sinh, đệm nằm, đồ chơi mềm đã qua sử dụng (vệ sinh hoặc tiếp xúc).</li>
-        <li>Hư hỏng do người dùng: rơi, va đập, bảo quản sai cách, tự tháo lắp.</li>
-        <li>Yêu cầu đổi trả gửi sau 7 ngày kể từ ngày nhận hàng.</li>
-        <li>Sản phẩm thuộc danh mục khuyến mãi, flash sale có ghi rõ "Không đổi trả".</li>
-        <li>Sản phẩm đặt hàng theo yêu cầu riêng (hàng đặt trước, hàng nhập theo đơn).</li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Sản phẩm đã được mở seal, sử dụng một phần hoặc toàn bộ.
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Thực phẩm, thức ăn, bánh thưởng cho thú cưng đã mở bao bì.
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Cát vệ sinh, đệm nằm, đồ chơi mềm đã qua sử dụng (vệ sinh hoặc tiếp xúc).
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Hư hỏng do người dùng: rơi, va đập, bảo quản sai cách, tự tháo lắp.
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Yêu cầu đổi trả gửi sau 7 ngày kể từ ngày nhận hàng.
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Sản phẩm thuộc danh mục khuyến mãi, flash sale có ghi rõ "Không đổi trả".
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          Sản phẩm đặt hàng theo yêu cầu riêng (hàng đặt trước, hàng nhập theo đơn).
+        </li>
       </ul>
       <div class="box-warn">
-        <span>⚠️</span>
+        <i data-lucide="triangle-alert" class="box-icon"></i>
         <p>Nếu bạn không chắc sản phẩm của mình có thuộc diện đổi trả hay không, hãy <strong>liên hệ PetShop trước khi gửi hàng về</strong>. Chúng tôi sẽ xác nhận trong vòng 2 giờ làm việc.</p>
       </div>
     </div>
 
+    <!-- SECTION 04 -->
     <div class="sec fade-in" id="r4">
       <div class="sec-head"><span class="sec-num">04</span><h2>Quy trình <em>đổi trả</em></h2></div>
       <p>Quy trình đổi trả của PetShop gồm 5 bước đơn giản, thường hoàn tất trong 3 – 5 ngày làm việc:</p>
@@ -244,37 +317,70 @@
       </div>
     </div>
 
+    <!-- SECTION 05 -->
     <div class="sec fade-in" id="r5">
       <div class="sec-head"><span class="sec-num">05</span><h2>Chính sách <em>hoàn tiền</em></h2></div>
       <p>PetShop hoàn tiền 100% giá trị sản phẩm (không bao gồm phí vận chuyển gốc trừ trường hợp lỗi thuộc về PetShop). Thời gian hoàn tiền tùy theo phương thức thanh toán ban đầu:</p>
       <ul>
-        <li><strong>Ví điện tử (MoMo, ZaloPay, VNPay):</strong> 1 – 3 ngày làm việc.</li>
-        <li><strong>Chuyển khoản ngân hàng:</strong> 2 – 5 ngày làm việc.</li>
-        <li><strong>Thẻ tín dụng / ghi nợ quốc tế:</strong> 7 – 15 ngày làm việc (tùy ngân hàng phát hành).</li>
-        <li><strong>Thanh toán COD:</strong> Chuyển khoản về tài khoản ngân hàng bạn cung cấp, 2 – 3 ngày làm việc.</li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Ví điện tử (MoMo, ZaloPay, VNPay):</strong> 1 – 3 ngày làm việc.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Chuyển khoản ngân hàng:</strong> 2 – 5 ngày làm việc.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Thẻ tín dụng / ghi nợ quốc tế:</strong> 7 – 15 ngày làm việc (tùy ngân hàng phát hành).</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Thanh toán COD:</strong> Chuyển khoản về tài khoản ngân hàng bạn cung cấp, 2 – 3 ngày làm việc.</span>
+        </li>
       </ul>
       <div class="box-info">
-        <span>ℹ️</span>
+        <i data-lucide="info" class="box-icon"></i>
         <p>Hoàn tiền chỉ được xử lý sau khi PetShop kiểm tra và xác nhận sản phẩm đổi trả đạt điều kiện. Bạn sẽ nhận thông báo qua email khi tiền được hoàn.</p>
       </div>
     </div>
 
+    <!-- SECTION 06 -->
     <div class="sec fade-in" id="r6">
       <div class="sec-head"><span class="sec-num">06</span><h2>Phí vận chuyển <em>đổi trả</em></h2></div>
       <ul>
-        <li><strong>PetShop chịu phí:</strong> Trường hợp lỗi thuộc trách nhiệm của PetShop (sản phẩm lỗi, giao sai, hư hỏng vận chuyển).</li>
-        <li><strong>Khách hàng chịu phí:</strong> Trường hợp đổi vì lý do cá nhân (đổi ý, chọn sai size, không ưng màu) — phí cả hai chiều.</li>
-        <li><strong>Chia sẻ phí:</strong> Một số trường hợp đặc biệt có thể được xem xét từng trường hợp — liên hệ bộ phận hỗ trợ để được tư vấn.</li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>PetShop chịu phí:</strong> Trường hợp lỗi thuộc trách nhiệm của PetShop (sản phẩm lỗi, giao sai, hư hỏng vận chuyển).</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Khách hàng chịu phí:</strong> Trường hợp đổi vì lý do cá nhân (đổi ý, chọn sai size, không ưng màu) — phí cả hai chiều.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Chia sẻ phí:</strong> Một số trường hợp đặc biệt có thể được xem xét từng trường hợp — liên hệ bộ phận hỗ trợ để được tư vấn.</span>
+        </li>
       </ul>
     </div>
 
+    <!-- SECTION 07 -->
     <div class="sec fade-in" id="r7">
       <div class="sec-head"><span class="sec-num">07</span><h2>Liên hệ <em>hỗ trợ</em></h2></div>
       <p>Đội ngũ PetShop sẵn sàng hỗ trợ bạn xuyên suốt quá trình đổi trả:</p>
       <ul>
-        <li><strong>Email:</strong> support@petshop.vn — phản hồi trong 2 giờ làm việc.</li>
-        <li><strong>Hotline:</strong> 0900 000 000 — 8:00 đến 20:00, mỗi ngày trong tuần.</li>
-        <li><strong>Địa chỉ nhận hàng đổi trả:</strong> 123 Đường Thú Cưng, Quận 1, TP. Hồ Chí Minh.</li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Email:</strong> support@petshop.vn — phản hồi trong 2 giờ làm việc.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Hotline:</strong> 0900 000 000 — 8:00 đến 20:00, mỗi ngày trong tuần.</span>
+        </li>
+        <li>
+          <i data-lucide="minus" class="li-icon"></i>
+          <span><strong>Địa chỉ nhận hàng đổi trả:</strong> 123 Đường Thú Cưng, Quận 1, TP. Hồ Chí Minh.</span>
+        </li>
       </ul>
       <div class="box-quote">
         <p>"Mỗi vấn đề đều có giải pháp. Hãy liên hệ với chúng tôi — chúng tôi ở đây để giúp bạn, không phải để từ chối."</p>
@@ -284,25 +390,31 @@
   </main>
 </div>
 
-<!--<div class="cta-bar fade-in">-->
-<!--  <div>-->
-<!--    <h3>Cần hỗ trợ đổi trả ngay?</h3>-->
-<!--    <p>Đội ngũ PetShop phản hồi trong vòng 2 giờ làm việc. Liên hệ ngay để được hướng dẫn từng bước.</p>-->
-<!--  </div>-->
-<!--  <a th:href="@{/contact}" href="/contact" class="btn-accent">-->
-<!--    Liên hệ hỗ trợ-->
-<!--    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>-->
-<!--  </a>-->
-<!--</div>-->
+<div class="cta-bar fade-in">
+  <div>
+    <h3>Cần hỗ trợ đổi trả ngay?</h3>
+    <p>Đội ngũ PetShop phản hồi trong vòng 2 giờ làm việc. Liên hệ ngay để được hướng dẫn từng bước.</p>
+  </div>
+  <a href="https://zalo.me/0865706232" target="_blank" rel="noopener" class="btn-accent">
+    Liên hệ hỗ trợ
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  </a>
+</div>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
+  // Initialize all Lucide icons
+  lucide.createIcons();
+
+  // Fade-in animation
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
   }, { threshold: 0.06 });
   document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 
+  // Sidebar active state on scroll
   const sections = document.querySelectorAll('.sec[id]');
   const links = document.querySelectorAll('.toc-list a');
   window.addEventListener('scroll', () => {
