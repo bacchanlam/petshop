@@ -23,7 +23,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-
+        
         // Sản phẩm mới nhất
         model.addAttribute("newProducts",
                 productService.findByFilters(null, null, null, null, null, null,
@@ -61,6 +61,9 @@ public class HomeController {
 
         model.addAttribute("bestSellerProducts", bestSellers);
         // ────────────────────────────────────────────────────────
+
+        // Chỉ hiển thị contact-float và chat-widget trên trang chủ
+        model.addAttribute("showHomeWidgets", true);
 
         return "user/home";
     }

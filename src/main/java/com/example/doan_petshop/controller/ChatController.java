@@ -4,6 +4,9 @@ import com.example.doan_petshop.dto.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +25,8 @@ public class ChatController {
     // Lưu toàn bộ dữ liệu chat trên server
     // Key: sessionId → thông tin phiên
     private final Map<String, SessionInfo> sessions = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> chatSessionToWsSessions = new ConcurrentHashMap<>();
+    private final Map<String, String> wsSessionToChatSession = new ConcurrentHashMap<>();
 
     // Inner class lưu thông tin 1 phiên chat
     static class SessionInfo {
@@ -138,7 +143,10 @@ public class ChatController {
     // Khách kết nối
     // /app/chat.join
     @MessageMapping("/chat.join")
-    public void join(@Payload ChatMessage message) {
+    public void join(
+            @Payload ChatMessage message,
+            @Header("simpSessionId") String wsSessionId
+    ) {
         message.setType(ChatMessage.MessageType.JOIN);
         message.setTime(ChatMessage.nowTime());
         message.setFromAdmin(false);
@@ -167,7 +175,42 @@ public class ChatController {
         messagingTemplate.convertAndSend("/topic/admin", message);
         messagingTemplate.convertAndSend(
                 "/topic/chat." + message.getSessionId(), message);
+        if (wsSessionId != null) {
+            wsSessionToChatSession.put(wsSessionId, message.getSessionId());
+            chatSessionToWsSessions
+                    .computeIfAbsent(message.getSessionId(), k -> ConcurrentHashMap.newKeySet())
+                    .add(wsSessionId);
+        }
     }
+    @EventListener
+    public void handleSessionDisconnect(SessionDisconnectEvent event) {
+        StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
+        String wsSessionId = sha.getSessionId();
+        if (wsSessionId == null) return;
+        String chatSessionId = wsSessionToChatSession.remove(wsSessionId);
+        if (chatSessionId == null) return;
+        Set<String> wsSet = chatSessionToWsSessions.get(chatSessionId);
+        if (wsSet != null) {
+            wsSet.remove(wsSessionId);
+            if (wsSet.isEmpty()) {
+                chatSessionToWsSessions.remove(chatSessionId);
+                SessionInfo s = sessions.get(chatSessionId);
+                if (s != null) {
+                    s.online = false;
+                    ChatMessage leaveMsg = ChatMessage.builder()
+                            .type(ChatMessage.MessageType.LEAVE)
+                            .sessionId(chatSessionId)
+                            .sender(s.customerName)
+                            .fromAdmin(false)
+                            .time(ChatMessage.nowTime())
+                            .content(null)
+                            .build();
+                    messagingTemplate.convertAndSend("/topic/admin", leaveMsg);
+                }
+            }
+        }
+    }
+    
 
     // Khách rời đi
     // /app/chat.leave
@@ -208,5 +251,6 @@ public class ChatController {
         SessionInfo s = sessions.get(sessionId);
         return s != null ? s.messages : Collections.emptyList();
     }
+    
 
 }

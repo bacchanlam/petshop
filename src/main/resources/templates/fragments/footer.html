@@ -219,8 +219,37 @@
           © 2026 PetShop. Tất cả quyền được bảo lưu.
         </div>
       </div>
-      <div th:replace="~{fragments/contact-float :: contactFloat}"></div>
-      <div th:replace="~{fragments/chat-widget :: petshopChat}"></div>
+      <div id="ps-home-widgets">
+        <div th:replace="~{fragments/contact-float :: contactFloat}"></div>
+        <div th:replace="~{fragments/chat-widget :: petshopChat}"></div>
+      </div>
+      <script>
+        (function () {
+          const wrap = document.getElementById("ps-home-widgets");
+          if (!wrap) return;
+          const norm = (path) => {
+            const s = String(path || "").replace(/\/+$/, "");
+            return s === "" ? "/" : s;
+          };
+          const currentPath = window.location.pathname || "/";
+          let homePath = null;
+          const brand = document.querySelector(".navbar-brand");
+          if (brand) {
+            const href = brand.getAttribute("href");
+            if (href) {
+              try {
+                homePath = new URL(href, window.location.href).pathname;
+              } catch (e) {
+                homePath = href;
+              }
+            }
+          }
+          const isHome = homePath
+            ? norm(currentPath) === norm(homePath)
+            : norm(currentPath) === "/";
+          wrap.style.display = isHome ? "" : "none";
+        })();
+      </script>
     </footer>
   </body>
 </html>
