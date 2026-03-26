@@ -10,11 +10,18 @@
     .success-icon { animation: bounceIn .6s ease; display:flex; justify-content:center; }
     .success-icon svg { width:80px; height:80px; color:#198754; }
     @keyframes bounceIn {
-        0%   { transform:scale(0); opacity:0; }
-        60%  { transform:scale(1.2); }
-        100% { transform:scale(1);  opacity:1; }
+      0%   { transform:scale(0); opacity:0; }
+      60%  { transform:scale(1.2); }
+      100% { transform:scale(1);  opacity:1; }
     }
     .success-card { border-radius:20px; border:none; box-shadow:0 10px 40px rgba(0,0,0,.12); }
+    .momo-badge { background:#ae2070; color:white; border-radius:8px; padding:6px 14px; font-weight:700; font-size:.9rem; display:inline-flex; align-items:center; gap:6px; }
+    .transfer-info { background:#f0f5ff; border:1.5px solid #c0d4f7; border-radius:10px; padding:16px; }
+    .qr-wrapper { background:#fff; border:2px solid #c0d4f7; border-radius:14px; padding:16px; display:inline-block; }
+    .qr-wrapper img { width:200px; height:200px; display:block; }
+    .bank-row { display:flex; justify-content:space-between; font-size:.85rem; padding:4px 0; border-bottom:1px solid #e9eef7; }
+    .bank-row:last-child { border-bottom:none; }
+    .copy-btn { cursor:pointer; font-size:.75rem; color:#0d6efd; background:none; border:none; padding:0; }
   </style>
 </head>
 <body class="bg-light">
@@ -25,6 +32,8 @@
   <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5">
       <div class="card success-card text-center p-5">
+
+        <!-- Icon thành công -->
         <div class="success-icon mb-3">
           <i data-lucide="circle-check-big"></i>
         </div>
@@ -34,13 +43,93 @@
           Đơn hàng của bạn đang được xử lý.
         </p>
 
-        <!-- Mã đơn hàng nếu có -->
+        <!-- Mã đơn hàng -->
         <div th:if="${orderId}" class="alert alert-info rounded-3 mb-4">
           <span class="fw-semibold">Mã đơn hàng: #<span th:text="${orderId}"></span></span>
         </div>
 
-        <!-- Thông tin theo dõi -->
-        <div class="text-start mb-4 p-3 bg-light rounded-3">
+        <!-- MoMo đã thanh toán -->
+        <div th:if="${paymentMethod == 'MOMO'}"
+             class="mb-4 p-3 rounded-3"
+             style="background:#fdf0f6; border:1.5px solid #f5c4d8">
+          <div class="momo-badge mb-2 mx-auto" style="width:fit-content">
+            <svg viewBox="0 0 100 100" width="18" height="18" fill="none">
+              <rect width="100" height="100" rx="20" fill="white"/>
+              <text x="50" y="65" font-size="42" text-anchor="middle" fill="#ae2070" font-weight="bold" font-family="Arial">M</text>
+            </svg>
+            Đã thanh toán qua MoMo
+          </div>
+          <p class="small mb-0" style="color:#ae2070">
+            Giao dịch MoMo thành công! Đơn hàng của bạn đã được xác nhận tự động.
+          </p>
+        </div>
+
+        <!-- Chuyển khoản — VietQR -->
+        <div th:if="${paymentMethod == 'TRANSFER'}">
+          <div class="transfer-info text-start mb-4">
+            <p class="fw-semibold mb-3 d-flex align-items-center gap-2">
+              <i data-lucide="building-2" style="width:16px;height:16px;color:#0d6efd"></i>
+              Quét mã QR để chuyển khoản
+            </p>
+
+            <!-- VietQR động -->
+            <div class="text-center mb-3">
+              <div class="qr-wrapper mx-auto">
+                <img th:src="'https://img.vietqr.io/image/MB-1234567890-compact2.png'
+                             + '?amount=' + ${totalAmount}
+                             + '&addInfo=DH' + ${orderId}
+                             + '&accountName=NGUYEN+VAN+A'"
+                     alt="QR chuyển khoản"
+                     onerror="this.src='/images/no-image.png'">
+              </div>
+              <small class="text-muted d-block mt-2">Quét bằng app ngân hàng bất kỳ</small>
+            </div>
+
+            <!-- Chi tiết tài khoản -->
+            <div class="px-1">
+              <div class="bank-row">
+                <span class="text-muted">Ngân hàng</span>
+                <span class="fw-semibold">MB Bank</span>
+              </div>
+              <div class="bank-row">
+                <span class="text-muted">Số tài khoản</span>
+                <span class="fw-semibold">
+                  1234567890
+                  <button class="copy-btn ms-1" onclick="copyText('1234567890', this)" title="Sao chép">
+                    <i data-lucide="copy" style="width:12px;height:12px"></i>
+                  </button>
+                </span>
+              </div>
+              <div class="bank-row">
+                <span class="text-muted">Chủ tài khoản</span>
+                <span class="fw-semibold">NGUYEN VAN A</span>
+              </div>
+              <div class="bank-row">
+                <span class="text-muted">Số tiền</span>
+                <span class="fw-semibold text-danger"
+                      th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT') + ' ₫'}"></span>
+              </div>
+              <div class="bank-row">
+                <span class="text-muted">Nội dung</span>
+                <span class="fw-semibold text-danger">
+                  DH<span th:text="${orderId}" id="transferContent"></span>
+                  <button class="copy-btn ms-1" th:onclick="'copyText(\'DH' + ${orderId} + '\', this)'" title="Sao chép">
+                    <i data-lucide="copy" style="width:12px;height:12px"></i>
+                  </button>
+                </span>
+              </div>
+            </div>
+
+            <div class="alert alert-warning py-2 mt-3 small mb-0 d-flex align-items-start gap-2">
+              <i data-lucide="clock" style="width:14px;height:14px;flex-shrink:0;margin-top:1px"></i>
+              <span>Vui lòng chuyển khoản trong <strong>24 giờ</strong>. Đơn hàng sẽ được xác nhận sau khi chúng tôi nhận được thanh toán.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COD -->
+        <div th:if="${paymentMethod == 'COD' or (paymentMethod == null and orderId != null)}"
+             class="text-start mb-4 p-3 bg-light rounded-3">
           <p class="mb-2 small d-flex align-items-center gap-2">
             <i data-lucide="package" style="width:15px;height:15px;flex-shrink:0;color:#6c757d"></i>
             <strong>Trạng thái:</strong>
@@ -56,12 +145,15 @@
           </p>
         </div>
 
+        <!-- Buttons -->
         <div class="d-grid gap-2">
-          <a th:href="@{/orders/history}" class="btn btn-primary btn-lg fw-semibold d-flex align-items-center justify-content-center gap-2">
+          <a th:href="@{/orders/history}"
+             class="btn btn-primary btn-lg fw-semibold d-flex align-items-center justify-content-center gap-2">
             <i data-lucide="clock" style="width:18px;height:18px"></i>
             Xem lịch sử đơn hàng
           </a>
-          <a th:href="@{/products}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
+          <a th:href="@{/products}"
+             class="btn btn-outline-secondary d-flex align-items-center justify-content-center gap-2">
             <i data-lucide="shopping-bag" style="width:16px;height:16px"></i>
             Tiếp tục mua sắm
           </a>
@@ -73,6 +165,20 @@
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>lucide.createIcons();</script>
+<script>
+  lucide.createIcons();
+
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      const icon = btn.querySelector('svg') || btn;
+      btn.innerHTML = '<i data-lucide="check" style="width:12px;height:12px;color:#198754"></i>';
+      lucide.createIcons();
+      setTimeout(() => {
+        btn.innerHTML = '<i data-lucide="copy" style="width:12px;height:12px"></i>';
+        lucide.createIcons();
+      }, 1500);
+    });
+  }
+</script>
 </body>
 </html>
