@@ -1,7 +1,10 @@
 package com.example.doan_petshop.controller;
 
+import com.example.doan_petshop.dto.SiteNotification;
+import com.example.doan_petshop.entity.User;
 import com.example.doan_petshop.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class AdminUserController {
 
-    private final UserService userService;
+    private final UserService            userService;
+    private final SimpMessagingTemplate  messagingTemplate;
 
     // ========================
     // GET - Danh sách user
@@ -31,8 +35,13 @@ public class AdminUserController {
                                 RedirectAttributes redirectAttributes) {
         try {
             userService.toggleUserEnabled(id);
-            redirectAttributes.addFlashAttribute("successMsg",
-                    "Đã cập nhật trạng thái tài khoản.");
+            User user = userService.findById(id);
+            String type = user.getEnabled() ? "ACCOUNT_UNLOCKED" : "ACCOUNT_LOCKED";
+            String msg  = user.getEnabled() ? "Tài khoản của bạn đã được mở khóa."
+                                            : "Tài khoản của bạn đã bị khóa bởi quản trị viên.";
+            messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/account-status",
+                    new SiteNotification(type, id, msg));
+            redirectAttributes.addFlashAttribute("successMsg", "Đã cập nhật trạng thái tài khoản.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
@@ -48,8 +57,10 @@ public class AdminUserController {
                              RedirectAttributes redirectAttributes) {
         try {
             userService.changeRole(id, roleName);
-            redirectAttributes.addFlashAttribute("successMsg",
-                    "Đã cập nhật quyền tài khoản.");
+            User user = userService.findById(id);
+            messagingTemplate.convertAndSendToUser(user.getUsername(), "/queue/account-status",
+                    new SiteNotification("ROLE_CHANGED", id, "Quyền tài khoản của bạn vừa được thay đổi."));
+            redirectAttributes.addFlashAttribute("successMsg", "Đã cập nhật quyền tài khoản.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }

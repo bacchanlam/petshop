@@ -362,5 +362,6 @@
         .then(data => { const el = document.getElementById('cartCount'); if (el && data.count > 0) el.textContent = data.count; })
         .catch(() => {});
 </script>
+<div th:replace="~{fragments/site-ws :: site-ws('HOME', 0)}"></div>
 </body>
 </html>

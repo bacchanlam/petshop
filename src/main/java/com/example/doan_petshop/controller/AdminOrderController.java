@@ -1,10 +1,12 @@
 package com.example.doan_petshop.controller;
 
+import com.example.doan_petshop.dto.OrderStatusNotification;
 import com.example.doan_petshop.entity.Order;
 import com.example.doan_petshop.enums.OrderStatus;
 import com.example.doan_petshop.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class AdminOrderController {
 
-    private final OrderService orderService;
+    private final OrderService           orderService;
+    private final SimpMessagingTemplate  messagingTemplate;
 
     // ========================
     // GET - Danh sách đơn hàng
@@ -66,6 +69,16 @@ public class AdminOrderController {
                                RedirectAttributes redirectAttributes) {
         try {
             orderService.updateStatus(id, status);
+
+            // Push real-time notification đến user sở hữu đơn hàng
+            Order order = orderService.findById(id);
+            String username = order.getUser().getUsername();
+            messagingTemplate.convertAndSendToUser(
+                    username,
+                    "/queue/order-status",
+                    new OrderStatusNotification(id, status.name(), status.getDisplayName())
+            );
+
             redirectAttributes.addFlashAttribute("successMsg",
                     "Cập nhật trạng thái đơn #" + id + " thành công!");
         } catch (IllegalStateException e) {
