@@ -30,6 +30,9 @@ public class ReviewController {
                     "Cảm ơn bạn đã đánh giá sản phẩm!");
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg",
+                    "Có lỗi xảy ra khi gửi đánh giá. Vui lòng thử lại.");
         }
         return "redirect:/products/" + productId;
     }

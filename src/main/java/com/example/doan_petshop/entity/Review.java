@@ -8,10 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-        name = "reviews",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "product_id", "order_id"})
-)
+@Table(name = "reviews")
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -47,10 +44,6 @@ public class Review {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // ========================
-    // Quan hệ Many-to-One với Order
-    // (đảm bảo user đã mua sản phẩm mới được review)
-    // ========================
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
