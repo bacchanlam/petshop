@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -70,4 +71,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Đếm đơn theo trạng thái (cho dashboard)
     long countByStatus(OrderStatus status);
+    boolean existsByUserIdAndStatusAndOrderItems_Product_Id(
+            Long userId, OrderStatus status, Long productId
+    );
+
+    // Lấy đơn COMPLETED của user có chứa sản phẩm (để gán vào review)
+    @Query("""
+        SELECT DISTINCT o FROM Order o
+        JOIN o.orderItems oi
+        WHERE o.user.id    = :userId
+          AND oi.product.id = :productId
+          AND o.status      = 'COMPLETED'
+        ORDER BY o.createdAt DESC
+    """)
+    List<Order> findCompletedOrdersByUserAndProduct(
+            @Param("userId")    Long userId,
+            @Param("productId") Long productId
+    );
 }

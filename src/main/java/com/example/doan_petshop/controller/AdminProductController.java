@@ -1,6 +1,7 @@
 package com.example.doan_petshop.controller;
 
 import com.example.doan_petshop.dto.ProductDTO;
+import com.example.doan_petshop.dto.SiteNotification;
 import com.example.doan_petshop.entity.Product;
 import com.example.doan_petshop.enums.PetType;
 import com.example.doan_petshop.service.CategoryService;
@@ -8,6 +9,7 @@ import com.example.doan_petshop .service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,8 +23,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class AdminProductController {
 
-    private final ProductService  productService;
-    private final CategoryService categoryService;
+    private final ProductService         productService;
+    private final CategoryService        categoryService;
+    private final SimpMessagingTemplate  messagingTemplate;
 
     // ========================
     // GET - Danh sách sản phẩm (có tìm kiếm, phân trang)
@@ -73,6 +76,8 @@ public class AdminProductController {
         }
         try {
             productService.create(dto);
+            messagingTemplate.convertAndSend("/topic/site-updates",
+                    new SiteNotification("PRODUCT_ADDED", null, "Sản phẩm mới vừa được thêm vào cửa hàng!"));
             redirectAttributes.addFlashAttribute("successMsg", "Thêm sản phẩm thành công!");
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("errorMsg", "Lỗi upload ảnh: " + e.getMessage());
@@ -125,6 +130,8 @@ public class AdminProductController {
         }
         try {
             productService.update(id, dto);
+            messagingTemplate.convertAndSend("/topic/site-updates",
+                    new SiteNotification("PRODUCT_UPDATED", id, "Thông tin sản phẩm vừa được cập nhật."));
             redirectAttributes.addFlashAttribute("successMsg", "Cập nhật sản phẩm thành công!");
         } catch (IOException e) {
             redirectAttributes.addFlashAttribute("errorMsg", "Lỗi upload ảnh: " + e.getMessage());
@@ -138,6 +145,11 @@ public class AdminProductController {
     @PostMapping("/toggle/{id}")
     public String toggle(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         productService.toggleActive(id);
+        Product p = productService.findById(id);
+        String type = p.getActive() ? "PRODUCT_ACTIVATED" : "PRODUCT_DEACTIVATED";
+        String msg  = p.getActive() ? "Sản phẩm \"" + p.getName() + "\" đã được kích hoạt."
+                                    : "Sản phẩm \"" + p.getName() + "\" đã bị ẩn.";
+        messagingTemplate.convertAndSend("/topic/site-updates", new SiteNotification(type, id, msg));
         redirectAttributes.addFlashAttribute("successMsg", "Đã cập nhật trạng thái sản phẩm.");
         return "redirect:/admin/products";
     }
@@ -160,6 +172,8 @@ public class AdminProductController {
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         productService.delete(id);
+        messagingTemplate.convertAndSend("/topic/site-updates",
+                new SiteNotification("PRODUCT_DELETED", id, "Một sản phẩm đã bị xóa."));
         redirectAttributes.addFlashAttribute("successMsg", "Đã xóa sản phẩm.");
         return "redirect:/admin/products";
     }

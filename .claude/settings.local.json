@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /d/J2EE/doan_petshop -type f \\\\\\(-name *.java -o -name *.js -o -name *.html -o -name *.xml -o -name *.properties \\\\\\))"
+    ]
+  }
+}

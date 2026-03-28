@@ -21,12 +21,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final OrderRepository    orderRepository;
-    private final CartRepository     cartRepository;
-    private final CartItemRepository cartItemRepository;
-    private final ProductRepository  productRepository;
-    private final UserRepository     userRepository;
-    private final CartService        cartService;
+    private final OrderRepository     orderRepository;
+    private final CartRepository      cartRepository;
+    private final CartItemRepository  cartItemRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final ProductRepository   productRepository;
+    private final UserRepository      userRepository;
+    private final CartService         cartService;
 
     // ========================
     // ĐẶT HÀNG từ giỏ hàng
@@ -212,6 +213,10 @@ public class OrderService {
     public Order findById(Long id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng id: " + id));
+    }
+
+    public int countItems(Long orderId) {
+        return orderItemRepository.countByOrderId(orderId);
     }
 
     @Transactional

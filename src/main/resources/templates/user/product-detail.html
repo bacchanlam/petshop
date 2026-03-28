@@ -19,6 +19,53 @@
         .related-img { height:200px; object-fit:contain; background:#fff; border-radius:10px 10px 0 0; width:100%; padding:8px; }
         .review-card { border-radius:10px; border:none; background:#f8f9fa; }
         .qty-btn     { width:36px; height:36px; }
+
+        /* Avatar tròn cho reviewer */
+        .review-avatar {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Hover effect cho review card */
+        .review-item {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 3px solid transparent !important;
+        }
+        .review-item:hover {
+            transform: translateX(4px);
+            border-left: 3px solid #f39c12 !important;
+        }
+
+        /* Star select - form đánh giá */
+        .star-label {
+            font-size: 2rem;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.15s, transform 0.15s;
+        }
+        .star-label:hover {
+            transform: scale(1.2);
+        }
+        .star-label.selected {
+            color: #f39c12;
+        }
+
+        /* Hiệu ứng ẩn mượt cho alert */
+        .alert-fade-out {
+            animation: fadeSlideUp 0.5s ease forwards;
+        }
+        @keyframes fadeSlideUp {
+            to { opacity: 0; transform: translateY(-10px); height: 0; padding: 0; margin: 0; overflow: hidden; }
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -83,7 +130,7 @@
                           th:text="${i <= product.averageRating} ? '★' : '☆'"></span>
                 </div>
                 <span class="text-muted small"
-                      th:text="${#numbers.formatDecimal(product.averageRating,1,'.',1,'.')} + '/5 (' + ${product.reviews.size()} + ' đánh giá)'"></span>
+                      th:text="${#numbers.formatDecimal(product.averageRating,1,1)} + '/5 (' + ${product.reviews.size()} + ' đánh giá)'"></span>
             </div>
 
             <!-- Giá -->
@@ -180,34 +227,63 @@
 
     <!-- ===== ĐÁNH GIÁ SẢN PHẨM ===== -->
     <div class="mb-5">
+        <!-- Thông báo flash - tự ẩn sau 5s -->
+        <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show flash-alert" role="alert">
+            <i data-lucide="check-circle" style="width:16px;height:16px" class="me-1"></i>
+            <span th:text="${successMsg}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show flash-alert" role="alert">
+            <i data-lucide="alert-circle" style="width:16px;height:16px" class="me-1"></i>
+            <span th:text="${errorMsg}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
         <h4 class="fw-bold mb-4 d-flex align-items-center gap-2">
             <i data-lucide="star" style="width:20px;height:20px;color:#f39c12"></i>
             Đánh giá từ khách hàng
         </h4>
 
-        <!-- Thông báo khi chưa có đánh giá -->
+        <!-- Chưa có đánh giá -->
         <div th:if="${#lists.isEmpty(product.reviews)}"
              class="text-center text-muted py-4 bg-white rounded-3 border">
             Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá!
         </div>
 
         <!-- Danh sách đánh giá -->
-        <div th:each="r : ${product.reviews}" class="card review-card mb-3 p-3">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <strong th:text="${r.user.fullName ?: r.user.username}"></strong>
-                    <div class="star-rating small">
-                        <span th:each="i : ${#numbers.sequence(1,5)}"
-                              th:text="${i <= r.rating} ? '★' : '☆'"></span>
+        <div th:each="r : ${product.reviews}" class="card border-0 shadow-sm mb-3 review-item">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-start gap-3">
+                    <!-- Avatar -->
+                    <div class="review-avatar">
+                        <span th:text="${#strings.substring(r.user.fullName ?: r.user.username, 0, 1).toUpperCase()}"></span>
+                    </div>
+                    <!-- Nội dung -->
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h6 class="mb-0 fw-bold" th:text="${r.user.fullName ?: r.user.username}"></h6>
+                            <small class="text-muted d-flex align-items-center gap-1">
+                                <i data-lucide="calendar" style="width:12px;height:12px"></i>
+                                <span th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy')}"></span>
+                            </small>
+                        </div>
+                        <!-- Sao đánh giá -->
+                        <div class="star-rating mb-2">
+                            <span th:each="i : ${#numbers.sequence(1,5)}"
+                                  th:text="${i <= r.rating} ? '★' : '☆'"></span>
+                            <span class="badge rounded-pill ms-1"
+                                  th:classappend="${r.rating >= 4 ? 'bg-success' : (r.rating >= 3 ? 'bg-warning text-dark' : 'bg-danger')}"
+                                  th:text="${r.rating + '/5'}"></span>
+                        </div>
+                        <!-- Nội dung đánh giá -->
+                        <p class="mb-0 text-secondary" th:text="${r.comment}"
+                           style="line-height:1.6"></p>
                     </div>
                 </div>
-                <small class="text-muted"
-                       th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy')}"></small>
             </div>
-            <p class="mb-0 mt-2 text-muted" th:text="${r.comment}"></p>
         </div>
 
-        <!-- Form đánh giá (chỉ hiện khi đã đăng nhập) -->
+        <!-- Form đánh giá (đã đăng nhập) -->
         <div sec:authorize="isAuthenticated()" class="card border-0 shadow-sm p-4 mt-4">
             <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
                 <i data-lucide="pencil-line" style="width:16px;height:16px;color:#6c757d"></i>
@@ -222,16 +298,16 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Đánh giá</label>
-                    <div class="star-select d-flex gap-2">
+                    <div class="star-select d-flex align-items-center gap-2">
                         <th:block th:each="i : ${#numbers.sequence(1,5)}">
-                            <input type="radio" class="d-none" name="rating"
+                            <input type="radio" class="d-none" name="rating" required
                                    th:id="'star' + ${i}" th:value="${i}">
                             <label th:for="'star' + ${i}"
-                                   class="fs-3 text-muted"
-                                   style="cursor:pointer"
+                                   class="star-label"
                                    onmouseover="highlightStars(this)"
                                    onmouseout="resetStars()">★</label>
                         </th:block>
+                        <span id="ratingText" class="ms-2 fw-semibold small text-muted"></span>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -239,7 +315,8 @@
                     <textarea name="comment" class="form-control" rows="3"
                               placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-2">
+                <button type="submit"
+                        class="btn btn-primary px-4 d-flex align-items-center gap-2">
                     <i data-lucide="send" style="width:15px;height:15px"></i>
                     Gửi đánh giá
                 </button>
@@ -247,7 +324,8 @@
         </div>
 
         <!-- Chưa đăng nhập -->
-        <div sec:authorize="isAnonymous()" class="text-center text-muted p-3 bg-white rounded-3 border mt-3">
+        <div sec:authorize="isAnonymous()"
+             class="text-center text-muted p-3 bg-white rounded-3 border mt-3">
             <a th:href="@{/auth/login}" class="text-primary">Đăng nhập</a>
             để viết đánh giá sản phẩm.
         </div>
@@ -300,28 +378,74 @@
         val = Math.max(1, Math.min(val, parseInt(input.max)));
         input.value = val;
     }
+
+    // Star rating
     const starLabels = document.querySelectorAll('.star-select label');
+    const ratingText = document.getElementById('ratingText');
+    const ratingMessages = ['', 'Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Tuyệt vời'];
+
     function highlightStars(el) {
         const idx = Array.from(starLabels).indexOf(el);
-        starLabels.forEach((l, i) => l.style.color = i <= idx ? '#f39c12' : '#ccc');
+        starLabels.forEach((l, i) => {
+            l.style.color = i <= idx ? '#f39c12' : '#ccc';
+        });
+        if (ratingText) ratingText.textContent = ratingMessages[idx + 1];
     }
+
     function resetStars() {
         const checked = document.querySelector('.star-select input:checked');
-        starLabels.forEach((l, i) => {
-            l.style.color = (checked && i <= parseInt(checked.value) - 1) ? '#f39c12' : '#ccc';
-        });
+        if (checked) {
+            const val = parseInt(checked.value);
+            starLabels.forEach((l, i) => {
+                if (i < val) {
+                    l.classList.add('selected');
+                    l.style.color = '';
+                } else {
+                    l.classList.remove('selected');
+                    l.style.color = '#ccc';
+                }
+            });
+            if (ratingText) ratingText.textContent = ratingMessages[val];
+        } else {
+            starLabels.forEach(l => {
+                l.classList.remove('selected');
+                l.style.color = '#ccc';
+            });
+            if (ratingText) ratingText.textContent = '';
+        }
     }
+
     starLabels.forEach(l => {
         l.addEventListener('click', () => {
             const idx = Array.from(starLabels).indexOf(l);
             document.getElementById('star' + (idx + 1)).checked = true;
-            starLabels.forEach((sl, i) => sl.style.color = i <= idx ? '#f39c12' : '#ccc');
+            starLabels.forEach((sl, i) => {
+                if (i <= idx) {
+                    sl.classList.add('selected');
+                    sl.style.color = '';
+                } else {
+                    sl.classList.remove('selected');
+                    sl.style.color = '#ccc';
+                }
+            });
+            if (ratingText) ratingText.textContent = ratingMessages[idx + 1];
         });
     });
 
+    // Cart count
     fetch('/cart/count', { credentials: 'same-origin' }).then(r => r.json())
         .then(d => { const el = document.getElementById('cartCount'); if(el && d.count > 0) el.textContent = d.count; })
         .catch(()=>{});
+
+    document.querySelectorAll('.flash-alert').forEach(alert => {
+        setTimeout(() => {
+            alert.classList.add('alert-fade-out');
+            alert.addEventListener('animationend', () => {
+                alert.remove();
+            });
+        }, 5000);
+    });
 </script>
+<div th:replace="~{fragments/site-ws :: site-ws('PRODUCT_DETAIL', ${product.id})}"></div>
 </body>
 </html>

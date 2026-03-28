@@ -1,5 +1,6 @@
 package com.example.doan_petshop.controller;
 
+import com.example.doan_petshop.dto.AdminNotification;
 import com.example.doan_petshop.entity.Order;
 import com.example.doan_petshop.entity.Cart;
 import com.example.doan_petshop.enums.OrderStatus;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +24,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
@@ -31,9 +37,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final MomoService   momoService;
-    private final OrderService  orderService;
-    private final CartService   cartService;
+    private final MomoService            momoService;
+    private final OrderService           orderService;
+    private final CartService            cartService;
+    private final SimpMessagingTemplate  messagingTemplate;
 
     // =========================================================
     // POST /payment/momo/create
@@ -129,6 +136,8 @@ public class PaymentController {
                     // Xác nhận đơn hàng tự động
                     orderService.confirmPayment(orderId, PaymentMethod.MOMO);
                     log.info("[MoMo] Order #{} confirmed after payment", orderId);
+                    // Thông báo real-time cho admin
+                    sendNewOrderNotification(orderId);
                 } catch (Exception e) {
                     log.error("[MoMo] Error confirming order #{}", orderId, e);
                 }
@@ -184,6 +193,8 @@ public class PaymentController {
                 try {
                     orderService.confirmPayment(orderId, PaymentMethod.MOMO);
                     log.info("[MoMo IPN] Order #{} confirmed via IPN", orderId);
+                    // Thông báo real-time cho admin (IPN đến trước return)
+                    sendNewOrderNotification(orderId);
                 } catch (Exception e) {
                     log.error("[MoMo IPN] Error confirming order #{}", orderId, e);
                 }
@@ -196,5 +207,38 @@ public class PaymentController {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    // =========================================================
+    // Helper: gửi WebSocket notification cho admin
+    // =========================================================
+    private void sendNewOrderNotification(Long orderId) {
+        try {
+            Order order = orderService.findById(orderId);
+            String amountStr = NumberFormat.getNumberInstance(new Locale("vi", "VN"))
+                    .format(order.getTotalAmount()) + " ₫";
+            LocalDateTime createdAt = order.getCreatedAt() != null
+                    ? order.getCreatedAt() : LocalDateTime.now();
+            String dateStr = createdAt.format(DateTimeFormatter.ofPattern("dd/MM HH:mm"));
+
+            int itemCount = orderService.countItems(order.getId());
+            AdminNotification notif = new AdminNotification(
+                    "NEW_ORDER", order.getId(),
+                    "Đơn hàng mới #" + order.getId() + " từ " + order.getFullName()
+                            + " – " + amountStr + " [MoMo]",
+                    order.getFullName(),
+                    order.getPhone(),
+                    itemCount,
+                    order.getTotalAmount().longValue(),
+                    order.getPaymentMethod().getDisplayName(),
+                    order.getStatus().name(),
+                    order.getStatus().getDisplayName(),
+                    dateStr
+            );
+            messagingTemplate.convertAndSend("/topic/admin-updates", notif);
+            log.info("[MoMo] Admin notified for order #{}", orderId);
+        } catch (Exception e) {
+            log.warn("[MoMo] Could not send admin notification for order #{}: {}", orderId, e.getMessage());
+        }
     }
 }

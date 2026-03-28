@@ -14,6 +14,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Kiểm tra user đã review sản phẩm này của đơn hàng đó chưa
     boolean existsByUserIdAndProductIdAndOrderId(Long userId, Long productId, Long orderId);
 
+    // Kiểm tra user đã từng review sản phẩm này chưa (bất kể đơn hàng nào)
+    boolean existsByUserIdAndProductId(Long userId, Long productId);
+
     // Lấy review theo sản phẩm
     List<Review> findByProductIdOrderByCreatedAtDesc(Long productId);
 

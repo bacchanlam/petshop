@@ -257,5 +257,6 @@
         .then(d => { const el = document.getElementById('cartCount'); if(el && d.count > 0) el.textContent = d.count; })
         .catch(()=>{});
 </script>
+<div th:replace="~{fragments/site-ws :: site-ws('PRODUCT_LIST', 0)}"></div>
 </body>
 </html>

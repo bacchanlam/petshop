@@ -61,7 +61,8 @@
     </div>
 
     <!-- Danh sách đơn hàng -->
-    <div th:each="order : ${orders}" class="card order-card shadow-sm mb-3">
+    <div th:each="order : ${orders}" class="card order-card shadow-sm mb-3"
+         th:attr="data-order-id=${order.id}">
         <div class="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <span class="fw-bold">#<span th:text="${order.id}"></span></span>
@@ -125,6 +126,50 @@
 
 <div th:replace="~{fragments/footer :: footer}"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script>
+  function showToast(msg) {
+    let container = document.getElementById('ws-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'ws-toast-container';
+      container.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-bg-primary border-0 show';
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `<div class="d-flex"><div class="toast-body">${msg}</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button></div>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+  }
+
+  const socket = new SockJS('/ws-chat');
+  const stompClient = Stomp.over(socket);
+  stompClient.debug = null;
+  stompClient.connect({}, function() {
+    stompClient.subscribe('/user/queue/order-status', function(frame) {
+      const n = JSON.parse(frame.body);
+      const card = document.querySelector('[data-order-id="' + n.orderId + '"]');
+      if (!card) return;
+      const badge = card.querySelector('.status-badge');
+      if (badge) {
+        badge.className = badge.className.replace(/status-\w+/, 'status-' + n.status);
+        badge.textContent = n.displayName;
+      }
+      showToast('Đơn hàng #' + n.orderId + ': ' + n.displayName);
+    });
+    stompClient.subscribe('/user/queue/account-status', function(frame) {
+      const n = JSON.parse(frame.body);
+      if (n.type === 'ACCOUNT_LOCKED') {
+        showToast('Tài khoản của bạn đã bị khóa. Đang đăng xuất...');
+        setTimeout(function() { window.location = '/logout'; }, 2500);
+      }
+    });
+  });
+</script>
 <script>lucide.createIcons();</script>
 </body>
 </html>

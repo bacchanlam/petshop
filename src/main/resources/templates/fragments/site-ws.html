@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<!--
+  Fragment dùng chung cho tất cả user pages.
+  Cách dùng:
+    <div th:replace="~{fragments/site-ws :: site-ws('HOME', 0)}"></div>
+    <div th:replace="~{fragments/site-ws :: site-ws('PRODUCT_DETAIL', ${product.id})}"></div>
+
+  pageType: HOME | PRODUCT_LIST | PRODUCT_DETAIL | CART | GENERIC
+  entityId: product.id khi PRODUCT_DETAIL, 0 khi khác
+-->
+<th:block th:fragment="site-ws(pageType, entityId)">
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script th:inline="javascript">
+(function () {
+  const SW_PAGE    = /*[[${pageType}]]*/ 'GENERIC';
+  const SW_ENTITY  = /*[[${entityId}]]*/ 0;
+  const SW_IS_AUTH = /*[[${#authorization.expression('isAuthenticated()')}]]*/ false;
+
+  /* ---- helpers ---- */
+  var _reloadScheduled = false;
+  function autoReload(msg) {
+    if (_reloadScheduled) return;
+    _reloadScheduled = true;
+    showToast(msg || 'Đang cập nhật nội dung...');
+    setTimeout(function () { location.reload(); }, 1500);
+  }
+
+  function showAlert(msg, cb) {
+    const ov = document.createElement('div');
+    ov.style.cssText =
+      'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10001;' +
+      'display:flex;align-items:center;justify-content:center';
+    ov.innerHTML =
+      '<div style="background:#fff;border-radius:12px;padding:28px 36px;max-width:420px;text-align:center">' +
+        '<p style="margin:0 0 18px;font-size:1rem">' + msg + '</p>' +
+        '<button id="sw-alert-ok" style="background:#0d6efd;color:#fff;border:none;' +
+          'padding:9px 28px;border-radius:6px;font-weight:600;cursor:pointer">OK</button>' +
+      '</div>';
+    document.body.appendChild(ov);
+    document.getElementById('sw-alert-ok').onclick = function () { ov.remove(); if (cb) cb(); };
+  }
+
+  function showToast(msg) {
+    let c = document.getElementById('sw-toast-box');
+    if (!c) {
+      c = document.createElement('div');
+      c.id = 'sw-toast-box';
+      c.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px';
+      document.body.appendChild(c);
+    }
+    const t = document.createElement('div');
+    t.className = 'toast align-items-center text-bg-primary border-0 show';
+    t.innerHTML =
+      '<div class="d-flex"><div class="toast-body">' + msg + '</div>' +
+      '<button type="button" class="btn-close btn-close-white me-2 m-auto" ' +
+        'onclick="this.closest(\'.toast\').remove()"></button></div>';
+    c.appendChild(t);
+    setTimeout(function () { t.remove(); }, 5000);
+  }
+
+  /* ---- handlers ---- */
+  function onSiteUpdate(n) {
+    const t = n.type, id = n.entityId, msg = n.message;
+
+    if (t === 'PRODUCT_DEACTIVATED' || t === 'PRODUCT_DELETED') {
+      if (SW_PAGE === 'PRODUCT_DETAIL' && SW_ENTITY == id) {
+        showAlert('Sản phẩm này hiện không còn khả dụng.', function () {
+          window.location = '/products';
+        });
+        return;
+      }
+    }
+
+    const affectedPage =
+      SW_PAGE === 'HOME' ||
+      SW_PAGE === 'PRODUCT_LIST' ||
+      SW_PAGE === 'CART' ||
+      (SW_PAGE === 'PRODUCT_DETAIL' && SW_ENTITY == id);
+
+    if (t.startsWith('PRODUCT_') && affectedPage) {
+      autoReload(msg || 'Thông tin sản phẩm vừa được cập nhật');
+    } else if (t.startsWith('CATEGORY_') && (SW_PAGE === 'HOME' || SW_PAGE === 'PRODUCT_LIST')) {
+      autoReload(msg || 'Danh mục vừa được cập nhật');
+    }
+  }
+
+  function onAccountStatus(n) {
+    if (n.type === 'ACCOUNT_LOCKED') {
+      showAlert('Tài khoản của bạn đã bị khóa bởi quản trị viên.', function () {
+        window.location = '/logout';
+      });
+    } else if (n.type === 'ACCOUNT_UNLOCKED') {
+      showToast('Tài khoản của bạn đã được mở khóa!');
+    } else if (n.type === 'ROLE_CHANGED') {
+      showToast('Quyền tài khoản của bạn đã thay đổi. Đang đăng xuất...');
+      setTimeout(function () { window.location = '/logout'; }, 2500);
+    }
+  }
+
+  /* ---- connect ---- */
+  var sock = new SockJS('/ws-chat');
+  var stompSite = Stomp.over(sock);
+  stompSite.debug = null;
+  stompSite.connect({}, function () {
+    stompSite.subscribe('/topic/site-updates', function (frame) {
+      onSiteUpdate(JSON.parse(frame.body));
+    });
+    if (SW_IS_AUTH) {
+      stompSite.subscribe('/user/queue/account-status', function (frame) {
+        onAccountStatus(JSON.parse(frame.body));
+      });
+    }
+  });
+  window.siteWsClient = stompSite;
+})();
+</script>
+</th:block>
+
+</body>
+</html>

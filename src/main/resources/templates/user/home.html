@@ -210,7 +210,6 @@
                             <th:block th:if="${iterStat.index >= 3}"><span th:text="${iterStat.count}"></span></th:block>
                         </span>
                         <span class="badge-hot" th:if="${iterStat.index < 3}"><i class="bi bi-fire"></i> HOT</span>
-                        <span class="prod-badge" th:if="${iterStat.index >= 3}" th:text="${p.petType.displayName}"></span>
                     </div>
                     <div class="prod-body">
                         <div class="prod-brand" th:text="${p.brand ?: '&nbsp;'}"></div>
@@ -363,5 +362,6 @@
         .then(data => { const el = document.getElementById('cartCount'); if (el && data.count > 0) el.textContent = data.count; })
         .catch(() => {});
 </script>
+<div th:replace="~{fragments/site-ws :: site-ws('HOME', 0)}"></div>
 </body>
 </html>
