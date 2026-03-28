@@ -811,7 +811,11 @@
 
     function renderSidebar() {
       const list = document.getElementById("sessionsList");
-      const keys = Object.keys(sessions);
+      // Chỉ hiển thị session có ít nhất 1 tin nhắn CHAT thực từ khách
+      const keys = Object.keys(sessions).filter(sid => {
+        const msgs = sessions[sid].messages || [];
+        return msgs.some(m => !m.fromAdmin && (!m.type || m.type === 'CHAT'));
+      });
       document.getElementById("noSessionMsg").style.display = keys.length
         ? "none"
         : "flex";
