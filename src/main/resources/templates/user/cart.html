@@ -17,6 +17,8 @@
         .remove-btn  { color:#dc3545; border:none; background:none; cursor:pointer; display:flex; align-items:center; }
         .remove-btn:hover { color:#a71d2a; }
         .empty-cart  { text-align:center; padding:80px 0; }
+        @keyframes toastProgress { from { transform:scaleX(1); } to { transform:scaleX(0); } }
+        .toast { animation: none !important; }
     </style>
 </head>
 <body class="bg-light">
@@ -37,16 +39,45 @@
         Giỏ Hàng Của Bạn
     </h4>
 
-    <!-- Thông báo -->
-    <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show flash-alert d-flex align-items-center gap-2">
-        <i data-lucide="check-circle-2" style="width:16px;height:16px;flex-shrink:0"></i>
-        <span th:text="${successMsg}"></span>
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
-    </div>
-    <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show flash-alert d-flex align-items-center gap-2">
-        <i data-lucide="alert-circle" style="width:16px;height:16px;flex-shrink:0"></i>
-        <span th:text="${errorMsg}"></span>
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    <!-- Toast container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1100">
+        <div th:if="${successMsg}" id="toastSuccess" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true"
+             style="background:#fff; min-width:320px; border-radius:14px; overflow:hidden;">
+            <div class="d-flex">
+                <div style="width:5px; background:#22c55e; flex-shrink:0; border-radius:14px 0 0 14px;"></div>
+                <div class="toast-body d-flex align-items-center gap-3 py-3 px-3 flex-grow-1">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                         style="width:38px;height:38px;background:#dcfce7;">
+                        <i data-lucide="check-circle-2" style="width:20px;height:20px;color:#16a34a"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold text-dark" style="font-size:.9rem;">Thành công</div>
+                        <div class="text-muted" style="font-size:.82rem;" th:text="${successMsg}"></div>
+                    </div>
+                    <button type="button" class="btn-close ms-1" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="toast-progress" style="height:3px;background:#22c55e;width:100%;transform-origin:left;animation:toastProgress 4s linear forwards;"></div>
+        </div>
+
+        <div th:if="${errorMsg}" id="toastError" class="toast align-items-center border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true"
+             style="background:#fff; min-width:320px; border-radius:14px; overflow:hidden;">
+            <div class="d-flex">
+                <div style="width:5px; background:#ef4444; flex-shrink:0; border-radius:14px 0 0 14px;"></div>
+                <div class="toast-body d-flex align-items-center gap-3 py-3 px-3 flex-grow-1">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                         style="width:38px;height:38px;background:#fee2e2;">
+                        <i data-lucide="alert-circle" style="width:20px;height:20px;color:#dc2626"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold text-dark" style="font-size:.9rem;">Có lỗi xảy ra</div>
+                        <div class="text-muted" style="font-size:.82rem;" th:text="${errorMsg}"></div>
+                    </div>
+                    <button type="button" class="btn-close ms-1" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="toast-progress" style="height:3px;background:#ef4444;width:100%;transform-origin:left;animation:toastProgress 4s linear forwards;"></div>
+        </div>
     </div>
 
     <!-- Giỏ hàng trống -->
@@ -288,13 +319,12 @@
 <script>
     lucide.createIcons();
 
-    document.querySelectorAll('.flash-alert').forEach(alert => {
-        setTimeout(() => {
-            alert.style.transition = 'opacity 0.5s, transform 0.5s';
-            alert.style.opacity = '0';
-            alert.style.transform = 'translateY(-10px)';
-            setTimeout(() => alert.remove(), 500);
-        }, 5000);
+    ['toastSuccess', 'toastError'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            const toast = new bootstrap.Toast(el, { delay: 4000 });
+            toast.show();
+        }
     });
 
     fetch('/cart/count', {
