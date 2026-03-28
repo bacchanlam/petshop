@@ -1,5 +1,6 @@
 package com.example.doan_petshop.controller;
 
+import com.example.doan_petshop.dto.AdminNotification;
 import com.example.doan_petshop.dto.OrderRequestDTO;
 import com.example.doan_petshop.entity.Cart;
 import com.example.doan_petshop.entity.Order;
@@ -9,6 +10,7 @@ import com.example.doan_petshop.service.CartService;
 import com.example.doan_petshop.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,14 +19,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final OrderService orderService;
-    private final CartService  cartService;
+    private final OrderService           orderService;
+    private final CartService            cartService;
+    private final SimpMessagingTemplate  messagingTemplate;
 
     // ========================
     // GET /orders/checkout - Trang đặt hàng
@@ -80,6 +87,27 @@ public class OrderController {
             redirectAttributes.addFlashAttribute("orderId", order.getId());
             redirectAttributes.addFlashAttribute("paymentMethod", order.getPaymentMethod().name());
             redirectAttributes.addFlashAttribute("totalAmount", order.getTotalAmount().longValue());
+
+            // Thông báo real-time cho admin
+            String amountStr = NumberFormat.getNumberInstance(new Locale("vi", "VN"))
+                    .format(order.getTotalAmount()) + " ₫";
+            LocalDateTime createdAt = order.getCreatedAt() != null
+                    ? order.getCreatedAt() : LocalDateTime.now();
+            String dateStr = createdAt.format(DateTimeFormatter.ofPattern("dd/MM HH:mm"));
+            AdminNotification notif = new AdminNotification(
+                    "NEW_ORDER", order.getId(),
+                    "Đơn hàng mới #" + order.getId() + " từ " + order.getFullName() + " – " + amountStr,
+                    order.getFullName(),
+                    order.getPhone(),
+                    order.getOrderItems().size(),
+                    order.getTotalAmount().longValue(),
+                    order.getPaymentMethod().getDisplayName(),
+                    order.getStatus().name(),
+                    order.getStatus().getDisplayName(),
+                    dateStr
+            );
+            messagingTemplate.convertAndSend("/topic/admin-updates", notif);
+
             return "redirect:/orders/success";
         } catch (IllegalStateException e) {
             model.addAttribute("errorMsg", e.getMessage());
@@ -137,6 +165,13 @@ public class OrderController {
         try {
             orderService.cancelOrder(id, userDetails.getId());
             redirectAttributes.addFlashAttribute("successMsg", "Đã hủy đơn hàng thành công.");
+
+            // Thông báo real-time cho admin
+            messagingTemplate.convertAndSend("/topic/admin-updates",
+                    new AdminNotification("ORDER_CANCELLED", id,
+                            "Đơn hàng #" + id + " bị hủy bởi khách "
+                                    + userDetails.getUser().getFullName(),
+                            null, null, null, null, null, "CANCELLED", "Đã hủy", null));
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }

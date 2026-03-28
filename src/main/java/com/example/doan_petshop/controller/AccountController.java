@@ -25,11 +25,11 @@ public class AccountController {
     @GetMapping("/profile")
     public String profilePage(@AuthenticationPrincipal CustomUserDetails userDetails,
                               Model model) {
-        // Nếu chưa đăng nhập, redirect về login
         if (userDetails == null) {
             return "redirect:/auth/login";
         }
-        model.addAttribute("user", userDetails.getUser());
+        // Load fresh từ DB để luôn hiện data mới nhất
+        model.addAttribute("user", userService.findById(userDetails.getId()));
         return "user/account/profile";
     }
 
@@ -44,13 +44,18 @@ public class AccountController {
             @RequestParam(required = false) String address,
             RedirectAttributes redirectAttributes) {
 
-        // Nếu chưa đăng nhập, redirect về login
         if (userDetails == null) {
             return "redirect:/auth/login";
         }
 
         try {
             userService.updateProfile(userDetails.getId(), fullName, phone, address);
+
+            // Sync lại object cached trong Security context để tránh hiện data cũ
+            userDetails.getUser().setFullName(fullName);
+            userDetails.getUser().setPhone(phone);
+            userDetails.getUser().setAddress(address);
+
             redirectAttributes.addFlashAttribute("successMsg", "Cập nhật thông tin thành công!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMsg", "Có lỗi xảy ra, vui lòng thử lại.");
