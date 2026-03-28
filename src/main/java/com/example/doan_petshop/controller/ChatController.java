@@ -72,6 +72,12 @@ public class ChatController {
     public List<Map<String, Object>> getSessions() {
         List<Map<String, Object>> result = new ArrayList<>();
         for (SessionInfo s : sessions.values()) {
+            // Bỏ qua session chưa có tin nhắn CHAT thực sự từ khách
+            boolean hasCustomerChat = s.messages.stream().anyMatch(msg ->
+                    msg != null && !msg.isFromAdmin() &&
+                    (msg.getType() == ChatMessage.MessageType.CHAT || msg.getType() == null));
+            if (!hasCustomerChat) continue;
+
             Map<String, Object> m = new LinkedHashMap<>();
             m.put("sessionId",    s.sessionId);
             m.put("customerName", s.customerName);
