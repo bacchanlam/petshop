@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(find /d/J2EE/doan_petshop -type f \\\\\\(-name *.java -o -name *.js -o -name *.html -o -name *.xml -o -name *.properties \\\\\\))",
-      "Bash(find D:/J2EE/doan_petshop -type f -name *chat*)",
-      "Bash(grep -E \"\\\\.\\(html|js|css\\)$\")"
-    ]
-  }
-}
